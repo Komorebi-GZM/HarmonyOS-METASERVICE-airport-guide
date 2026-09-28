@@ -2,7 +2,7 @@
 
 > ArkTS 构建的纯端侧机场室内导航**元服务**：六层航站楼示意图、跨层最短路径、**中央安检必经**拆分、中英双语、地铁换乘引导。数据随包，无云端 / 无账号 / 无支付 / 无权限。
 
-<img src="./docs/images/map-4f.png" width="640" alt="4F 出发层路径图">
+<img src="./cases/cover.png" width="100%" alt="首页封面">
 
 | 项目 | 内容 |
 | --- | --- |
@@ -41,10 +41,6 @@
 | 4F 出发层 | 2F 到达层 | B2 地铁站台 |
 |:---:|:---:|:---:|
 | <img src="./docs/images/map-4f.png" width="240" alt="4F 出发层"> | <img src="./docs/images/map-2f.png" width="240" alt="2F 到达层"> | <img src="./docs/images/map-b2.png" width="240" alt="B2 地铁站台"> |
-
-六层纵览（4F 出发 → B2 地铁站台）：
-
-<p align="center"><img src="./docs/images/map-overview.png" height="520" alt="六层纵览"></p>
 
 ### 技术方案一览
 
