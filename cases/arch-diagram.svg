@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2080" height="820" viewBox="0 0 2080 820" font-family="PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fafbfd"/>
+      <stop offset="100%" stop-color="#eef2f8"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-10%" width="104%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#1e2733" flood-opacity="0.08"/>
+    </filter>
+    <linearGradient id="g0" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#357abd"/></linearGradient>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5ba0e8"/><stop offset="100%" stop-color="#4080c8"/></linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#9077d8"/><stop offset="100%" stop-color="#6d54c0"/></linearGradient>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4aac7b"/><stop offset="100%" stop-color="#348960"/></linearGradient>
+    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5cb98b"/><stop offset="100%" stop-color="#42996c"/></linearGradient>
+  </defs>
+  <rect width="2080" height="820" fill="url(#bg)"/>
+  <text x="60" y="68" font-size="38" font-weight="bold" fill="#1e2733">星海国际机场室内导航 · 技术架构</text>
+  <rect x="1780" y="38" width="240" height="42" rx="21" fill="#e8eef8"/>
+  <text x="1900" y="60" font-size="22" fill="#4a6fa5" text-anchor="middle">ArkTS · ArkUI · API 24</text>
+  <rect x="56" y="108" width="1380" height="90" rx="16" fill="url(#g0)" filter="url(#shadow)"/>
+  <rect x="56" y="108" width="6" height="90" rx="3" fill="#ffffff" fill-opacity="0.35"/>
+  <circle cx="106" cy="153" r="24" fill="#ffffff" fill-opacity="0.22"/>
+  <text x="106" y="154" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">P</text>
+  <text x="152" y="153" font-size="28" font-weight="bold" fill="#ffffff" dominant-baseline="middle">Pages</text>
+  <text x="1408" y="153" font-size="22" fill="#ffffff" fill-opacity="0.88" text-anchor="end" dominant-baseline="middle">Index / SelectTarget / SelectStart / Route / MetroGuide / FloorBrowse</text>
+  <path d="M730,199 L762,199 L746,213 Z" fill="#b0bcc8"/>
+  <rect x="56" y="220" width="1380" height="90" rx="16" fill="url(#g1)" filter="url(#shadow)"/>
+  <rect x="56" y="220" width="6" height="90" rx="3" fill="#ffffff" fill-opacity="0.35"/>
+  <circle cx="106" cy="265" r="24" fill="#ffffff" fill-opacity="0.22"/>
+  <text x="106" y="266" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">C</text>
+  <text x="152" y="265" font-size="28" font-weight="bold" fill="#ffffff" dominant-baseline="middle">Core</text>
+  <text x="1408" y="265" font-size="22" fill="#ffffff" fill-opacity="0.88" text-anchor="end" dominant-baseline="middle">Pathfinder(Dijkstra+安检必经) / Viewport(视口变换) / Router(跨页路由)</text>
+  <path d="M730,311 L762,311 L746,325 Z" fill="#b0bcc8"/>
+  <rect x="56" y="332" width="1380" height="90" rx="16" fill="url(#g2)" filter="url(#shadow)"/>
+  <rect x="56" y="332" width="6" height="90" rx="3" fill="#ffffff" fill-opacity="0.35"/>
+  <circle cx="106" cy="377" r="24" fill="#ffffff" fill-opacity="0.22"/>
+  <text x="106" y="378" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">VM</text>
+  <text x="152" y="377" font-size="28" font-weight="bold" fill="#ffffff" dominant-baseline="middle">Model</text>
+  <text x="1408" y="377" font-size="22" fill="#ffffff" fill-opacity="0.88" text-anchor="end" dominant-baseline="middle">AirportMap(119节点) / Localization(双语) / Categories(分类搜索) / Loc(文案表)</text>
+  <path d="M730,423 L762,423 L746,437 Z" fill="#b0bcc8"/>
+  <rect x="56" y="444" width="1380" height="90" rx="16" fill="url(#g3)" filter="url(#shadow)"/>
+  <rect x="56" y="444" width="6" height="90" rx="3" fill="#ffffff" fill-opacity="0.35"/>
+  <circle cx="106" cy="489" r="24" fill="#ffffff" fill-opacity="0.22"/>
+  <text x="106" y="490" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">S</text>
+  <text x="152" y="489" font-size="28" font-weight="bold" fill="#ffffff" dominant-baseline="middle">UI</text>
+  <text x="1408" y="489" font-size="22" fill="#ffffff" fill-opacity="0.88" text-anchor="end" dominant-baseline="middle">FloorCanvas(三层Canvas渲染+动效) / Theme(色板/字号)</text>
+  <path d="M730,535 L762,535 L746,549 Z" fill="#b0bcc8"/>
+  <rect x="56" y="556" width="1380" height="90" rx="16" fill="url(#g4)" filter="url(#shadow)"/>
+  <rect x="56" y="556" width="6" height="90" rx="3" fill="#ffffff" fill-opacity="0.35"/>
+  <circle cx="106" cy="601" r="24" fill="#ffffff" fill-opacity="0.22"/>
+  <text x="106" y="602" font-size="22" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">R</text>
+  <text x="152" y="601" font-size="28" font-weight="bold" fill="#ffffff" dominant-baseline="middle">Data</text>
+  <text x="1408" y="601" font-size="22" fill="#ffffff" fill-opacity="0.88" text-anchor="end" dominant-baseline="middle">XHA_xinghai_t1.map.json → gen_model.py → AirportMap.ets</text>
+  <rect x="1464" y="108" width="560" height="538" rx="16" fill="#ffffff" stroke="#e3e9f3" stroke-width="1" filter="url(#shadow)"/>
+  <text x="1504" y="162" font-size="28" font-weight="bold" fill="#1e2733">数据流</text>
+  <rect x="1504" y="174" width="48" height="4" rx="2" fill="#4a90d9"/>
+  <line x1="1520" y1="212" x2="1520" y2="492" stroke="#dbe4f0" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="1520" cy="212" r="8" fill="#4a90d9"/>
+  <circle cx="1520" cy="212" r="4" fill="#ffffff"/>
+  <text x="1548" y="212" font-size="20" fill="#3d4858" dominant-baseline="middle">JSON 数据源</text>
+  <circle cx="1520" cy="268" r="8" fill="#4a90d9"/>
+  <circle cx="1520" cy="268" r="4" fill="#ffffff"/>
+  <text x="1548" y="268" font-size="20" fill="#3d4858" dominant-baseline="middle">gen_model.py 编译</text>
+  <circle cx="1520" cy="324" r="8" fill="#4a90d9"/>
+  <circle cx="1520" cy="324" r="4" fill="#ffffff"/>
+  <text x="1548" y="324" font-size="20" fill="#3d4858" dominant-baseline="middle">AirportMap.ets 类型化模型</text>
+  <circle cx="1520" cy="380" r="8" fill="#4a90d9"/>
+  <circle cx="1520" cy="380" r="4" fill="#ffffff"/>
+  <text x="1548" y="380" font-size="20" fill="#3d4858" dominant-baseline="middle">Pathfinder Dijkstra 寻路（安检必经拆段）</text>
+  <circle cx="1520" cy="436" r="8" fill="#4a90d9"/>
+  <circle cx="1520" cy="436" r="4" fill="#ffffff"/>
+  <text x="1548" y="436" font-size="20" fill="#3d4858" dominant-baseline="middle">Route.ets 逐层路径</text>
+  <circle cx="1520" cy="492" r="8" fill="#4a90d9"/>
+  <circle cx="1520" cy="492" r="4" fill="#ffffff"/>
+  <text x="1548" y="492" font-size="20" fill="#3d4858" dominant-baseline="middle">FloorCanvas Canvas 三层渲染</text>
+</svg>

@@ -1,0 +1,10 @@
+{
+  "modelVersion": "6.0.0",
+  "name": "harmony_airport_guide",
+  "version": "1.0.0",
+  "description": "星海国际机场 · 室内导航元服务（纯前端）",
+  "main": "",
+  "author": "鸿蒙实践案例开发团队",
+  "license": "MIT",
+  "dependencies": {}
+}

@@ -1,0 +1,268 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Xinghai Airport · indoor navigation"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "Xinghai Airport indoor navigation"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "Xinghai Airport"
+    },
+    {
+      "name": "home_title",
+      "value": "Xinghai International Airport"
+    },
+    {
+      "name": "home_sub",
+      "value": "Main Terminal · 6 levels"
+    },
+    {
+      "name": "btn_find",
+      "value": "Find Gate & Facility"
+    },
+    {
+      "name": "btn_metro",
+      "value": "Metro Transfer"
+    },
+    {
+      "name": "btn_browse",
+      "value": "Browse Floors"
+    },
+    {
+      "name": "sec_floors",
+      "value": "FLOORS"
+    },
+    {
+      "name": "sel_title",
+      "value": "Select Destination"
+    },
+    {
+      "name": "sel_search",
+      "value": "Search: gate / metro / security…"
+    },
+    {
+      "name": "sel_start_label",
+      "value": "Start"
+    },
+    {
+      "name": "tab_all",
+      "value": "All"
+    },
+    {
+      "name": "tab_gate",
+      "value": "Gates"
+    },
+    {
+      "name": "tab_checkin",
+      "value": "Check-in & Security"
+    },
+    {
+      "name": "tab_door",
+      "value": "Entrances"
+    },
+    {
+      "name": "tab_bag",
+      "value": "Baggage"
+    },
+    {
+      "name": "tab_metro",
+      "value": "Metro"
+    },
+    {
+      "name": "tab_transport",
+      "value": "Transport"
+    },
+    {
+      "name": "tab_parking",
+      "value": "Parking & Ground"
+    },
+    {
+      "name": "tab_service",
+      "value": "Shops & Services"
+    },
+    {
+      "name": "tab_vertical",
+      "value": "Lifts & Stairs"
+    },
+    {
+      "name": "sel_empty",
+      "value": "No matching results"
+    },
+    {
+      "name": "sel_anywhere",
+      "value": "Any node"
+    },
+    {
+      "name": "sel_quick_start",
+      "value": "Quick start (simulated location)"
+    },
+    {
+      "name": "sel_pick_start",
+      "value": "Select start point"
+    },
+    {
+      "name": "route_title",
+      "value": "Route"
+    },
+    {
+      "name": "route_total",
+      "value": "Total"
+    },
+    {
+      "name": "route_via_security",
+      "value": "Pass through Central Security"
+    },
+    {
+      "name": "route_same_side",
+      "value": "Same side, no security needed"
+    },
+    {
+      "name": "route_transfer_to",
+      "value": "Transfer to"
+    },
+    {
+      "name": "route_by_elevator",
+      "value": "elevator"
+    },
+    {
+      "name": "route_by_escalator",
+      "value": "escalator"
+    },
+    {
+      "name": "route_by_stair",
+      "value": "stairs"
+    },
+    {
+      "name": "route_meters",
+      "value": "m"
+    },
+    {
+      "name": "route_no_path",
+      "value": "No route found"
+    },
+    {
+      "name": "route_from_start",
+      "value": "From current position"
+    },
+    {
+      "name": "route_arrived",
+      "value": "Arrived at destination"
+    },
+    {
+      "name": "route_levels",
+      "value": "levels"
+    },
+    {
+      "name": "metro_title",
+      "value": "Metro Transfer"
+    },
+    {
+      "name": "metro_dir_city",
+      "value": "To City Center"
+    },
+    {
+      "name": "metro_dir_resort",
+      "value": "To Xinghu Resort"
+    },
+    {
+      "name": "metro_hint",
+      "value": "Pick a direction → route to the platform"
+    },
+    {
+      "name": "metro_plat_sub",
+      "value": "Metro platform B2"
+    },
+    {
+      "name": "metro_step_gate_t",
+      "value": "Tap through gates"
+    },
+    {
+      "name": "metro_step_gate_d",
+      "value": "At B1 metro gates, tap through"
+    },
+    {
+      "name": "metro_step_descend_t",
+      "value": "Go down"
+    },
+    {
+      "name": "metro_step_descend_d",
+      "value": "Escalator / stairs down to B2"
+    },
+    {
+      "name": "metro_step_plat_t",
+      "value": "Wait"
+    },
+    {
+      "name": "metro_step_plat_d",
+      "value": "Wait on the B2 platform"
+    },
+    {
+      "name": "browse_title",
+      "value": "Floor Browse"
+    },
+    {
+      "name": "browse_tap_hint",
+      "value": "Tap a node to inspect"
+    },
+    {
+      "name": "pick_dest",
+      "value": "Set as destination"
+    },
+    {
+      "name": "pick_start",
+      "value": "Set as start"
+    },
+    {
+      "name": "planner_from",
+      "value": "From"
+    },
+    {
+      "name": "planner_to",
+      "value": "To"
+    },
+    {
+      "name": "planner_swap",
+      "value": "Swap"
+    },
+    {
+      "name": "planner_go",
+      "value": "Confirm"
+    },
+    {
+      "name": "trans_count",
+      "value": "transfers"
+    },
+    {
+      "name": "common_cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "common_ok",
+      "value": "OK"
+    },
+    {
+      "name": "common_pref",
+      "value": "Routing preference"
+    },
+    {
+      "name": "pref_shortest",
+      "value": "Shortest"
+    },
+    {
+      "name": "pref_elevator",
+      "value": "Prefer elevator"
+    },
+    {
+      "name": "pref_escalator",
+      "value": "Prefer escalator"
+    },
+    {
+      "name": "pref_avoid_stair",
+      "value": "Avoid stairs"
+    }
+  ]
+}

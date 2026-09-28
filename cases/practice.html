@@ -1,0 +1,95 @@
+<h2>实践步骤</h2>
+<p>本案例采用对话式开发（AI 编程工具 + 人工确认需求），以下是完整开发流程的关键步骤，按时间顺序排列。你可以直接复制每条指令发给 AI，逐步完成。</p>
+
+<h3>步骤 1：生成需求文档</h3>
+<ol>
+  <li><strong>向 AI 提出需求</strong>：告知 AI 要做一个鸿蒙 App——机场室内地图导航（星海国际机场，虚构机场 XHA），让 AI 通过提问确认需求细节（覆盖楼层、寻路偏好、安检限制、双语范围、地铁换乘引导、界面风格）。</li>
+  <li><strong>确认需求要点</strong>：六层航站楼（4F→B2）、地图数据随包纯本地、完整导航闭环（分类/搜索选终点→选起点→跨层最短路→逐层路径图）、中央安检必经且醒目标注、换层偏好四档、中英双语即时切换、地铁换乘引导、路径绘制动效。</li>
+  <li><strong>产出</strong>：需求规格文档，含功能需求、验收标准、UI 设计要求和数据约定。参见 <code>docs/需求文档.md</code>。</li>
+</ol>
+<p><strong>完成标志</strong>：需求文档包含六层总览、分类+搜索、跨层寻路、安检必经、逐层路径图、地铁引导、中英双语、路径动效等功能定义。</p>
+
+<h3>步骤 2：生成架构设计</h3>
+<ol>
+  <li><strong>向 AI 发送</strong>：<code>根据该需求文档生成一份架构设计</code>。</li>
+  <li><strong>关键设计决策</strong>：pages → core → model → ui 的分层结构；Dijkstra 寻路 + 安检必经拆段；Canvas 三层渲染（示意背景/拓扑/路径）；数据管道 JSON → 类型化模型编译进包；Navigation 多页面 + NavDestination 分发。</li>
+  <li><strong>产出</strong>：架构设计文档，含分层架构图、模块职责、数据流、技术选型。参见 <code>docs/开发文档.md</code>。</li>
+</ol>
+<p><strong>完成标志</strong>：架构文档包含分层结构图、寻路算法方案（含安检拆段逻辑）、渲染方案（Canvas 三层 + 视口变换）、数据同步链。</p>
+
+<h3>步骤 3：生成完整应用代码</h3>
+<ol>
+  <li><strong>向 AI 发送</strong>：<code>根据需求文档和设计文档生成App</code>。</li>
+  <li><strong>工程结构</strong>：<code>harmony_app/</code> 目录下包含 entry 模块（AppScope/entry）、6 个页面（pages/）、3 个核心模块（core/）、2 个 UI 组件（ui/）、4 个模型文件（model/）、资源文件（resources/）。</li>
+  <li><strong>数据管道</strong>：先编写 <code>data/XHA_xinghai_t1.map.json</code>（119 节点 / 145 边 / 6 层），再用 <code>tools/gen_model.py</code> 编译生成 <code>model/AirportMap.ets</code>（类型化常量，含 side 陆空侧 BFS 分类、NODE_EN 英文翻译、FLOOR_BBOX 包围盒）。</li>
+  <li><strong>寻路引擎</strong>：<code>core/Pathfinder.ets</code> 实现 Dijkstra（朴素法，119 节点规模足够），垂直边权重电梯30/扶梯40/楼梯25，偏好乘子四档。安检必经拆段：异侧起终点拆成 <code>起→安检→终</code> 两段拼接。</li>
+  <li><strong>渲染</strong>：<code>ui/FloorCanvas.ets</code> Canvas 单层绘制三层内容（示意背景 + 拓扑 + 路径），共用 <code>core/Viewport.ets</code> 视口变换。路径动效用 <code>setInterval(16ms)</code> 驱动 <code>progress += 0.02</code>。</li>
+</ol>
+<p><strong>完成标志</strong>：工程可通过 <code>hvigorw assembleHap</code> 编译通过，生成 HAP 安装包。</p>
+
+<h3>步骤 4：运行到模拟器并验证</h3>
+<ol>
+  <li><strong>编译</strong>：设置环境变量（DEVECO_SDK_HOME / JAVA_HOME / NODE_HOME / PATH），在 <code>harmony_app/</code> 下执行 <code>hvigorw assembleHap --no-daemon --mode module -p product=default -p module=entry@default</code>。</li>
+  <li><strong>安装</strong>：启动 API 23+ 模拟器，<code>hdc -t 127.0.0.1:5555 install -r entry/build/default/outputs/default/entry-default-unsigned.hap</code>。</li>
+  <li><strong>启动</strong>：<code>hdc shell aa start -a EntryAbility -b com.example.airportguide</code>。</li>
+  <li><strong>验证</strong>：依次验证六层总览、分类搜索（搜「登机口 C308」）、跨层寻路（异侧必经安检）、逐层路径图、地铁引导、中英切换、路径动效。</li>
+</ol>
+<p><strong>完成标志</strong>：应用正常运行，所有验收项通过。</p>
+
+<h3>步骤 5：修复问题与迭代优化</h3>
+<p>验证过程中发现的问题及修复方案：</p>
+<table>
+  <tr><th>问题（用户可见）</th><th>根因</th><th>修复方案</th></tr>
+  <tr>
+    <td>四种偏好下距离显示不一致</td>
+    <td>planRoute 选路用偏好乘子，显示距离也用了乘子后的权重</td>
+    <td>选路用偏好乘子、显示距离一律用数据原始权重（walk=真实米，垂直=基准 30/40/25），偏好只影响选路不改显示距离</td>
+  </tr>
+  <tr>
+    <td>直达路线残留 3F/2F 空 Tab</td>
+    <td>跨层路线中间楼层只有单节点过站（电梯停站），生成了空楼层分页</td>
+    <td>mergeTransitLegs 把单节点过站腿吸收为一条直达换乘，Tabs 只含真实途经楼层</td>
+  </tr>
+  <tr>
+    <td>FloorBrowse 弹窗大片白区</td>
+    <td>bindSheet 弹层未设置 backgroundColor，默认白底</td>
+    <td>bindSheet 选项加 <code>backgroundColor: APP.bg</code>（弹层深色无白区）</td>
+  </tr>
+  <tr>
+    <td>出发点不明 + 缺地图式 UI</td>
+    <td>SelectTarget 顶栏无起点显示，FloorBrowse 无设为出发点/目的地入口</td>
+    <td>SelectTarget 顶栏加「起点|交换|终点|确认」；FloorBrowse 节点弹层加「设为出发点/设为目的地/取消」</td>
+  </tr>
+</table>
+<p><strong>完成标志</strong>：所有问题修复，重新构建安装到模拟器后功能正常，视觉效果明显改善。</p>
+
+<h2>关键代码结构</h2>
+<table>
+  <tr><th>文件</th><th>职责</th><th>行数</th></tr>
+  <tr><td><code>model/AirportMap.ets</code></td><td>生成文件：119 节点 / 145 边 / side / FLOOR_BBOX / NODE_EN</td><td>~2139</td></tr>
+  <tr><td><code>core/Pathfinder.ets</code></td><td>Dijkstra + 安检必经拆段 + 偏好乘子</td><td>~289</td></tr>
+  <tr><td><code>ui/FloorCanvas.ets</code></td><td>Canvas 三层渲染 + 动效 + 手势</td><td>~473</td></tr>
+  <tr><td><code>pages/Index.ets</code></td><td>总览 + Navigation 宿主分发</td><td>~253</td></tr>
+  <tr><td><code>pages/Route.ets</code></td><td>逐层路径图 + 换层提示 + 动效</td><td>~396</td></tr>
+  <tr><td><code>core/Viewport.ets</code></td><td>视口变换（zoom/translate/坐标换算）</td><td>~68</td></tr>
+  <tr><td><code>model/Loc.ets</code></td><td>运行时中英文案表（51 键 ZH/EN 对称）</td><td>~124</td></tr>
+</table>
+
+<h2>高频问题排查</h2>
+<table>
+  <tr><th>现象</th><th>环节</th><th>原因</th><th>解决</th></tr>
+  <tr><td>00308018 EPERM</td><td>编译</td><td>local.properties 的 sdk.dir 不正确</td><td>修正 sdk.dir 或用 DevEco Studio 打开一次自动补齐</td></tr>
+  <tr><td>00303217</td><td>编译</td><td>SDK 环境变量未设置</td><td>参考 BUILD.md §3.1 设置 DEVECO_SDK_HOME 等</td></tr>
+  <tr><td>arkts-no-untyped-obj-literals</td><td>编译</td><td>ArkTS 禁用 Record/无类型对象字面量</td><td>键值字典改 Map + .set()，元数据用显式 interface</td></tr>
+  <tr><td>Cannot find 'Gesture'</td><td>编译</td><td>GestureGroup 在本 SDK 是工厂值无类型名</td><td>去掉返回类型注解由调用推断</td></tr>
+  <tr><td>bindSheet 空白弹层</td><td>运行时</td><td>弹层内容变成空树导致不关闭</td><td>弹层内容永远非空（空选中态渲染占位根）</td></tr>
+  <tr><td>Canvas 点不中节点</td><td>测试</td><td>Canvas 坐标系 ≠ 物理 px</td><td>用 PIL 实测坐标，不按分辨率折算</td></tr>
+</table>
+
+<h2>验证方法</h2>
+<ol>
+  <li><strong>编译验证</strong>：<code>hvigorw assembleHap</code> 全绿，产物 <code>entry-default-unsigned.hap</code> 生成。</li>
+  <li><strong>数据一致性</strong>：<code>python3 tools/gen_model.py</code> 重跑幂等，diff 为空（AirportMap.ets 与 map.json 逐字段一致）。</li>
+  <li><strong>寻路回归</strong>：<code>python3 tools/pathfind_reference.py</code> 跑 500 组随机用例与端侧 Pathfinder 比对，异侧 270 例全部含 <code>xha_p4_sec</code>，同侧 230 例全部不含。</li>
+  <li><strong>模拟器实测</strong>：安装到 HarmonyOS 6.1.0(23) 模拟器，人工验证全部 9 项业务验收 + hilog 无 FATAL/JsError/CppCrash。</li>
+</ol>

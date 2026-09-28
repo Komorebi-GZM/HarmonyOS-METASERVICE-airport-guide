@@ -1,0 +1,12 @@
+{
+  "float": [
+    {
+      "name": "card_radius",
+      "value": "16vp"
+    },
+    {
+      "name": "pill_radius",
+      "value": "999vp"
+    }
+  ]
+}

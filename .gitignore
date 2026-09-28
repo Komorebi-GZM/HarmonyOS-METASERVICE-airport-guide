@@ -1,0 +1,35 @@
+# ===== 环境变量 / 敏感配置 =====
+.env
+
+# ===== 依赖与构建产物 =====
+node_modules/
+oh_modules/
+.hvigor/
+build/
+*.hap
+*.har
+*.hsp
+*.app
+*.zip
+*.tar.gz
+
+# ===== 本地工具链与 IDE（机器相关，不入公共仓库）=====
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# AI 辅助开发本地数据（不入公共仓库）
+.claude/
+.agents/
+.codeartsdoer/
+.codegraph/
+skills-lock.json
+
+# ===== 日志与临时 =====
+*.log
+.temp/
+
+# ===== 生成的可视化预览 =====
+# 由 tools/preview_nodes.py 从 data/*.map.json 渲染生成，本地查看用，不入公共仓库
+preview/

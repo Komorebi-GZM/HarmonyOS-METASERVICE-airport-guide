@@ -1,0 +1,13 @@
+# Windows 批处理 —— 始终 CRLF（否则 cmd 无法执行）
+*.bat text eol=crlf
+
+# Unix shell 脚本 —— 始终 LF（否则 shebang 找不到解释器）
+*.sh text eol=lf
+
+# 源码文件 —— 按 Git 默认（autocrlf 自动转换）
+*.ets text
+*.ts text
+*.json5 text
+*.json text
+*.md text
+*.yml text

@@ -1,0 +1,268 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "星海国际机场 · 室内导航元服务"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "星海国际机场室内导航元服务"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "星海机场"
+    },
+    {
+      "name": "home_title",
+      "value": "星海国际机场"
+    },
+    {
+      "name": "home_sub",
+      "value": "主航站楼 · 六层导览"
+    },
+    {
+      "name": "btn_find",
+      "value": "找登机口 · 设施"
+    },
+    {
+      "name": "btn_metro",
+      "value": "地铁换乘"
+    },
+    {
+      "name": "btn_browse",
+      "value": "楼层漫游"
+    },
+    {
+      "name": "sec_floors",
+      "value": "楼层导览"
+    },
+    {
+      "name": "sel_title",
+      "value": "选择目的地"
+    },
+    {
+      "name": "sel_search",
+      "value": "搜索：登机口 / 地铁 / 安检…"
+    },
+    {
+      "name": "sel_start_label",
+      "value": "起点"
+    },
+    {
+      "name": "tab_all",
+      "value": "全部"
+    },
+    {
+      "name": "tab_gate",
+      "value": "登机口"
+    },
+    {
+      "name": "tab_checkin",
+      "value": "值机·安检"
+    },
+    {
+      "name": "tab_door",
+      "value": "出入口"
+    },
+    {
+      "name": "tab_bag",
+      "value": "行李"
+    },
+    {
+      "name": "tab_metro",
+      "value": "地铁"
+    },
+    {
+      "name": "tab_transport",
+      "value": "接驳交通"
+    },
+    {
+      "name": "tab_parking",
+      "value": "停车·地面"
+    },
+    {
+      "name": "tab_service",
+      "value": "商业·服务"
+    },
+    {
+      "name": "tab_vertical",
+      "value": "换层设施"
+    },
+    {
+      "name": "sel_empty",
+      "value": "没有匹配的结果"
+    },
+    {
+      "name": "sel_anywhere",
+      "value": "任意节点"
+    },
+    {
+      "name": "sel_quick_start",
+      "value": "快捷起点（模拟当前位置）"
+    },
+    {
+      "name": "sel_pick_start",
+      "value": "选择起点"
+    },
+    {
+      "name": "route_title",
+      "value": "路线"
+    },
+    {
+      "name": "route_total",
+      "value": "全程"
+    },
+    {
+      "name": "route_via_security",
+      "value": "途中需通过 · 中央安检大厅"
+    },
+    {
+      "name": "route_same_side",
+      "value": "同侧直达，无需安检"
+    },
+    {
+      "name": "route_transfer_to",
+      "value": "换乘"
+    },
+    {
+      "name": "route_by_elevator",
+      "value": "电梯"
+    },
+    {
+      "name": "route_by_escalator",
+      "value": "扶梯"
+    },
+    {
+      "name": "route_by_stair",
+      "value": "楼梯"
+    },
+    {
+      "name": "route_meters",
+      "value": "米"
+    },
+    {
+      "name": "route_no_path",
+      "value": "暂无可达路线"
+    },
+    {
+      "name": "route_from_start",
+      "value": "从当前位置出发"
+    },
+    {
+      "name": "route_arrived",
+      "value": "已到达目的地"
+    },
+    {
+      "name": "route_levels",
+      "value": "楼层"
+    },
+    {
+      "name": "metro_title",
+      "value": "地铁换乘"
+    },
+    {
+      "name": "metro_dir_city",
+      "value": "往市区方向"
+    },
+    {
+      "name": "metro_dir_resort",
+      "value": "往星湖度假区"
+    },
+    {
+      "name": "metro_hint",
+      "value": "选择出行方向 → 自动规划到对应站台"
+    },
+    {
+      "name": "metro_plat_sub",
+      "value": "B2 地铁站台"
+    },
+    {
+      "name": "metro_step_gate_t",
+      "value": "过闸"
+    },
+    {
+      "name": "metro_step_gate_d",
+      "value": "到 B1 地铁闸机群过闸"
+    },
+    {
+      "name": "metro_step_descend_t",
+      "value": "下 B2"
+    },
+    {
+      "name": "metro_step_descend_d",
+      "value": "乘地铁扶梯 / 楼梯下到 B2"
+    },
+    {
+      "name": "metro_step_plat_t",
+      "value": "候车"
+    },
+    {
+      "name": "metro_step_plat_d",
+      "value": "在 B2 站台等车"
+    },
+    {
+      "name": "browse_title",
+      "value": "楼层浏览"
+    },
+    {
+      "name": "browse_tap_hint",
+      "value": "点击节点查看"
+    },
+    {
+      "name": "pick_dest",
+      "value": "设为目的地"
+    },
+    {
+      "name": "pick_start",
+      "value": "设为出发点"
+    },
+    {
+      "name": "planner_from",
+      "value": "出发点"
+    },
+    {
+      "name": "planner_to",
+      "value": "终点"
+    },
+    {
+      "name": "planner_swap",
+      "value": "交换"
+    },
+    {
+      "name": "planner_go",
+      "value": "确认"
+    },
+    {
+      "name": "trans_count",
+      "value": "次换层"
+    },
+    {
+      "name": "common_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "common_ok",
+      "value": "确定"
+    },
+    {
+      "name": "common_pref",
+      "value": "寻路偏好"
+    },
+    {
+      "name": "pref_shortest",
+      "value": "最短距离"
+    },
+    {
+      "name": "pref_elevator",
+      "value": "优先电梯"
+    },
+    {
+      "name": "pref_escalator",
+      "value": "优先扶梯"
+    },
+    {
+      "name": "pref_avoid_stair",
+      "value": "避开楼梯"
+    }
+  ]
+}
