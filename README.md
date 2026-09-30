@@ -6,7 +6,7 @@
 
 | 项目 | 内容 |
 | --- | --- |
-| 仓库名 | HarmonyOS-METASERVICE-airport-guide |
+| 仓库名 | HarmonyOS-AtomSer-airport-guide |
 | 适合谁 | HarmonyOS 进阶到高级开发者；想完整复刻「元服务 + 数据驱动寻路 + Canvas 拓扑绘制 + 多语言」案例的人 |
 | 难度与耗时 | 进阶 · 编译到模拟器实跑约 30 分钟（含 DevEco Studio 启动与模拟器开机） |
 | 你将学到 | ArkTS 强类型数据模型（JSON → 类型化常量）、Dijkstra 最短路径与「安检必经」拆段、Canvas 三层渲染（示意背景 / 拓扑 / 路径）、Navigation 多页、中英双语、动效与转场 |
@@ -96,8 +96,8 @@ flowchart LR
 ### 1）获取代码
 
 ```bash
-git clone https://gitcode.com/harmony-practice-center/HarmonyOS-METASERVICE-airport-guide.git
-cd HarmonyOS-METASERVICE-airport-guide
+git clone https://gitcode.com/harmony-practice-center/HarmonyOS-AtomSer-airport-guide.git
+cd HarmonyOS-AtomSer-airport-guide
 ```
 
 **完成标志**：根目录存在 `README.md`、`harmony_app/`、`docs/`、`data/`、`tools/`。
