@@ -1,95 +1,377 @@
-<h2>实践步骤</h2>
-<p>本案例采用对话式开发（AI 编程工具 + 人工确认需求），以下是完整开发流程的关键步骤，按时间顺序排列。你可以直接复制每条指令发给 AI，逐步完成。</p>
-
-<h3>步骤 1：生成需求文档</h3>
+<h2 id="快速体验">快速体验</h2>
+<p>使用<strong>现成工程</strong>体验“选目的地 → 选当前位置 → 看路线 → 分步指引”。选择云端或本地路径，把提示词复制给 AI。</p>
+<h3>云端快速体验</h3>
+<p>在<a href="https://harmonybp.developer.huaweicloud.com/">鸿蒙开发实践中心</a>操作，无需本机安装开发工具。</p>
+<h4>第一步：创建项目并导入案例</h4>
+<p>从案例详情页点击 <strong>“云端开发环境”</strong>，核对自动带入的信息，再点击 <strong>“创建”</strong>。</p>
+<p>直接进入作业中心时，点击 <strong>“新建项目”</strong>：</p>
+<ul>
+<li>填写项目名称，例如“机场导航实践”。</li>
+<li>技术模板选择 <strong>“空项目”</strong>。</li>
+<li>在 <strong>“案例仓地址”</strong> 中填写：</li>
+</ul>
+<pre><code class="language-text">https://gitcode.com/harmony-practice-center/HarmonyOS-AtomSer-airport-guide.git
+</code></pre>
+<p>“Git 仓库地址”用于管理自己的代码，此处可留空。</p>
+<p><strong>完成标志：</strong> 开发环境中可见 <code>harmony_app</code> 和 <code>data/XHA_xinghai_t1.map.json</code>。</p>
+<h4>第二步：让 AI 编译打包</h4>
+<p>输入：</p>
+<pre><code class="language-text">请找到当前机场导航案例的 HarmonyOS 工程，检查 SDK、依赖与构建工具，编译 HAP。
+按日志修复并重新编译，保留地图数据、寻路规则和包名。
+告诉我 HAP 路径及设备 API、签名要求。
+</code></pre>
+<p><strong>完成标志：</strong> 构建成功，AI 给出生成的 HAP 路径。</p>
+<h4>第三步：创建云手机</h4>
+<p>进入 <strong>“设备管理 → 鸿蒙云手机”</strong>，选择符合工程要求的系统镜像并申请创建。</p>
+<p>待云手机运行后，完成设备连接。</p>
+<p><strong>完成标志：</strong> 云手机运行且开发环境能识别。</p>
+<h4>第四步：让 AI 安装并打开</h4>
+<p>输入：</p>
+<pre><code class="language-text">请识别已连接的鸿蒙云手机，推送、安装刚生成的 HAP，并打开机场导航元服务。
+多个设备时先让我选择；失败时按错误处理连接、API 或签名问题。
+告诉我所用设备和启动结果。
+</code></pre>
+<p><strong>完成标志：</strong> 云手机上出现机场导航首页。</p>
+<h4>第五步：体验机场导航</h4>
+<p>在云手机上完成以下操作：</p>
 <ol>
-  <li><strong>向 AI 提出需求</strong>：告知 AI 要做一个鸿蒙 App——机场室内地图导航（星海国际机场，虚构机场 XHA），让 AI 通过提问确认需求细节（覆盖楼层、寻路偏好、安检限制、双语范围、地铁换乘引导、界面风格）。</li>
-  <li><strong>确认需求要点</strong>：六层航站楼（4F→B2）、地图数据随包纯本地、完整导航闭环（分类/搜索选终点→选起点→跨层最短路→逐层路径图）、中央安检必经且醒目标注、换层偏好四档、中英双语即时切换、地铁换乘引导、路径绘制动效。</li>
-  <li><strong>产出</strong>：需求规格文档，含功能需求、验收标准、UI 设计要求和数据约定。参见 <code>docs/需求文档.md</code>。</li>
+<li>点击 <strong>“去登机口”</strong>，搜索并选择 <strong>A101</strong>。</li>
+<li>选择当前位置 <strong>“西出发门”</strong>。</li>
+<li>查看路线中的步行距离与中央安检提示。</li>
+<li>点击 <strong>“开始指引”</strong>，按照提示手动确认进度，直到确认到达目的地。</li>
 </ol>
-<p><strong>完成标志</strong>：需求文档包含六层总览、分类+搜索、跨层寻路、安检必经、逐层路径图、地铁引导、中英双语、路径动效等功能定义。</p>
-
-<h3>步骤 2：生成架构设计</h3>
+<p><strong>完成标志：</strong> 从目的地选择走完整个指引流程。</p>
+<h3>本地快速体验</h3>
+<p>通过码道 IDE 与 Command Line Tools，在本机编译并运行模拟器。</p>
+<h4>第一步：准备开发工具</h4>
+<p>按官方指导安装：</p>
+<ul>
+<li><a href="https://support.huaweicloud.com/usermanual-codeartsagent/codeartsagent_ug_0002.html">码道 IDE</a></li>
+<li><a href="https://developer.huawei.com/consumer/cn/deveco-studio/resources/">HarmonyOS Command Line Tools</a></li>
+</ul>
+<p><strong>完成标志：</strong> 码道 AI 对话可用，Command Line Tools 已安装。</p>
+<h4>第二步：让 AI 获取案例代码</h4>
+<p>在码道中创建项目或打开工作文件夹，输入：</p>
+<pre><code class="language-text">请将此案例默认分支的最新代码拉取到当前工作区的独立目录，保留已有文件：
+https://gitcode.com/harmony-practice-center/HarmonyOS-AtomSer-airport-guide.git
+告诉我代码位置和 HarmonyOS 工程目录。
+</code></pre>
+<p><strong>完成标志：</strong> 本地可见 <code>harmony_app</code> 和 <code>data/XHA_xinghai_t1.map.json</code>。</p>
+<h4>第三步：让 AI 编译打包</h4>
+<p>继续输入：</p>
+<pre><code class="language-text">请解析刚获取的机场导航案例，检查本机 SDK、依赖与构建工具，编译 HAP。
+按日志修复并重新编译，保留地图数据、寻路规则和包名。
+告诉我 HAP 路径及设备 API、签名要求。
+</code></pre>
+<p><strong>完成标志：</strong> 构建成功，AI 给出本地 HAP 路径。</p>
+<h4>第四步：准备模拟器</h4>
+<p>按 Command Line Tools 官方指导或 <a href="https://developer.huawei.com/consumer/cn/doc/HarmonyOS-Guides/ide-emulator-create">模拟器创建说明</a>，创建并启动符合工程要求的模拟器。</p>
+<p>回到码道，输入：</p>
+<pre><code class="language-text">请识别本机已启动的 HarmonyOS 模拟器，检查连接和安装条件。
+告诉我可用设备；未识别时定位连接问题并给出恢复步骤。
+</code></pre>
+<p><strong>完成标志：</strong> 模拟器已启动，AI 能够识别该设备。</p>
+<h4>第五步：让 AI 安装并打开</h4>
+<p>输入：</p>
+<pre><code class="language-text">请识别本机已连接的 HarmonyOS 模拟器，推送、安装刚生成的 HAP，并打开机场导航元服务。
+多个设备时先让我选择；失败时按错误处理连接、API 或签名问题。
+告诉我所用设备和启动结果。
+</code></pre>
+<p><strong>完成标志：</strong> 模拟器上出现机场导航首页。</p>
+<h4>第六步：体验机场导航</h4>
+<p>在模拟器上完成以下操作：</p>
 <ol>
-  <li><strong>向 AI 发送</strong>：<code>根据该需求文档生成一份架构设计</code>。</li>
-  <li><strong>关键设计决策</strong>：pages → core → model → ui 的分层结构；Dijkstra 寻路 + 安检必经拆段；Canvas 三层渲染（示意背景/拓扑/路径）；数据管道 JSON → 类型化模型编译进包；Navigation 多页面 + NavDestination 分发。</li>
-  <li><strong>产出</strong>：架构设计文档，含分层架构图、模块职责、数据流、技术选型。参见 <code>docs/开发文档.md</code>。</li>
+<li>点击 <strong>“去登机口”</strong>，搜索并选择 <strong>A101</strong>。</li>
+<li>选择当前位置 <strong>“西出发门”</strong>。</li>
+<li>查看路线中的步行距离与中央安检提示。</li>
+<li>点击 <strong>“开始指引”</strong>，按照提示手动确认进度，直到确认到达目的地。</li>
 </ol>
-<p><strong>完成标志</strong>：架构文档包含分层结构图、寻路算法方案（含安检拆段逻辑）、渲染方案（Canvas 三层 + 视口变换）、数据同步链。</p>
-
-<h3>步骤 3：生成完整应用代码</h3>
-<ol>
-  <li><strong>向 AI 发送</strong>：<code>根据需求文档和设计文档生成App</code>。</li>
-  <li><strong>工程结构</strong>：<code>harmony_app/</code> 目录下包含 entry 模块（AppScope/entry）、6 个页面（pages/）、3 个核心模块（core/）、2 个 UI 组件（ui/）、4 个模型文件（model/）、资源文件（resources/）。</li>
-  <li><strong>数据管道</strong>：先编写 <code>data/XHA_xinghai_t1.map.json</code>（119 节点 / 145 边 / 6 层），再用 <code>tools/gen_model.py</code> 编译生成 <code>model/AirportMap.ets</code>（类型化常量，含 side 陆空侧 BFS 分类、NODE_EN 英文翻译、FLOOR_BBOX 包围盒）。</li>
-  <li><strong>寻路引擎</strong>：<code>core/Pathfinder.ets</code> 实现 Dijkstra（朴素法，119 节点规模足够），垂直边权重电梯30/扶梯40/楼梯25，偏好乘子四档。安检必经拆段：异侧起终点拆成 <code>起→安检→终</code> 两段拼接。</li>
-  <li><strong>渲染</strong>：<code>ui/FloorCanvas.ets</code> Canvas 单层绘制三层内容（示意背景 + 拓扑 + 路径），共用 <code>core/Viewport.ets</code> 视口变换。路径动效用 <code>setInterval(16ms)</code> 驱动 <code>progress += 0.02</code>。</li>
-</ol>
-<p><strong>完成标志</strong>：工程可通过 <code>hvigorw assembleHap</code> 编译通过，生成 HAP 安装包。</p>
-
-<h3>步骤 4：运行到模拟器并验证</h3>
-<ol>
-  <li><strong>编译</strong>：设置环境变量（DEVECO_SDK_HOME / JAVA_HOME / NODE_HOME / PATH），在 <code>harmony_app/</code> 下执行 <code>hvigorw assembleHap --no-daemon --mode module -p product=default -p module=entry@default</code>。</li>
-  <li><strong>安装</strong>：启动 API 23+ 模拟器，<code>hdc -t 127.0.0.1:5555 install -r entry/build/default/outputs/default/entry-default-unsigned.hap</code>。</li>
-  <li><strong>启动</strong>：<code>hdc shell aa start -a EntryAbility -b com.example.airportguide</code>。</li>
-  <li><strong>验证</strong>：依次验证六层总览、分类搜索（搜「登机口 C308」）、跨层寻路（异侧必经安检）、逐层路径图、地铁引导、中英切换、路径动效。</li>
-</ol>
-<p><strong>完成标志</strong>：应用正常运行，所有验收项通过。</p>
-
-<h3>步骤 5：修复问题与迭代优化</h3>
-<p>验证过程中发现的问题及修复方案：</p>
+<p><strong>完成标志：</strong> 从目的地选择走完整个指引流程。</p>
+<h2 id="完整实践">完整实践</h2>
+<p><strong>从空项目开始</strong>，由 AI 创建应用代码。云端新建“空项目”，<strong>案例仓地址留空</strong>；本地在码道中打开空文件夹。</p>
+<p>依次复制八组提示词，每步达到完成标志后继续；出错先修复。工具操作可参考<a href="https://support.huaweicloud.com/bestpractice-codeartsagent/codeartsagent_bp_0050.html">码道空项目开发示例</a>。</p>
+<h3>统一教学素材</h3>
+<p>只需一份地图和三张参考图，无需拉取工程。第 2 步会让 AI 下载，也可按表中路径手动保存。</p>
 <table>
-  <tr><th>问题（用户可见）</th><th>根因</th><th>修复方案</th></tr>
-  <tr>
-    <td>四种偏好下距离显示不一致</td>
-    <td>planRoute 选路用偏好乘子，显示距离也用了乘子后的权重</td>
-    <td>选路用偏好乘子、显示距离一律用数据原始权重（walk=真实米，垂直=基准 30/40/25），偏好只影响选路不改显示距离</td>
-  </tr>
-  <tr>
-    <td>直达路线残留 3F/2F 空 Tab</td>
-    <td>跨层路线中间楼层只有单节点过站（电梯停站），生成了空楼层分页</td>
-    <td>mergeTransitLegs 把单节点过站腿吸收为一条直达换乘，Tabs 只含真实途经楼层</td>
-  </tr>
-  <tr>
-    <td>FloorBrowse 弹窗大片白区</td>
-    <td>bindSheet 弹层未设置 backgroundColor，默认白底</td>
-    <td>bindSheet 选项加 <code>backgroundColor: APP.bg</code>（弹层深色无白区）</td>
-  </tr>
-  <tr>
-    <td>出发点不明 + 缺地图式 UI</td>
-    <td>SelectTarget 顶栏无起点显示，FloorBrowse 无设为出发点/目的地入口</td>
-    <td>SelectTarget 顶栏加「起点|交换|终点|确认」；FloorBrowse 节点弹层加「设为出发点/设为目的地/取消」</td>
-  </tr>
-</table>
-<p><strong>完成标志</strong>：所有问题修复，重新构建安装到模拟器后功能正常，视觉效果明显改善。</p>
+<thead>
+<tr>
+<th>素材</th>
+<th>保存位置</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://api.gitcode.com/api/v5/repos/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/raw/data/XHA_xinghai_t1.map.json?ref=6815f2c9e64b161cd1900d1e46829d8d597083d9">地图 JSON</a></td>
+<td><code>reference/map.json</code></td>
+<td>固定地点、坐标与连接关系。</td>
+</tr>
+<tr>
+<td><a href="https://api.gitcode.com/api/v5/repos/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/raw/docs/images/product-20261001/phone/01-home.jpeg?ref=6815f2c9e64b161cd1900d1e46829d8d597083d9">首页参考</a></td>
+<td><code>reference/home.jpeg</code></td>
+<td>导视风格与首页入口。</td>
+</tr>
+<tr>
+<td><a href="https://api.gitcode.com/api/v5/repos/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/raw/docs/images/product-20261001/phone/04-security-route-preview.jpeg?ref=6815f2c9e64b161cd1900d1e46829d8d597083d9">安检预览参考</a></td>
+<td><code>reference/security-preview.jpeg</code></td>
+<td>路线、起终点与安检提示。</td>
+</tr>
+<tr>
+<td><a href="https://api.gitcode.com/api/v5/repos/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/raw/docs/images/product-20261001/phone/10-elevator-transfer.jpeg?ref=6815f2c9e64b161cd1900d1e46829d8d597083d9">电梯指引参考</a></td>
+<td><code>reference/elevator-guidance.jpeg</code></td>
+<td>当前步骤、下一步与换层确认。</td>
+</tr>
+</tbody></table>
+<p>素材固定于同一版本，采用 <a href="https://gitcode.com/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/blob/main/LICENSE">MIT 许可证</a>；应用代码由 AI 创建。</p>
+<h3>1. 检查环境</h3>
+<p><strong>目标：</strong> 检查工作区、SDK、构建工具与设备。</p>
+<p><strong>复制给 AI：</strong></p>
+<pre><code class="language-text">我要从空项目制作 HarmonyOS 机场导航元服务。
+请只读检查工作区、原生元服务创建条件、SDK、构建工具、云手机或模拟器，
+以及公开素材是否可访问，列出缺项和需要手动完成的操作。
+不要拉取案例工程、写业务代码或安装未经确认的大型工具。
+</code></pre>
+<p><strong>完成标志：</strong> 明确环境缺项和工程创建位置。</p>
+<h3>2. 确定产品需求和视觉方案</h3>
+<p><strong>目标：</strong> 获取素材，确定需求与视觉方案。</p>
+<p><strong>复制给 AI：</strong></p>
+<pre><code class="language-text">请为虚构的“星海国际机场”设计原生 HarmonyOS 导览元服务。
+只用本地示例数据，不含实时定位、航班动态或真实机场导航。
 
-<h2>关键代码结构</h2>
+仅下载以下素材，依次保存为 reference/map.json、reference/home.jpeg、
+reference/security-preview.jpeg、reference/elevator-guidance.jpeg。
+不要克隆仓库、下载其他文件或阅读示例源码。
+地图 JSON：https://api.gitcode.com/api/v5/repos/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/raw/data/XHA_xinghai_t1.map.json?ref=6815f2c9e64b161cd1900d1e46829d8d597083d9
+首页参考：https://api.gitcode.com/api/v5/repos/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/raw/docs/images/product-20261001/phone/01-home.jpeg?ref=6815f2c9e64b161cd1900d1e46829d8d597083d9
+安检预览参考：https://api.gitcode.com/api/v5/repos/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/raw/docs/images/product-20261001/phone/04-security-route-preview.jpeg?ref=6815f2c9e64b161cd1900d1e46829d8d597083d9
+电梯指引参考：https://api.gitcode.com/api/v5/repos/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/raw/docs/images/product-20261001/phone/10-elevator-transfer.jpeg?ref=6815f2c9e64b161cd1900d1e46829d8d597083d9
+
+核对 JSON 可解析，含 119 个节点、145 条边；三张图片为 JPEG。
+地图原始字节 SHA-256：a61d3d22cde1d320533c07d9a8f692dcf707110ca7f950a5de4f2913febbb256。
+下载失败就停止，让我手动获取；不能使用 HTML 错误页。
+
+六页：首页、目的地、起点、路线预览与指引、地铁方向、六层地图。
+首页展示机场名和“你想去哪里？”，提供“去登机口”“坐地铁”“找设施”。
+新行程起终点为空，先选目的地再手动选当前位置；起点页用“你现在在哪里？”。
+主要动作依次为“选择出发位置”“从这里出发，查看路线”“开始指引”。
+指引突出当前与下一步，用户手动确认进度。
+陆侧与空侧间必经中央安检；跨层说明电梯、扶梯或楼梯。
+偏好为“推荐路线、优先电梯、优先扶梯、尽量少走楼梯”。
+支持中英双语，保存最近六个目的地；进度仅留在会话内。
+
+浅色机场导视：主色 #007F7A、背景 #F4F7F9、白卡、文字 #172B3A、
+安检色 #B86A12；系统 Sans 字体、原生符号或本地 SVG。
+正文至少 16fp、辅助文字至少 14fp、按钮高度至少 48vp，适配安全区、胶囊、键盘与宽屏。
+先输出页面流程、交互与异常状态、视觉层级和功能完成标准，
+保存需求与设计记录，暂不写应用代码。
+</code></pre>
+<p><strong>完成标志：</strong> <code>reference/</code> 素材齐全，六页需求与设计已保存。</p>
+<h3>3. 创建可编译的原生元服务工程</h3>
+<p><strong>目标：</strong> 建立可编译的原生工程与六页骨架。</p>
+<p><strong>复制给 AI：</strong></p>
+<pre><code class="language-text">按已保存的需求与设计，创建原生 ArkTS / ArkUI 元服务工程。
+目标与兼容版本为 HarmonyOS 6.1.0（API 23）。
+配置包名、入口、资源和六页导航骨架，使用当前 SDK 与工具，不写死机器路径或复制案例。
+执行调试构建，按日志修复，告诉我工程入口、构建命令、HAP 路径与导航情况。
+设备运行留到后续步骤。
+</code></pre>
+<p><strong>完成标志：</strong> 生成 HAP，建立六页骨架与导航入口。</p>
+<h3>4. 接入统一地图，做首页与目的地搜索</h3>
+<p><strong>目标：</strong> 接入固定地图，完成首页与地点搜索。</p>
+<p><strong>复制给 AI：</strong></p>
+<pre><code class="language-text">将 reference/map.json 和三张参考图接入自己的工程，保留原始 JSON。
+先做首页、六层入口和目的地分类/搜索，地图数据以 JSON 为准。
+首页展示机场名、“你想去哪里？”及“去登机口”“坐地铁”“找设施”；
+4F、3F、2F、1F、B1、B2 入口用两列完整展示。
+
+地图含 119 个节点、145 条边：
+xha_p4_sec 为中央安检，xha_p4_doorW 为西出发门，xha_p4_airMall 为空侧商业区。
+节点含 id、中文 name、type、floor、x、y；lift 表示电梯。
+边含 from、to、type、weight：walk 的 weight 为步行米数，垂直边为选路成本。
+坐标只用于绘图，不推算距离；独立补齐英文地点名和登机口别名。
+side 需派生：在双向图中临时移除 xha_p4_sec，
+与 xha_p4_airMall 连通的地点为空侧，其余为陆侧；安检单独处理。
+
+只展示可选公开地点，隐藏普通中转节点。
+搜索忽略首尾空格和英文大小写，精确登机口编号优先；无结果可清除重选。
+选目的地后用“选择出发位置”继续。
+地铁先选往市区或往星湖，再复用手动起点流程。
+检查字段、连通性、数据加载与搜索。
+</code></pre>
+<p><strong>完成标志：</strong> 六层入口可见，A101 可搜索；列表不混入普通中转节点，原始 JSON 保留。</p>
+<h3>5. 完成起点与规划</h3>
+<p><strong>目标：</strong> 完成起点选择与路线预览。</p>
+<p><strong>复制给 AI：</strong></p>
+<pre><code class="language-text">完成“先目的地、后起点”流程，新行程起终点为空。
+起点页用“你现在在哪里？”，手动选择后点击“从这里出发，查看路线”。
+
+用 Dijkstra 在双向图上规划，提供“推荐路线、优先电梯、优先扶梯、尽量少走楼梯”。
+步行边用原 weight；垂直边按电梯/扶梯/楼梯乘以下系数：
+推荐 1/1/1，优先电梯 0.7/1.6/3.2，优先扶梯 1.3/0.8/2.2，尽量少走楼梯 1/1.4/6。
+系数仅影响选路；陆侧与空侧间必经 xha_p4_sec，同侧不绕行。
+安检为起点或终点时，直接规划与另一地点之间的路线。
+预览显示步行米数、换层次数和“开始指引”；步行只累计 walk 边，垂直边单独提示换层。
+检查西出发门到 A101、同侧两点、跨层到地铁站台。
+相同点位提示“起点和目的地相同”；不可达时说明原因，两者均可重选。
+</code></pre>
+<p><strong>完成标志：</strong> 路线可预览；异侧经安检，同侧不绕行；步行与换层分开显示，相同或不可达地点可重选。</p>
+<p>可在第 6 步前按<a href="#%E5%BF%AB%E9%80%9F%E4%BD%93%E9%AA%8C">快速体验</a>连接云手机，或按<a href="https://developer.huawei.com/consumer/cn/doc/HarmonyOS-Guides/ide-emulator-create">模拟器说明</a>准备本地设备，也可留到第 8 步运行。</p>
+<h3>6. 完成地图与手动指引</h3>
+<p><strong>目标：</strong> 联动地图、路线与手动指引。</p>
+<p><strong>复制给 AI：</strong></p>
+<pre><code class="language-text">完成六层地图，以及路线预览、指引、完成三种状态。
+地图支持平移、点选、缩放、“查看全层”“查看当前路线”。
+地图设起点后给出反馈并引导选目的地；起终点、当前段、安检、换层设施清晰可见，
+默认视口容纳关键标记，标签与控件避免遮挡。
+
+路线拆为步行、安检、换层、到达步骤，突出当前与下一步，按步骤提供手动确认按钮。
+支持上一步与全程步骤；用路段索引关联地图，重复经过同一楼层也能对应。
+查看其他楼层或路段不推进进度。
+适配手机、大字体与宽屏，主要按钮可见并避让系统区域。
+设备已连接时安装，检查安检与跨层流程；否则先做逻辑检查，第 8 步运行。
+</code></pre>
+<p><strong>完成标志：</strong> 地图与步骤同步，查看楼层不推进；指引可完成、回退，按钮可操作。</p>
+<h3>7. 补齐双语、状态与异常</h3>
+<p><strong>目标：</strong> 补齐双语、编辑状态与异常处理。</p>
+<p><strong>复制给 AI：</strong></p>
+<pre><code class="language-text">补齐所有文案与地点名的中英双语，本地保存语言和最近六个目的地。
+进度仅留在会话内，新行程起终点为空。
+编辑先改草稿：取消保留原路线和进度；确认后重新规划、回到预览、步骤归零。
+交换起终点或修改偏好也重新规划并归零。
+处理相同地点、无路、数据缺失、返回、键盘遮挡与地图无可选地点。
+检查双语、重启保存、编辑取消/确认、偏好、交换、上一步与完成页，修复问题。
+</code></pre>
+<p><strong>完成标志：</strong> 双语与最近地点保存正常，编辑取消保留、确认重置，异常可恢复。</p>
+<h3>8. 运行并检查完整流程</h3>
+<p><strong>目标：</strong> 安装运行，检查完整流程。</p>
+<p><strong>复制给 AI：</strong></p>
+<pre><code class="language-text">编译元服务，给出 HAP 路径。设备未就绪时指导创建、启动与连接，
+在我选定的设备上推送、安装、打开；按错误处理连接、API 与签名问题。
+逐项体验：新行程空起终点、A101、西出发门、中央安检预览、
+当前/下一步手动指引与完成页、同侧免安检、地铁跨层与电梯偏好、
+六层地图、双语与最近地点、编辑取消/确认、交换与返回。
+按需求检查，结合日志修复后重新运行对应操作，告诉我如何再次构建和运行。
+</code></pre>
+<p><strong>完成标志：</strong> 云手机或模拟器上完成选目的地、选起点、看路线与分步抵达。</p>
+<h2 id="功能检查与排障">功能检查与排障</h2>
+<h3>体验检查</h3>
+<p>按下表检查常用场景与状态变化。</p>
 <table>
-  <tr><th>文件</th><th>职责</th><th>行数</th></tr>
-  <tr><td><code>model/AirportMap.ets</code></td><td>生成文件：119 节点 / 145 边 / side / FLOOR_BBOX / NODE_EN</td><td>~2139</td></tr>
-  <tr><td><code>core/Pathfinder.ets</code></td><td>Dijkstra + 安检必经拆段 + 偏好乘子</td><td>~289</td></tr>
-  <tr><td><code>ui/FloorCanvas.ets</code></td><td>Canvas 三层渲染 + 动效 + 手势</td><td>~473</td></tr>
-  <tr><td><code>pages/Index.ets</code></td><td>总览 + Navigation 宿主分发</td><td>~253</td></tr>
-  <tr><td><code>pages/Route.ets</code></td><td>逐层路径图 + 换层提示 + 动效</td><td>~396</td></tr>
-  <tr><td><code>core/Viewport.ets</code></td><td>视口变换（zoom/translate/坐标换算）</td><td>~68</td></tr>
-  <tr><td><code>model/Loc.ets</code></td><td>运行时中英文案表（51 键 ZH/EN 对称）</td><td>~124</td></tr>
-</table>
-
-<h2>高频问题排查</h2>
+<thead>
+<tr>
+<th>场景</th>
+<th>操作</th>
+<th>可观察的完成标志</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>新行程</td>
+<td>首页进入“去登机口”</td>
+<td>起终点为空，先选目的地再选起点。</td>
+</tr>
+<tr>
+<td>安检路线</td>
+<td>选 A101 → 西出发门</td>
+<td>预览提示中央安检；指引展示当前与下一步，手动确认推进。</td>
+</tr>
+<tr>
+<td>同侧路线</td>
+<td>选同侧两点</td>
+<td>无需安检，不绕行。</td>
+</tr>
+<tr>
+<td>跨层与偏好</td>
+<td>4F → B2 市区站台，选“优先电梯”</td>
+<td>列出换层并要求确认；步行米数不含垂直边。</td>
+</tr>
+<tr>
+<td>状态回退</td>
+<td>查看其他楼层、全程步骤，返回上一步</td>
+<td>查看不推进，上一步回退；改偏好或确认编辑后重回预览。</td>
+</tr>
+<tr>
+<td>编辑与交换</td>
+<td>编辑后取消、确认，再交换起终点</td>
+<td>取消保留路线及进度；确认、交换重新规划并重置。</td>
+</tr>
+<tr>
+<td>双语与最近</td>
+<td>切换 English、选择目的地后重启</td>
+<td>文案与地点名切换；语言、最近 6 个目的地保留，新行程起终点为空。</td>
+</tr>
+<tr>
+<td>六层地图</td>
+<td>依次进入 4F、3F、2F、1F、B1、B2</td>
+<td>全层、缩放、点选可用；地点可用于规划。</td>
+</tr>
+<tr>
+<td>相同地点</td>
+<td>起终点选同一地点</td>
+<td>提示“起点和目的地相同”，可重选。</td>
+</tr>
+<tr>
+<td>搜索无结果</td>
+<td>输入无匹配查询</td>
+<td>提示无结果，可清除后重选。</td>
+</tr>
+</tbody></table>
+<h3>运行检查</h3>
+<ul>
+<li><input disabled="" type="checkbox"> 构建成功，生成 HAP。</li>
+<li><input disabled="" type="checkbox"> 选定设备安装成功，首页可打开。</li>
+<li><input disabled="" type="checkbox"> 地点可搜索，路线预览与指引可完成。</li>
+<li><input disabled="" type="checkbox"> 错误输入或操作有恢复入口。</li>
+</ul>
+<h3>高频问题</h3>
 <table>
-  <tr><th>现象</th><th>环节</th><th>原因</th><th>解决</th></tr>
-  <tr><td>00308018 EPERM</td><td>编译</td><td>local.properties 的 sdk.dir 不正确</td><td>修正 sdk.dir 或用 DevEco Studio 打开一次自动补齐</td></tr>
-  <tr><td>00303217</td><td>编译</td><td>SDK 环境变量未设置</td><td>参考 BUILD.md §3.1 设置 DEVECO_SDK_HOME 等</td></tr>
-  <tr><td>arkts-no-untyped-obj-literals</td><td>编译</td><td>ArkTS 禁用 Record/无类型对象字面量</td><td>键值字典改 Map + .set()，元数据用显式 interface</td></tr>
-  <tr><td>Cannot find 'Gesture'</td><td>编译</td><td>GestureGroup 在本 SDK 是工厂值无类型名</td><td>去掉返回类型注解由调用推断</td></tr>
-  <tr><td>bindSheet 空白弹层</td><td>运行时</td><td>弹层内容变成空树导致不关闭</td><td>弹层内容永远非空（空选中态渲染占位根）</td></tr>
-  <tr><td>Canvas 点不中节点</td><td>测试</td><td>Canvas 坐标系 ≠ 物理 px</td><td>用 PIL 实测坐标，不按分辨率折算</td></tr>
-</table>
-
-<h2>验证方法</h2>
+<thead>
+<tr>
+<th>现象</th>
+<th>先检查</th>
+<th>处理方向</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>找不到 SDK、Node、Java 或构建工具</td>
+<td>工具是否齐全、路径是否有效</td>
+<td>补齐工具后重新编译；勿照搬其他机器的路径。</td>
+</tr>
+<tr>
+<td>构建成功但未找到 HAP</td>
+<td>工程目录、构建日志与产物路径</td>
+<td>让 AI 定位生成的 HAP，再安装。</td>
+</tr>
+<tr>
+<td>设备不可见或安装失败</td>
+<td>设备运行、连接与签名状态</td>
+<td>按错误处理连接、API 或签名配置。</td>
+</tr>
+<tr>
+<td>页面打开但路线为空</td>
+<td>起终点是否已选、是否相同</td>
+<td>重选两个不同地点。</td>
+</tr>
+<tr>
+<td>布局或搜索结果与示例不同</td>
+<td>窗口、语言、字号和查询</td>
+<td>对照<a href="https://gitcode.com/harmony-practice-center/HarmonyOS-AtomSer-airport-guide/blob/main/docs/images/product-20261001/phone/README.md">案例截图</a>，让 AI 检查数据与布局。</td>
+</tr>
+</tbody></table>
+<p>将操作和错误日志交给 AI：</p>
+<pre><code class="language-text">请根据我的操作与日志复现问题，区分环境、编译、设备/签名或业务逻辑原因。
+按已有需求设计修复，重新构建或运行对应步骤，说明原因、结果与下一步。
+</code></pre>
+<h2 id="安全与清理">安全与清理</h2>
+<h3>实践中的安全注意事项</h3>
+<ul>
+<li>使用虚构机场地图；语言和最近目的地保存在设备本地。</li>
+<li>按工具指导配置签名，不向公开仓库提交私钥或登录凭据。</li>
+<li>反馈时附环境、步骤和日志，移除敏感配置。</li>
+</ul>
+<h3>清理资源</h3>
 <ol>
-  <li><strong>编译验证</strong>：<code>hvigorw assembleHap</code> 全绿，产物 <code>entry-default-unsigned.hap</code> 生成。</li>
-  <li><strong>数据一致性</strong>：<code>python3 tools/gen_model.py</code> 重跑幂等，diff 为空（AirportMap.ets 与 map.json 逐字段一致）。</li>
-  <li><strong>寻路回归</strong>：<code>python3 tools/pathfind_reference.py</code> 跑 500 组随机用例与端侧 Pathfinder 比对，异侧 270 例全部含 <code>xha_p4_sec</code>，同侧 230 例全部不含。</li>
-  <li><strong>模拟器实测</strong>：安装到 HarmonyOS 6.1.0(23) 模拟器，人工验证全部 9 项业务验收 + hilog 无 FATAL/JsError/CppCrash。</li>
+<li>保存源码、需求设计和所需 HAP。</li>
+<li>用工作区上方的关机操作停止云端环境，节省核时；关闭浏览器页签不会停止环境。</li>
+<li>按平台说明停止不再使用的云手机，核对状态；本地关闭模拟器。</li>
+<li>保留后续所需配置，清理临时签名和测试数据。</li>
 </ol>
+<p><strong>完成标志：</strong> 资料已保存，闲置资源已停止。</p>

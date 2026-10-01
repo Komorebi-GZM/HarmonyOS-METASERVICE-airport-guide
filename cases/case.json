@@ -1,73 +1,83 @@
 {
   "baseInfo": {
-    "title": "星海国际机场室内导航元服务",
-    "description": "ArkTS 构建的纯端侧机场室内导航元服务：六层航站楼示意图、跨层最短路径、中央安检必经拆分、中英双语、地铁换乘引导。数据随包，无云端/无账号/无支付/无权限。",
+    "title": "星海国际机场导航元服务",
+    "description": "通过 AI 对话运行机场导航元服务，再从空项目构建自己的版本，学习原生页面、本地地图、安检约束寻路、手动指引与中英双语。",
     "coverImage": "cover.png",
+    "cardImage": "card.png",
     "difficulty": "进阶",
-    "duration": 30,
+    "duration": 240,
     "author": "鸿蒙实践案例开发团队",
-    "tags": ["ArkTS", "Dijkstra", "Canvas", "Navigation", "元服务", "中英双语"],
+    "tags": [
+      "ArkTS",
+      "ArkUI",
+      "Navigation",
+      "Dijkstra",
+      "Canvas",
+      "元服务"
+    ],
     "category": "应用开发",
     "repoUrl": "https://gitcode.com/harmony-practice-center/HarmonyOS-AtomSer-airport-guide.git",
-    "shareImage": "share.png",
-    "demoVideo": ""
+    "shareImage": "share.png"
   },
   "introduction": {
-    "overview": "本案例以「一句话需求」为起点：做一个机场地图指引，选好起点终点就能把路走通。从这个需求出发，产出了一个兼顾实用功能与代码示范价值的纯端侧元服务。地图以一张节点-边图（119 节点 / 145 边 / 6 层）为唯一事实源，端侧 Dijkstra 寻路强制处理「中央安检必经」——起点终点分属陆侧/空侧时，路线被拆成「起 → 安检 → 终」两段，安检作为醒目标注，绝不可能被绕过。",
+    "overview": "以虚构的星海国际机场为教学场景，先体验现成工程，再通过八阶段 AI 对话从空项目构建六页元服务。完整实践约 3–6 小时，快速体验约 15–30 分钟（估计，不含环境与设备准备）；无需会手写 ArkTS。",
     "highlights": [
       {
         "icon": "MagicStick",
-        "title": "ArkUI 声明式开发",
-        "desc": "Navigation 多页面 + Canvas 自定义绘制 + @StorageLink 状态管理，构建流畅的机场导航界面"
+        "title": "分阶段 AI 实践",
+        "desc": "云端或本地快速体验现成工程；完整实践从空项目开始，依次完成八阶段目标和检查。"
       },
       {
         "icon": "Cpu",
-        "title": "Dijkstra + 安检必经拆分",
-        "desc": "端侧最短路径引擎，唯一安检是陆空割点，异侧路线强制拆段拼接，结构上保证不可绕过"
+        "title": "本地地图与安检约束寻路",
+        "desc": "六层地图含 119 个节点、145 条边；Dijkstra 规划异侧中央安检必经、同侧直接寻路，四种偏好影响换层选路。"
       },
       {
-        "icon": "Brush",
-        "title": "Canvas 三层渲染",
-        "desc": "程序化示意背景 + 拓扑节点/边 + 路径高亮，共用同一视口变换天然对齐，含路径生长动效"
+        "icon": "Phone",
+        "title": "地图与手动指引联动",
+        "desc": "Navigation 六页流程、Canvas 地图、RouteStep 与 legIndex 联动，用户手动确认进度。"
+      },
+      {
+        "icon": "CollectionTag",
+        "title": "双语与行程状态",
+        "desc": "PlannerState 管理选择草稿、已确认地点、偏好、阶段和步骤；Preferences 保存语言与最近六个目的地。"
       }
     ],
     "deliverables": {
       "title": "你能做出什么",
-      "intro": "完成本案例后，你将产出以下成果",
+      "intro": "完成实践后，你可以构建并运行一个教学用机场导览元服务：",
       "items": [
-        "一个可运行的机场室内导航元服务（atomicService）",
-        "支持六层航站楼浏览、分类搜索、跨层最短路径寻路",
-        "中央安检必经拆分，路线醒目标注，不可绕过",
-        "中英双语即时切换、地铁换乘引导、路径绘制动效",
-        "完整的数据驱动开发管道（JSON → 类型化模型 → 端侧消费）"
+        "六页原生导览流程：选目的地、选起点、路线预览与手动指引，并可查看地铁方向和六层地图",
+        "本地地图搜索与安检约束寻路，区分步行米数和换层设施",
+        "四种路线偏好、起终点编辑与交换、中英双语及最近六个目的地"
       ]
     },
-    "targetAudience": "HarmonyOS 进阶到高级开发者；想完整复刻「元服务 + 数据驱动寻路 + Canvas 拓扑绘制 + 多语言」案例的人"
+    "targetAudience": "会使用 AI 编程工具、愿意核对运行效果的开发者；无需会手写 ArkTS。"
   },
   "prerequisites": {
     "cloud": [
       {
         "icon": "Key",
-        "title": "华为开发者联盟账号",
-        "desc": "纯端侧元服务，模拟器调试无需账号；真机签名分发时需实名认证账号",
-        "status": "可选"
-      },
-      {
-        "icon": "Help",
-        "title": "网络环境",
-        "desc": "首次下载 HarmonyOS SDK 和模拟器镜像需联网；日常编译运行无需网络",
-        "status": "建议"
-      },
-      {
-        "icon": "Money",
-        "title": "费用",
-        "desc": "纯端侧元服务，零云资源消耗，完全免费",
-        "status": "免费"
+        "title": "账号要求",
+        "desc": "准备已实名认证的华为开发者联盟账号，并按鸿蒙开发实践中心当前流程进入作业中心。",
+        "status": "必须"
       },
       {
         "icon": "Box",
-        "title": "HarmonyOS SDK",
-        "desc": "需通过 DevEco Studio 安装 HarmonyOS SDK，API ≥ 23（6.1.0+），compile API 24（6.1.1）",
+        "title": "网络环境",
+        "desc": "需要可访问鸿蒙开发实践中心、GitCode 和开发环境的稳定网络。",
+        "status": "必须"
+      },
+      {
+        "icon": "Money",
+        "title": "费用与配额",
+        "desc": "创建环境前查看账号核时额度、云手机资源条件与平台当前费用说明；使用后停止闲置资源。",
+        "status": "建议"
+      },
+      {
+        "icon": "Phone",
+        "title": "设备要求",
+        "desc": "电脑浏览器即可进入云端环境；云端创建并连接云手机，无需在本机安装 DevEco Studio。",
         "status": "必须"
       }
     ],
@@ -75,73 +85,59 @@
       {
         "icon": "ReadingLamp",
         "title": "基础知识",
-        "desc": "ArkTS 基本语法、ArkUI 声明式 UI 组件概念、TypeScript 基础、图论基础（Dijkstra 算法）",
-        "status": "必须"
+        "desc": "会使用 AI 编程工具；理解 JSON 的节点和边有助于核对地图与路线，无需会手写 ArkTS。",
+        "status": "建议"
       },
       {
         "icon": "Phone",
         "title": "测试设备",
-        "desc": "HarmonyOS 模拟器或真机（API 23+），执行 hdc list targets 应显示设备",
-        "status": "建议"
+        "desc": "准备并启动 HarmonyOS 模拟器；让 AI 识别设备，并核对工程 API 23 目标与兼容版本、设备 API 和签名安装条件。",
+        "status": "必须"
       },
       {
-        "icon": "Calendar",
+        "icon": "Timer",
         "title": "预计时长",
-        "desc": "约 30 分钟（含 DevEco Studio 启动与模拟器开机），编译到模拟器实跑",
+        "desc": "快速体验约 15–30 分钟；完整实践约 3–6 小时，均为估计且不含环境与设备准备。",
         "status": "建议"
       },
       {
         "icon": "MagicStick",
-        "title": "AI 编程工具",
-        "desc": "推荐使用 CodeArts Agent 等 AI 编程工具辅助开发，本案例的开发过程即采用对话式开发",
-        "status": "可选"
+        "title": "AI 工具",
+        "desc": "准备码道 IDE 与 HarmonyOS Command Line Tools，由 AI 检查 SDK、编译 HAP、识别设备并辅助安装。",
+        "status": "必须"
       }
     ]
   },
   "knowledgePoints": {
-    "intro": "本案例涵盖以下核心知识点，从数据建模到寻路算法到 Canvas 渲染，形成完整的端侧导航技术栈",
+    "intro": "围绕本地地图、六页交互和从空项目构建，理解以下知识点。",
     "list": [
       {
-        "title": "ArkUI 组件化开发与 Navigation 多页面",
-        "subtitle": "声明式 UI + NavDestination 路由",
+        "title": "原生页面与行程状态",
+        "subtitle": "ArkUI / Navigation / PlannerState / 草稿编辑",
         "importance": "核心",
-        "content": "使用 ArkTS + ArkUI 构建 Navigation 宿主页面，通过 NavPathStack + navDestination 分发二级页面（SelectTarget / SelectStart / Route / MetroGuide / FloorBrowse）。跨页参数通过模块级 Router 静态类传递，避免 ArkTS param 类型坑。Tabs 组件用于楼层切换和分类切换，bindSheet 用于半模态节点详情。",
-        "transferScene": "适用于所有需要多页面导航的 ArkUI 应用，特别是需要跨页状态传递的场景"
+        "content": "<p>六页页面共享同一行程状态。本案例中你将学到：</p><ul><li><strong>宿主状态</strong>：<code>Navigation</code> 宿主以 <code>@Provide</code> 提供 <code>PlannerState</code>，更新时替换对象，由子页消费。</li><li><strong>草稿与确认</strong>：区分草稿和已确认的起终点；取消编辑保留原路线与进度，确认编辑、交换或改偏好后重新规划。</li><li><strong>阶段与步骤</strong>：在 preview、guiding、completed 等阶段管理 <code>stepIndex</code>，查看地图不自动推进。</li></ul>",
+        "transferScene": "可迁移到需要多页编辑和逐步确认的导览流程。"
       },
       {
-        "title": "Dijkstra 最短路径与安检必经拆分",
-        "subtitle": "图论算法落地 ArkTS",
+        "title": "地图建模与安检约束寻路",
+        "subtitle": "本地 JSON / Dijkstra / 中央安检 / 四种偏好",
         "importance": "核心",
-        "content": "端侧实现 Dijkstra 最短路径算法：walk 边用来权、垂直边（电梯30/扶梯40/楼梯25）用基准权重。核心创新是「安检必经拆分」——当起终点分属陆侧/空侧时，路线被拆成「起→安检」+「安检→终」两段 Dijkstra 拼接。唯一安检是图的割点（割点 = 删除后图不连通），因此该拆分严格等价于「不可能绕过安检」。偏好档位通过乘子重算垂直边权重实现（最短/优先电梯/优先扶梯/避开楼梯）。",
-        "transferScene": "适用于所有需要路径规划的应用：商场导航、医院导诊、校园导览、地下停车场寻车等"
+        "content": "<p>本地节点和边组成六层双向图。本案例中你将学到：</p><ul><li><strong>地图数据</strong>：用 119 个节点、145 条边的 JSON 提供地点、楼层、连接和 <code>weight</code>。</li><li><strong>安检规则</strong>：陆侧与空侧路线经 <code>xha_p4_sec</code> 分段规划；同侧直接规划，不为了安检绕行。</li><li><strong>路线偏好</strong>：“推荐路线、优先电梯、优先扶梯、尽量少走楼梯”改变垂直边选路成本。</li><li><strong>步行米数</strong>：展示值仅累计 <code>walk</code> 边的 <code>weight</code>，垂直边成本不计入步行米数。</li></ul>",
+        "transferScene": "可迁移到有通行约束与换层设施的场馆地图。"
       },
       {
-        "title": "Canvas 三层渲染与视口变换",
-        "subtitle": "程序化绘制 + 动效",
+        "title": "路线步骤与楼层地图",
+        "subtitle": "RouteStep / legIndex / Canvas / 手动确认",
         "importance": "核心",
-        "content": "Canvas 单层绘制 = 程序化示意背景（纸面底色 + 25m 网格 + 通道带 + 楼体轮廓）+ 拓扑层（节点圆/边线/双语标签）+ 路径层（白描边红线 + 0→1 生长动效）。三层共用同一 Viewport 变换（zoom/translate），天然对齐。路径动效用 setInterval(16ms) 驱动 progress += 0.02（约 800ms 线性），cutPolyline 按累计长度内插裁剪。支持 PanGesture/PinchGesture 平移缩放。",
-        "transferScene": "适用于所有需要自定义 Canvas 绘制的应用：地图、拓扑图、数据可视化、游戏棋盘等"
+        "content": "<p>路线被拆成可逐步阅读和确认的指引。本案例中你将学到：</p><ul><li><strong>步骤生成</strong>：按步行、安检、换层和到达生成 <code>RouteStep</code>，显示当前与下一步。</li><li><strong>路段联动</strong>：用 <code>legIndex</code> 把步骤关联到地图路段，重复经过同一楼层仍能对应。</li><li><strong>地图操作</strong>：<code>Canvas</code> 绘制地点与路线，支持切层、缩放、平移和点选；浏览不推进指引。</li></ul>",
+        "transferScene": "可迁移到楼层地图与清单步骤联动的应用。"
       },
       {
-        "title": "数据驱动模型生成管道",
-        "subtitle": "JSON → 类型化 ArkTS 常量",
+        "title": "双语与本地保存",
+        "subtitle": "Preferences / 中文英文 / 最近地点 / 会话进度",
         "importance": "重要",
-        "content": "data/XHA_xinghai_t1.map.json（119 节点 / 145 边 / 6 层）为唯一事实源，tools/gen_model.py 读取后输出 model/AirportMap.ets（类型化常量）。生成内容包括：MapNode/MapEdge 接口、XHA_NODES/XHA_EDGES 数组、NODE_EN 英文名 Map、FLOOR_BBOX 包围盒、side 陆空侧分类（生成时 BFS 计算）。ArkTS 严格模式禁用 Record 对象字面量，键值字典一律 Map 化。",
-        "transferScene": "适用于所有需要将结构化数据编译进包的应用，特别是数据量固定且需要类型安全的场景"
-      },
-      {
-        "title": "中英双语即时切换",
-        "subtitle": "运行时文案表 + AppStorage",
-        "importance": "重要",
-        "content": "运行时文案表 Loc.ets 维护 ZH/EN 两个 Map（51 键），key 与 resources/base|en_US/element/string.json 命名对齐。切换经 @StorageLink('lang') + AppStorage.setOrCreate('lang') 即时生效，页面文案与 Canvas 标签同步刷新。节点名级翻译由 AirportMap.ets 的 NODE_EN（生成时翻译全量 119 节点）+ Localization.nodeName() 提供，未知回落中文。",
-        "transferScene": "适用于所有需要多语言支持的鸿蒙应用"
-      },
-      {
-        "title": "元服务（atomicService）配置",
-        "subtitle": "免安装单入口",
-        "importance": "了解",
-        "content": "AppScope/app.json5 配置 bundleType: atomicService；module.json5 配置 deliveryWithInstall: true + installationFree: true，单 EntryAbility 入口。元服务可直接 hdc install 装入模拟器运行，无需签名（unsigned HAP 仅供调试）。EntryAbility 中 setWindowBackgroundColor 打深青底色防冷启动白闪。",
-        "transferScene": "适用于所有需要开发 HarmonyOS 元服务的场景"
+        "content": "<p>界面文案和地点名称支持中英切换。本案例中你将学到：</p><ul><li><strong>本地选择</strong>：<code>Preferences</code> 保存语言及最近六个目的地。</li><li><strong>会话进度</strong>：行程指引进度仅留在当前会话，新行程起终点为空。</li><li><strong>异常恢复</strong>：相同地点、无路、无搜索结果等状态提供重选入口。</li></ul>",
+        "transferScene": "可迁移到本地偏好保存与轻量多语言界面。"
       }
     ]
   },
@@ -150,110 +146,109 @@
   },
   "architecture": {
     "archImage": "arch-diagram.svg",
-    "description": "<p>应用采用数据驱动的分层架构，自底向上分为 5 层：</p><ul><li><strong>Data 层</strong>：data/XHA_xinghai_t1.map.json 为唯一事实源（119 节点 / 145 边 / 6 层），tools/gen_model.py 编译生成 model/AirportMap.ets 类型化常量进包。</li><li><strong>Model 层</strong>：AirportMap.ets（生成文件，含 MapNode/MapEdge/XHA_META/NODE_EN/FLOOR_BBOX/side）、Localization.ets（类型/楼层双语）、Categories.ets（语义分类+搜索索引）、Loc.ets（运行时文案表 51 键）。</li><li><strong>Core 层</strong>：Pathfinder.ets（Dijkstra + 安检必经拆段 + 偏好乘子）、Viewport.ets（视口变换 zoom/translate）、Router.ets（跨页路由参数静态类）。</li><li><strong>UI 层</strong>：FloorCanvas.ets（Canvas 三层渲染：示意背景+拓扑+路径，含动效和手势）、Theme.ets（色板/字号/圆角）。</li><li><strong>Pages 层</strong>：Index（总览+Navigation 宿主）、SelectTarget（分类Tabs+搜索）、SelectStart（快捷起点+全节点检索）、Route（逐层路径图+动效）、MetroGuide（地铁引导）、FloorBrowse（楼层漫游+bindSheet详情）。</li></ul><p>数据流：JSON 数据源 → gen_model.py 编译 → AirportMap.ets 类型化模型 → Pathfinder Dijkstra 寻路（安检必经拆段）→ Route.ets 逐层路径 → FloorCanvas Canvas 三层渲染。</p>"
+    "description": "<p>本地地图 JSON 生成 ArkTS 地图模型，供地点搜索和 Dijkstra 寻路使用。<code>Navigation</code> 宿主提供 <code>PlannerState</code>，管理草稿、已确认起终点、偏好、阶段和步骤；路线结果拆为 <code>RouteStep</code>，通过 <code>legIndex</code> 联动 Canvas 地图与手动指引。<code>Preferences</code> 保存语言和最近六个目的地，指引进度只在会话中。</p>"
   },
   "preview": {
-    "intro": "以下是应用在手机上的效果展示，包含机场总览、跨层路径图、安检必经标注",
+    "intro": "手机预览合成首页、中央安检路线预览和电梯换层指引三张系统截图。",
     "devices": [
       {
         "deviceType": "phone",
         "deviceName": "手机",
         "previewImage": "preview-phone.png",
-        "description": "在手机上的显示效果：机场总览页面展示六层航站楼、三大功能入口、快捷直达和楼层导览，深青夜航底色搭配浅色地图面"
+        "description": "展示开始行程、安检路线预览及跨层电梯手动确认。"
       }
     ]
   },
   "faqs": {
-    "intro": "开发过程中可能遇到以下问题，均已在实际开发中踩过并修复",
+    "intro": "按实践步骤和构建日志定位常见问题。",
     "list": [
       {
-        "title": "编译报 00308018 EPERM",
-        "question": "构建早期报 EPERM / 权限相关错误怎么解决？",
-        "reason": "harmony_app/local.properties 的 sdk.dir 不正确或被改写",
-        "solution": "手动修正 sdk.dir 指向本机 SDK（macOS: /Applications/DevEco-Studio.app/Contents/sdk），或用 DevEco Studio 打开一次让工具自动补齐"
+        "title": "构建工具不可用",
+        "question": "找不到 SDK、Node、Java 或构建工具怎么办？",
+        "reason": "工具未安装、路径无效或当前环境没有相应 SDK。",
+        "solution": "让 AI 检查工具与 SDK 路径，补齐缺项后重新编译，不照搬其他机器路径。"
       },
       {
-        "title": "ArkTS 严格模式编译错误",
-        "question": "编译报 arkts-no-untyped-obj-literals 等 ArkTS 严格模式错误怎么解决？",
-        "reason": "ArkTS 禁用 Record 对象字面量、@Builder 体内局部变量、Gesture 类型名等",
-        "solution": "键值字典改 Map + .set()；@Builder 局部变量拆成普通私有方法；GestureGroup 去掉返回类型注解由调用推断。详见 docs/开发文档.md §9 的 22 处整改清单"
+        "title": "未找到 HAP",
+        "question": "构建成功但不知道产物在哪？",
+        "reason": "查看的工程目录或产物路径不正确。",
+        "solution": "让 AI 根据构建日志定位生成的 HAP，再检查设备 API 与签名安装要求。"
       },
       {
-        "title": "bindSheet 弹层空白且关不掉",
-        "question": "FloorBrowse 页面节点详情弹层出现空白且无法关闭怎么解决？",
-        "reason": "弹层内容因状态变化变成空树，设 showDetail=false 也不关闭",
-        "solution": "弹层内容永远渲染一个非空占位根（空选中态渲染占位）；关闭动作不清空选中节点。框架自带关闭（X / 点遮罩）不受影响"
+        "title": "设备安装失败",
+        "question": "云手机或模拟器不可见，或者安装失败？",
+        "reason": "设备尚未运行或连接，或 API 与签名条件不满足。",
+        "solution": "先识别设备及其系统版本，再按实际错误处理连接、API 或签名配置。"
       },
       {
-        "title": "FloorCanvas 点击不中节点",
-        "question": "模拟器上点击 Canvas 节点无法命中怎么解决？",
-        "reason": "Canvas 坐标系不等于物理 px，FloorCanvas 内部映射与屏幕坐标不一致",
-        "solution": "用截图 + PIL 实测坐标（如 hdc shell snapshot_display 截图后用 PIL 色彩聚类定位），不要按分辨率比例折算"
-      },
-      {
-        "title": "直达路线残留空楼层 Tab",
-        "question": "直达路线仍出现中间楼层的空白 Tab 怎么解决？",
-        "reason": "跨层路线中间楼层只有单节点过站（如电梯在 2F 停一下），生成了空的楼层分页",
-        "solution": "mergeTransitLegs 把单节点过站腿吸收为一条直达换乘，Tabs 只含真实途经楼层"
-      },
-      {
-        "title": "四种寻路偏好距离显示不一致",
-        "question": "选择不同寻路偏好时路线相同但显示距离不一致怎么解决？",
-        "reason": "planRoute 选路用偏好乘子但显示距离也用了乘子后的权重",
-        "solution": "选路用偏好乘子、显示距离一律用数据原始权重（walk=真实米，垂直=基准 30/40/25），偏好只影响选路不改显示距离"
+        "title": "路线为空",
+        "question": "页面打开后无法预览路线？",
+        "reason": "起终点未选、选择相同地点，或地图数据与地点不匹配。",
+        "solution": "重新选择两个不同地点，检查地图数据和无路提示。"
       }
     ]
   },
   "scenarios": {
-    "intro": "本案例的技术方案可迁移到以下场景，核心复用「数据驱动的图寻路 + Canvas 拓扑绘制 + 多步导航流程」组合",
-    "migrationPoints": ["图寻路引擎", "Canvas 三层渲染", "Navigation 多页面", "数据驱动模型管道"],
+    "intro": "将本地地图和手动指引方法迁移到其他教学场景。",
+    "migrationPoints": [
+      "本地节点边数据",
+      "受限路径规划",
+      "多楼层地图与手动步骤"
+    ],
     "list": [
       {
         "icon": "Suitcase",
-        "title": "商场室内导航",
-        "desc": "基于相同的节点-边图模型和 Dijkstra 寻路，构建商场楼层导航：找店铺、跨层路径、设施分类搜索",
-        "skills": ["Dijkstra", "Canvas", "Navigation"],
-        "migrationPoints": ["复用 Pathfinder 寻路引擎", "替换 AirportMap 数据为商场拓扑", "Categories 分类适配商场业态"]
-      },
-      {
-        "icon": "AlarmClock",
-        "title": "医院导诊系统",
-        "desc": "科室分布图 + 挂号/取药/检查路径规划，支持科室分类搜索和跨楼层导航",
-        "skills": ["Dijkstra", "Canvas", "双语"],
-        "migrationPoints": ["复用 FloorCanvas 三层渲染", "路径动效改为步行动画", "增加排队叫号集成"]
+        "title": "展馆导览",
+        "desc": "使用本地展厅与通道数据，练习分类搜索、楼层切换与指定通行点。",
+        "skills": [
+          "本地 JSON",
+          "Canvas",
+          "Dijkstra"
+        ],
+        "migrationPoints": [
+          "替换地点与通道数据",
+          "调整通行约束与分类"
+        ]
       },
       {
         "icon": "ReadingLamp",
-        "title": "校园导览应用",
-        "desc": "校园地图 + 教学楼/实验室/食堂导航，支持新生入学导览和访客指引",
-        "skills": ["Navigation", "Canvas", "数据管道"],
-        "migrationPoints": ["复用数据生成管道 gen_model.py", "Categories 适配校园分类", "增加 AR 实景叠加"]
+        "title": "校园导览",
+        "desc": "以教学楼和设施地图练习目的地选择、路线预览和手动指引。",
+        "skills": [
+          "Navigation",
+          "PlannerState",
+          "RouteStep"
+        ],
+        "migrationPoints": [
+          "新增本地设施与英文名",
+          "调整地图标注与步骤文案"
+        ]
       }
     ]
   },
   "challenges": {
-    "intro": "完成基础案例后，可以尝试以下拓展挑战，逐步将示意原型演进为生产级应用",
+    "intro": "完成基础实践后，可在自己的工程中做小范围学习扩展。",
     "list": [
       {
-        "title": "接入真实航班动态数据",
-        "difficulty": "中等",
-        "kpTag": "数据",
-        "desc": "将登机口的静态示意数据替换为真实航班动态：登机口位置/编号/状态随航班变化。模型层接口不变，仅需替换 gate 节点数据。",
-        "hint": "用 @ohos.net.http 发起网络请求获取航班数据，或用 rawfile 运行时加载动态 JSON 替代编译进包的 AirportMap.ets"
-      },
-      {
-        "title": "集成室内定位能力",
-        "difficulty": "困难",
-        "kpTag": "定位",
-        "desc": "「起点」由用户手动选择改为基于蓝牙信标/Wi-Fi 指纹的室内定位自动获取，实现真正的「我在哪→去哪」导航。",
-        "hint": "参考 @ohos.bluetoothManager 蓝牙 API 扫描信标 RSSI，做三角定位后将结果写入 Router.startId"
-      },
-      {
-        "title": "替换程序化背景为位图手绘图",
+        "title": "新增一处本地设施",
         "difficulty": "简单",
+        "kpTag": "地图数据",
+        "desc": "增加设施节点、连接边和搜索分类，使其可搜索、点选与规划。",
+        "hint": "核对 JSON、英文名和地图标记，并回归安检与跨层路线。"
+      },
+      {
+        "title": "改进地图标注",
+        "difficulty": "中等",
         "kpTag": "Canvas",
-        "desc": "将程序化绘制的示意背景（通道带+网格+轮廓）替换为设计师手绘的位图背景，提升视觉品质。FloorCanvas.drawBase 已预留 drawImage 插槽。",
-        "hint": "在 drawBase 中用 ctx.drawImage 加载 rawfile 中的位图背景，替换现有的几何绘制代码"
+        "desc": "优化密集地点的标签位置和缩放下的可读性。",
+        "hint": "检查六层地图的全层视图、点选反馈和路线标记。"
+      },
+      {
+        "title": "扩展一组界面语言",
+        "difficulty": "中等",
+        "kpTag": "本地化",
+        "desc": "在现有中文与英文文案结构上增加一种练习语言。",
+        "hint": "同步地点名、步骤文案与语言保存，检查切换后的布局。"
       }
     ]
   }
