@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-01",
+  "bundle": "com.example.airportguide",
+  "hap": {
+    "path": "harmony_app/entry/build/default/outputs/default/entry-default-unsigned.hap",
+    "sha256": "214963fbc7766873d312beb42b235e6e8812bb1bce9db22fced45c6f7437ad18",
+    "bytes": 751682,
+    "signed": false
+  },
+  "coreVerification": {
+    "pythonBaselinePairs": 500,
+    "etsRouteCases": 2000,
+    "suitesPassed": 6
+  },
+  "api24UiFlows": [
+    {
+      "report": "docs/reports/product-20261001/api24-state.json",
+      "language": "zh",
+      "passedChecks": 21
+    },
+    {
+      "report": "docs/reports/product-20261001/api24-map.json",
+      "language": "zh",
+      "passedChecks": 14
+    },
+    {
+      "report": "docs/reports/product-20261001/api24-metro.json",
+      "language": "en",
+      "passedChecks": 6
+    }
+  ],
+  "runtimeLogAudit": {
+    "finishedAt": "2026-10-01T13:29:09+0800",
+    "results": [
+      {
+        "target": "127.0.0.1:5555",
+        "api": "26",
+        "pid": "8185",
+        "logLines": 25,
+        "errors": []
+      },
+      {
+        "target": "127.0.0.1:5557",
+        "api": "24",
+        "pid": "20182",
+        "logLines": 25,
+        "errors": []
+      },
+      {
+        "target": "127.0.0.1:5559",
+        "api": "24",
+        "pid": "23903",
+        "logLines": 31,
+        "errors": []
+      },
+      {
+        "target": "127.0.0.1:5561",
+        "api": "26",
+        "pid": "16724",
+        "logLines": 25,
+        "errors": []
+      }
+    ]
+  },
+  "screenshots": {
+    "directory": "docs/images/product-20261001/phone",
+    "count": 11,
+    "manifest": "docs/images/product-20261001/phone/manifest.json"
+  },
+  "testedVersions": [
+    24,
+    26
+  ],
+  "compatibilityTarget": 23,
+  "scope": "Local fictional airport data, manual starting location and manual guidance progress"
+}

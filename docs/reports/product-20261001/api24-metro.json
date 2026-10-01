@@ -1,0 +1,44 @@
+{
+  "publicSummary": true,
+  "evidenceBoundary": "Published summary only. Per-step UI trees and full-process screenshots remain local; representative screenshots are in docs/images/product-20261001/phone.",
+  "ok": true,
+  "language": "en",
+  "scope": "metro",
+  "finishedAt": "2026-10-01T13:22:26+0800",
+  "passed": [
+    "metro_city_home",
+    "metro_city_entry",
+    "metro_city_preview",
+    "metro_resort_home",
+    "metro_resort_entry",
+    "metro_resort_preview"
+  ],
+  "failures": [],
+  "sourceMap": "data/XHA_xinghai_t1.map.json",
+  "steps": [
+    {
+      "name": "metro_city_home",
+      "assertion": "首页与语言设置稳定"
+    },
+    {
+      "name": "metro_city_entry",
+      "assertion": "首页入口打开对应选择页"
+    },
+    {
+      "name": "metro_city_preview",
+      "assertion": "路线预览标题出现"
+    },
+    {
+      "name": "metro_resort_home",
+      "assertion": "首页与语言设置稳定"
+    },
+    {
+      "name": "metro_resort_entry",
+      "assertion": "首页入口打开对应选择页"
+    },
+    {
+      "name": "metro_resort_preview",
+      "assertion": "路线预览标题出现"
+    }
+  ]
+}

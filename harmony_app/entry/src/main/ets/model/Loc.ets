@@ -1,125 +1,123 @@
-// 全局文案表：运行时中/英切换（不依赖系统语言，元服务内自控）
-// key 与 resources/base|en_US/element/string.json 命名对齐，便于将来并轨
-// ArkTS 禁用 Record 对象字面量 -> 用 Map.set 逐条写入；两表键必须一一对应（有审计脚本兜底）
 import { FLOOR_LABELS, FLOOR_LABELS_EN } from './AirportMap';
-
+interface Translation { key: string; zh: string; en: string; }
+const TEXTS: Translation[] = [
+  { key: "brand", zh: "星海机场", en: "Xinghai Airport" },
+  { key: "home_title", zh: "你想去哪里？", en: "Where would you like to go?" },
+  { key: "home_sub", zh: "主航站楼 · 六层导览", en: "Main terminal · Six floors" },
+  { key: "search", zh: "搜索登机口、设施或地点", en: "Search gates, facilities or places" },
+  { key: "search_hint", zh: "试试 A101、洗手间或地铁", en: "Try A101, restroom or metro" },
+  { key: "go_gate", zh: "去登机口", en: "Find a gate" },
+  { key: "go_metro", zh: "坐地铁", en: "Take the metro" },
+  { key: "go_service", zh: "找设施", en: "Find facilities" },
+  { key: "popular", zh: "常用目的地", en: "Popular destinations" },
+  { key: "recent", zh: "最近查找", en: "Recent places" },
+  { key: "floors", zh: "查看楼层地图", en: "Explore floor maps" },
+  { key: "view_map", zh: "在地图上选择位置", en: "Choose on the map" },
+  { key: "home_tip", zh: "先选目的地，再选你现在的位置", en: "Choose a destination, then your starting point" },
+  { key: "sample", zh: "星海机场示例导览 · 位置由你手动选择", en: "Xinghai airport example · Select your location manually" },
+  { key: "target_title", zh: "选择目的地", en: "Destination" },
+  { key: "target_heading", zh: "你想去哪里？", en: "Choose your destination" },
+  { key: "target_hint", zh: "选好地点后，下一步选择出发位置", en: "Next, choose where you are starting from" },
+  { key: "start_title", zh: "出发位置", en: "Starting point" },
+  { key: "start_heading", zh: "你现在在哪里？", en: "Where are you now?" },
+  { key: "start_hint", zh: "请选择你所在的地点，或在地图上点选", en: "Choose your location from the list or map" },
+  { key: "step_one", zh: "第 1 步 · 目的地", en: "Step 1 · Destination" },
+  { key: "step_two", zh: "第 2 步 · 出发位置", en: "Step 2 · Starting point" },
+  { key: "next_start", zh: "选择出发位置", en: "Choose starting point" },
+  { key: "view_route", zh: "从这里出发，查看路线", en: "View route from here" },
+  { key: "apply", zh: "更新路线", en: "Update route" },
+  { key: "selected_target", zh: "前往", en: "Going to" },
+  { key: "selected_start", zh: "从这里出发", en: "Starting from" },
+  { key: "choose_target", zh: "请选择目的地", en: "Choose a destination" },
+  { key: "choose_start", zh: "请选择出发位置", en: "Choose a starting point" },
+  { key: "no_results", zh: "没有找到这个地点", en: "No matching places" },
+  { key: "no_results_hint", zh: "试试登机口编号，或换一个分类", en: "Try a gate number or another category" },
+  { key: "clear", zh: "清除搜索", en: "Clear search" },
+  { key: "all", zh: "全部", en: "All" },
+  { key: "quick_starts", zh: "常见出发位置", en: "Common starting points" },
+  { key: "results", zh: "地点", en: "Places" },
+  { key: "cancel", zh: "取消", en: "Cancel" },
+  { key: "back", zh: "返回", en: "Back" },
+  { key: "metro_title", zh: "坐地铁", en: "Metro" },
+  { key: "metro_heading", zh: "你准备去哪个方向？", en: "Which direction are you going?" },
+  { key: "metro_hint", zh: "选好方向后，再选择你现在的位置", en: "Choose a direction, then your starting point" },
+  { key: "city", zh: "往市区", en: "To the city" },
+  { key: "resort", zh: "往星湖度假区", en: "To Xinghu Resort" },
+  { key: "city_sub", zh: "市区方向 · B2 站台", en: "City-bound · Platform B2" },
+  { key: "resort_sub", zh: "星湖方向 · B2 站台", en: "Resort-bound · Platform B2" },
+  { key: "metro_steps", zh: "到站台的三个环节", en: "Three steps to the platform" },
+  { key: "metro_gate", zh: "到 B1 地铁闸机", en: "Reach the B1 metro gates" },
+  { key: "metro_down", zh: "乘扶梯或楼梯到 B2", en: "Take an escalator or stairs to B2" },
+  { key: "metro_wait", zh: "到所选方向站台候车", en: "Wait at your chosen platform" },
+  { key: "browse_title", zh: "楼层地图", en: "Floor maps" },
+  { key: "browse_heading", zh: "点选地点，查看详情", en: "Tap a place for details" },
+  { key: "browse_hint", zh: "拖动或缩放地图，点击设施标记", en: "Drag or zoom, then tap a facility" },
+  { key: "pick_start", zh: "我在这里", en: "I am here" },
+  { key: "pick_dest", zh: "去这里", en: "Go here" },
+  { key: "start_set", zh: "已选择出发位置", en: "Starting point selected" },
+  { key: "choose_next", zh: "接下来选择目的地", en: "Now choose a destination" },
+  { key: "full_floor", zh: "查看全层", en: "Fit floor" },
+  { key: "fit_route", zh: "查看路线", en: "Fit route" },
+  { key: "zoom_in", zh: "放大地图", en: "Zoom in" },
+  { key: "zoom_out", zh: "缩小地图", en: "Zoom out" },
+  { key: "legend", zh: "设施 · 点选查看", en: "Facilities · Tap for details" },
+  { key: "route_title", zh: "路线指引", en: "Route guide" },
+  { key: "route_preview", zh: "路线预览", en: "Route preview" },
+  { key: "route_guiding", zh: "正在指引", en: "Route guidance" },
+  { key: "route_complete", zh: "本次指引已完成", en: "Guidance completed" },
+  { key: "route_complete_hint", zh: "感谢使用，祝你一路顺利", en: "Have a pleasant journey" },
+  { key: "walking", zh: "步行约", en: "Walking" },
+  { key: "meters", zh: "米", en: "m" },
+  { key: "transfers", zh: "次换层", en: "floor changes" },
+  { key: "via_security", zh: "这条路线需要通过中央安检", en: "This route passes through central security" },
+  { key: "same_side", zh: "这条路线无需经过中央安检", en: "No central security on this route" },
+  { key: "manual", zh: "按照指引行走，到达后手动确认", en: "Follow the route and confirm each step manually" },
+  { key: "begin", zh: "开始指引", en: "Start guidance" },
+  { key: "arrived_here", zh: "已到达此处", en: "I am here" },
+  { key: "passed_security", zh: "已通过安检", en: "I passed security" },
+  { key: "arrived_floor", zh: "已到达下一层", en: "I reached the next floor" },
+  { key: "finish", zh: "确认到达目的地", en: "Confirm arrival" },
+  { key: "previous", zh: "上一步", en: "Previous step" },
+  { key: "all_steps", zh: "查看全程步骤", en: "All route steps" },
+  { key: "edit_from", zh: "修改出发位置", en: "Edit starting point" },
+  { key: "edit_to", zh: "修改目的地", en: "Edit destination" },
+  { key: "swap", zh: "交换起终点", en: "Reverse route" },
+  { key: "new_journey", zh: "规划新的路线", en: "Plan another route" },
+  { key: "route_options", zh: "路线偏好", en: "Route preference" },
+  { key: "pref_shortest", zh: "推荐路线", en: "Recommended" },
+  { key: "pref_elevator", zh: "优先电梯", en: "Prefer elevator" },
+  { key: "pref_escalator", zh: "优先扶梯", en: "Prefer escalator" },
+  { key: "pref_avoid_stair", zh: "尽量少走楼梯", en: "Minimize stairs" },
+  { key: "walk_to", zh: "沿通道前往", en: "Walk along the corridor to" },
+  { key: "pass_security", zh: "通过中央安检", en: "Pass central security" },
+  { key: "take", zh: "乘", en: "Take" },
+  { key: "elevator", zh: "电梯", en: "elevator" },
+  { key: "escalator", zh: "扶梯", en: "escalator" },
+  { key: "stair", zh: "楼梯", en: "stairs" },
+  { key: "to_floor", zh: "前往", en: "to" },
+  { key: "destination_step", zh: "到达目的地后确认完成", en: "Confirm when you reach your destination" },
+  { key: "from", zh: "从", en: "From" },
+  { key: "to", zh: "到", en: "To" },
+  { key: "step", zh: "步骤", en: "Step" },
+  { key: "next_step", zh: "下一步", en: "Next" },
+  { key: "missing", zh: "请先选择起点和目的地", en: "Choose both starting point and destination" },
+  { key: "invalid", zh: "这个地点已不可用", en: "This place is no longer available" },
+  { key: "same", zh: "起点和目的地相同", en: "Starting point and destination are the same" },
+  { key: "unreachable", zh: "暂无可达路线", en: "No route is available" },
+  { key: "error_hint", zh: "重新选择地点即可继续规划", en: "Choose another place to continue" },
+  { key: "choose_again", zh: "重新选择地点", en: "Choose places again" },
+  { key: "security", zh: "安检", en: "Security" },
+  { key: "start_marker", zh: "起", en: "S" },
+  { key: "end_marker", zh: "终", en: "D" },
+  { key: "start_label", zh: "起点", en: "Start" },
+  { key: "end_label", zh: "终点", en: "Destination" },
+  { key: "browse_other", zh: "正在查看其他路段", en: "Viewing another route segment" },
+  { key: "return_current", zh: "回到当前步骤", en: "Return to current step" }
+];
 const ZH: Map<string, string> = new Map<string, string>();
-ZH.set('home_title', '星海国际机场');
-ZH.set('home_sub', '主航站楼 · 六层导览');
-ZH.set('btn_find', '找登机口 · 设施');
-ZH.set('btn_metro', '地铁换乘');
-ZH.set('btn_browse', '楼层漫游');
-ZH.set('sec_floors', '楼层导览');
-ZH.set('sel_title', '选择目的地');
-ZH.set('sel_search', '搜索：登机口 / 地铁 / 安检…');
-ZH.set('sel_start_label', '起点');
-ZH.set('sel_pick_start', '选择起点');
-ZH.set('sel_anywhere', '任意节点');
-ZH.set('sel_quick_start', '快捷起点（模拟当前位置）');
-ZH.set('sel_empty', '没有匹配的结果');
-ZH.set('route_title', '路线');
-ZH.set('route_total', '全程');
-ZH.set('route_via_security', '途中需通过中央安检大厅');
-ZH.set('route_same_side', '同侧直达，无需安检');
-ZH.set('route_by_elevator', '电梯');
-ZH.set('route_by_escalator', '扶梯');
-ZH.set('route_by_stair', '楼梯');
-ZH.set('route_meters', '米');
-ZH.set('route_no_path', '暂无可达路线');
-ZH.set('route_transfer_to', '换乘');
-ZH.set('route_arrived', '已到达目的地');
-ZH.set('route_levels', '楼层');
-ZH.set('trans_count', '次换层');
-ZH.set('common_pref', '寻路偏好');
-ZH.set('pref_shortest', '最短距离');
-ZH.set('pref_elevator', '优先电梯');
-ZH.set('pref_escalator', '优先扶梯');
-ZH.set('pref_avoid_stair', '避开楼梯');
-ZH.set('metro_title', '地铁换乘');
-ZH.set('metro_dir_city', '往市区方向');
-ZH.set('metro_dir_resort', '往星湖度假区');
-ZH.set('metro_hint', '选择出行方向，自动规划到对应站台');
-ZH.set('metro_plat_sub', 'B2 地铁站台');
-ZH.set('metro_step_gate_t', '过闸');
-ZH.set('metro_step_gate_d', '到 B1 地铁闸机群过闸');
-ZH.set('metro_step_descend_t', '下 B2');
-ZH.set('metro_step_descend_d', '乘地铁扶梯 / 楼梯下到 B2');
-ZH.set('metro_step_plat_t', '候车');
-ZH.set('metro_step_plat_d', '在 B2 站台等车');
-ZH.set('browse_title', '楼层浏览');
-ZH.set('browse_tap_hint', '点击节点查看');
-ZH.set('pick_dest', '设为目的地');
-ZH.set('pick_start', '设为出发点');
-ZH.set('planner_from', '出发点');
-ZH.set('planner_to', '终点');
-ZH.set('planner_swap', '交换');
-ZH.set('planner_go', '确认');
-ZH.set('common_cancel', '取消');
-
 const EN: Map<string, string> = new Map<string, string>();
-EN.set('home_title', 'Xinghai Int’l Airport');
-EN.set('home_sub', 'Main Terminal · 6 levels');
-EN.set('btn_find', 'Find Gate & Facility');
-EN.set('btn_metro', 'Metro Transfer');
-EN.set('btn_browse', 'Browse Floors');
-EN.set('sec_floors', 'FLOORS');
-EN.set('sel_title', 'Select Destination');
-EN.set('sel_search', 'Search: gate / metro / security…');
-EN.set('sel_start_label', 'Start');
-EN.set('sel_pick_start', 'Choose start');
-EN.set('sel_anywhere', 'Any node');
-EN.set('sel_quick_start', 'Quick start (simulated location)');
-EN.set('sel_empty', 'No matching results');
-EN.set('route_title', 'Route');
-EN.set('route_total', 'Total');
-EN.set('route_via_security', 'Pass through Central Security');
-EN.set('route_same_side', 'Same side, no security');
-EN.set('route_by_elevator', 'elevator');
-EN.set('route_by_escalator', 'escalator');
-EN.set('route_by_stair', 'stairs');
-EN.set('route_meters', 'm');
-EN.set('route_no_path', 'No route found');
-EN.set('route_transfer_to', 'Transfer to');
-EN.set('route_arrived', 'Arrived at destination');
-EN.set('route_levels', 'levels');
-EN.set('trans_count', 'transfers');
-EN.set('common_pref', 'Routing preference');
-EN.set('pref_shortest', 'Shortest');
-EN.set('pref_elevator', 'Prefer elevator');
-EN.set('pref_escalator', 'Prefer escalator');
-EN.set('pref_avoid_stair', 'Avoid stairs');
-EN.set('metro_title', 'Metro Transfer');
-EN.set('metro_dir_city', 'To City Center');
-EN.set('metro_dir_resort', 'To Xinghu Resort');
-EN.set('metro_hint', 'Pick a direction to auto-plan the route');
-EN.set('metro_plat_sub', 'Metro platform B2');
-EN.set('metro_step_gate_t', 'Tap through gates');
-EN.set('metro_step_gate_d', 'At B1 metro gates, tap through');
-EN.set('metro_step_descend_t', 'Go down');
-EN.set('metro_step_descend_d', 'Escalator / stairs down to B2');
-EN.set('metro_step_plat_t', 'Wait');
-EN.set('metro_step_plat_d', 'Wait on the B2 platform');
-EN.set('browse_title', 'Floor Browse');
-EN.set('browse_tap_hint', 'Tap a node to inspect');
-EN.set('pick_dest', 'Set as destination');
-EN.set('pick_start', 'Set as start');
-EN.set('planner_from', 'From');
-EN.set('planner_to', 'To');
-EN.set('planner_swap', 'Swap');
-EN.set('planner_go', 'Confirm');
-EN.set('common_cancel', 'Cancel');
-
+for (let i = 0; i < TEXTS.length; i++) { ZH.set(TEXTS[i].key, TEXTS[i].zh); EN.set(TEXTS[i].key, TEXTS[i].en); }
 export class Loc {
-  static t(key: string, en: boolean): string {
-    const m = en ? EN : ZH;
-    const v = m.get(key);
-    return v === undefined ? key : v;
-  }
-
-  // 楼层名（跟随语言）
-  static floor(floor: string, en: boolean): string {
-    const m = en ? FLOOR_LABELS_EN : FLOOR_LABELS;
-    const v = m.get(floor);
-    return v === undefined ? floor : v;
-  }
+  static t(key: string, en: boolean): string { const text = (en ? EN : ZH).get(key); return text === undefined ? key : text; }
+  static floor(f: string, en: boolean): string { const text = (en ? FLOOR_LABELS_EN : FLOOR_LABELS).get(f); return text === undefined ? f : text; }
 }

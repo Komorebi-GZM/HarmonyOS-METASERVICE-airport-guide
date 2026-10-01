@@ -14,9 +14,17 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    // 整窗深青打底：杜绝冷启动白闪 / 页面转场透白
+    // 与浅色页面一致，避免冷启动和页面转场时闪出深色背景。
     windowStage.getMainWindow().then((win: window.Window) => {
-      win.setWindowBackgroundColor('#0F1F2E');
+      win.setWindowBackgroundColor('#F4F7F9');
+      win.setWindowSystemBarProperties({
+        statusBarColor: '#F4F7F9',
+        statusBarContentColor: '#172B3A',
+        navigationBarColor: '#F4F7F9',
+        navigationBarContentColor: '#172B3A'
+      }).catch((err: Error) => {
+        hilog.error(0x0000, TAG, 'setWindowSystemBarProperties failed: %{public}s', JSON.stringify(err));
+      });
     }).catch((err: Error) => {
       hilog.error(0x0000, TAG, 'setWindowBackgroundColor failed: %{public}s', JSON.stringify(err));
     });

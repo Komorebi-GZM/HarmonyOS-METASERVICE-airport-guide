@@ -56,6 +56,8 @@ export function floorShort(floor: string): string {
 
 // 节点显示名：优先英文(生成表)，缺失回落中文
 export function nodeName(n: MapNode, en: boolean): string {
+  // The source data's uniqueness annotation describes the graph, not a place name.
+  if (n.type === 'security') { return en ? 'Central Security' : '中央安检大厅'; }
   if (en) {
     const e = NODE_EN.get(n.id);
     return e === undefined ? n.name : e;

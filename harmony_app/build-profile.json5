@@ -5,7 +5,7 @@
       {
         "name": "default",
         "signingConfig": "default",
-        // 编译用本机已装 API 24（HarmonyOS 6.1.1），运行时目标用模拟器 API 23（HarmonyOS 6.1.0）
+        // 使用本机默认 SDK 编译；运行接口保持兼容 HarmonyOS 6.1.0（API 23）。
         "compatibleSdkVersion": "6.1.0(23)",
         "targetSdkVersion": "6.1.0(23)",
         "runtimeOS": "HarmonyOS",

@@ -1,0 +1,84 @@
+{
+  "publicSummary": true,
+  "evidenceBoundary": "Published summary only. Per-step UI trees and full-process screenshots remain local; representative screenshots are in docs/images/product-20261001/phone.",
+  "ok": true,
+  "language": "zh",
+  "scope": "map",
+  "finishedAt": "2026-10-01T13:21:48+0800",
+  "passed": [
+    "home_floor_top",
+    "floor_tile_4F",
+    "floor_tile_3F",
+    "floor_tile_2F",
+    "floor_tile_1F",
+    "floor_tile_B1",
+    "floor_tile_B2",
+    "home_six_floors_visible",
+    "browse_floor_4f",
+    "map_zoom",
+    "map_fit_floor",
+    "map_node_detail",
+    "map_start_feedback",
+    "map_start_then_destination_preview"
+  ],
+  "failures": [],
+  "sourceMap": "data/XHA_xinghai_t1.map.json",
+  "steps": [
+    {
+      "name": "home_floor_top",
+      "assertion": "首页滚动视图稳定"
+    },
+    {
+      "name": "floor_tile_4F",
+      "assertion": "楼层入口 4F 已滚动到屏幕可见范围"
+    },
+    {
+      "name": "floor_tile_3F",
+      "assertion": "楼层入口 3F 已滚动到屏幕可见范围"
+    },
+    {
+      "name": "floor_tile_2F",
+      "assertion": "楼层入口 2F 已滚动到屏幕可见范围"
+    },
+    {
+      "name": "floor_tile_1F",
+      "assertion": "楼层入口 1F 已滚动到屏幕可见范围"
+    },
+    {
+      "name": "floor_tile_B1",
+      "assertion": "楼层入口 B1 已滚动到屏幕可见范围"
+    },
+    {
+      "name": "floor_tile_B2",
+      "assertion": "楼层入口 B2 已滚动到屏幕可见范围"
+    },
+    {
+      "name": "home_six_floors_visible",
+      "assertion": "滚动后六层入口都可定位"
+    },
+    {
+      "name": "browse_floor_4f",
+      "assertion": "首页 4F 入口打开地图"
+    },
+    {
+      "name": "map_zoom",
+      "assertion": "地图放大后仍可见画布"
+    },
+    {
+      "name": "map_fit_floor",
+      "assertion": "全层按钮可见且地图已适配"
+    },
+    {
+      "name": "map_node_detail",
+      "assertion": "点击地图节点打开地点详情"
+    },
+    {
+      "name": "map_start_feedback",
+      "assertion": "设为起点后显示反馈"
+    },
+    {
+      "name": "map_start_then_destination_preview",
+      "assertion": "路线预览标题出现"
+    }
+  ]
+}

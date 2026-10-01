@@ -1,0 +1,87 @@
+{
+  "capturedOn": "2026-10-01",
+  "app": "com.example.airportguide",
+  "device": "Mate 80 Pro Max HarmonyOS API 26 emulator",
+  "captureMethod": "hdc shell snapshot_display -f <file>.jpeg; hdc file recv",
+  "imageEdits": false,
+  "hapSha256": "214963fbc7766873d312beb42b235e6e8812bb1bce9db22fced45c6f7437ad18",
+  "images": [
+    {
+      "file": "01-home.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "00853a653196d6b81d6bed1df875377956fd80cadd43cdf94ee2aee1aa472521"
+    },
+    {
+      "file": "02-destination-a101.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "6ebe834628c85c3c421962d21235a394e31a533032ad0f1807e12b0c2b8b65ad"
+    },
+    {
+      "file": "03-start-west-departure.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "486e7823cb70b9cbaae8f90333aae8477db0caae17dbaa2e6a3236f1d4fdfa88"
+    },
+    {
+      "file": "04-security-route-preview.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "f66b7742b79be00f5d3468ef77a8d709111501af4a4a86a539bb94ddb3d0ea5d"
+    },
+    {
+      "file": "05-guidance-next-step.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "011846da5d8261a772f3acebdea7be4854e0caa20b277db7df50db55b31847f3"
+    },
+    {
+      "file": "06-security-confirmation.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "2871165b6264af5710c2b33b783d44632a4c88d6af5976d023cc7a89100e2d83"
+    },
+    {
+      "file": "07-completed.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "dda738830b606ce7e2bcd2d23eb2dabfc815e9fe12e1e8b71e240259b68515a5"
+    },
+    {
+      "file": "08-metro-directions.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "8f36799085e1e84e9c6a56af70049bc5e3d9d621624635e1a9e2499366ddaf8b"
+    },
+    {
+      "file": "09-metro-cross-floor-preview.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "969a5e7f0c126f7f9d72fe3c24ebf3a149fc48ccd9a7c0d104bc791d5a427637"
+    },
+    {
+      "file": "10-elevator-transfer.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "18a0d725a5feba3752ba4320d89af83c6449546483acdd876037f3e8fee59213"
+    },
+    {
+      "file": "11-floor-4f-map.jpeg",
+      "width": 1320,
+      "height": 2848,
+      "format": "JPEG",
+      "sha256": "fd46a5ce1a7926f5388ef83ff7907f8217d8f72b1d2a9ae95dc102b903ec2cf3"
+    }
+  ]
+}

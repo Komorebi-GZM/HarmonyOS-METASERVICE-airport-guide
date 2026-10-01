@@ -1,0 +1,119 @@
+{
+  "publicSummary": true,
+  "evidenceBoundary": "Published summary only. Per-step UI trees and full-process screenshots remain local; representative screenshots are in docs/images/product-20261001/phone.",
+  "ok": true,
+  "language": "zh",
+  "scope": "state",
+  "finishedAt": "2026-10-01T13:20:09+0800",
+  "passed": [
+    "cross_floor_route_home",
+    "cross_floor_route_entry",
+    "cross_floor_route_preview",
+    "guidance_started",
+    "guidance_other_route_leg",
+    "guidance_return_current",
+    "guidance_all_steps_open",
+    "guidance_all_steps_closed",
+    "guidance_advanced",
+    "guidance_previous",
+    "edit_cancel_keeps_progress",
+    "edit_confirm_resets_preview",
+    "preference_keeps_preview",
+    "guidance_restarted",
+    "guidance_preferences_open",
+    "guidance_preference_replans_preview",
+    "guidance_after_preference",
+    "guidance_progress_before_swap",
+    "swap_resets_preview",
+    "guidance_completed",
+    "new_journey_empty"
+  ],
+  "failures": [],
+  "sourceMap": "data/XHA_xinghai_t1.map.json",
+  "steps": [
+    {
+      "name": "cross_floor_route_home",
+      "assertion": "首页与语言设置稳定"
+    },
+    {
+      "name": "cross_floor_route_entry",
+      "assertion": "首页入口打开对应选择页"
+    },
+    {
+      "name": "cross_floor_route_preview",
+      "assertion": "路线预览标题出现"
+    },
+    {
+      "name": "guidance_started",
+      "assertion": "路线进入指引"
+    },
+    {
+      "name": "guidance_other_route_leg",
+      "assertion": "查看其他路线楼层时步骤继续进行"
+    },
+    {
+      "name": "guidance_return_current",
+      "assertion": "回到当前指引楼层"
+    },
+    {
+      "name": "guidance_all_steps_open",
+      "assertion": "全程步骤面板展开"
+    },
+    {
+      "name": "guidance_all_steps_closed",
+      "assertion": "关闭全程步骤面板并返回指引"
+    },
+    {
+      "name": "guidance_advanced",
+      "assertion": "确认当前步骤后进度前进"
+    },
+    {
+      "name": "guidance_previous",
+      "assertion": "上一步返回原进度"
+    },
+    {
+      "name": "edit_cancel_keeps_progress",
+      "assertion": "取消编辑返回路线指引"
+    },
+    {
+      "name": "edit_confirm_resets_preview",
+      "assertion": "路线预览标题出现"
+    },
+    {
+      "name": "preference_keeps_preview",
+      "assertion": "路线预览标题出现"
+    },
+    {
+      "name": "guidance_restarted",
+      "assertion": "修改后的路线可以重新指引"
+    },
+    {
+      "name": "guidance_preferences_open",
+      "assertion": "指引中的路线偏好菜单展开"
+    },
+    {
+      "name": "guidance_preference_replans_preview",
+      "assertion": "路线预览标题出现"
+    },
+    {
+      "name": "guidance_after_preference",
+      "assertion": "调整偏好后可以重新开始指引"
+    },
+    {
+      "name": "guidance_progress_before_swap",
+      "assertion": "交换前已有指引进度"
+    },
+    {
+      "name": "swap_resets_preview",
+      "assertion": "路线预览标题出现"
+    },
+    {
+      "name": "guidance_completed",
+      "assertion": "最终确认后显示完成状态"
+    },
+    {
+      "name": "new_journey_empty",
+      "assertion": "新行程进入空目的地选择"
+    }
+  ]
+}
