@@ -673,6 +673,8 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 4. **同一个入口**：`npm run test:all` 串起核心回归（37）、Web 端到端（15）、Apple（42）与小程序（9）—— 共 103 项。
 5. **同一份渲染契约**：`packages/core/src/render.ts` 产出绘制命令流，Web 与小程序各自只写"解释器"（Canvas API 调用），
    Swift 端是等价实现。三端画同一张图，图层顺序/用色/标签阈值/命中半径只在核心定义一次。
+   **该契约由 `tools/gen_render_fixture.mjs` 的 10 个场景 / 664 条命令基准锁定**：Swift 端逐条比对（`RendererParityTests`），
+   连标签底片宽度（`len × size × 0.62 + 4`）与楼层水印位置都必须一致。
 
 ### 13.3.1 各端一致性对照
 
@@ -682,8 +684,9 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 | TypeScript | `packages/core/src/*.ts` | `npm test`（16 项） | `src/generated/*.ts` | ✅ |
 | Swift 核心 | `apps/apple/Sources/AirportCore/*.swift` | 核心 15 项（含 824 条逐节点比对） | `Resources/airport-data.json` | ✅ |
 | SwiftUI 界面 | `apps/apple/Sources/{AirportUI,AirportGuideApp}` | 呈现层 27 项（文案/绘制命令/状态机/偏好） | 同 Swift 核心 | ✅ 编译验证 / 视觉走查待做 |
-| Web UI | `apps/web/src/*.ts` | `pnpm test:web`（15 项端到端） | 同 TS 核心 | ✅ 视觉近似 |
+| Web UI | `apps/web/src/*.ts`（`main.ts` 已纯视图化，状态来自核心） | `pnpm test:web`（15 项端到端） | 同 TS 核心 | ✅ 视觉近似 |
 | 小程序 | `apps/weapp/miniprogram/**`（页面）+ `utils/core.js`（生成物） | `npm run test:weapp`（9 项：配置/文案/六页 Page 生命周期/Canvas/包体） | 同 TS 核心（esbuild → CommonJS） | ✅ 工程与逻辑；WXML 未在开发者工具中渲染过 |
+| 渲染契约 | `packages/core/src/render.ts` | TS 13 项 + Swift 逐命令比对（10 场景 / 664 条命令） | 三端共用 | ✅ 命令流逐条相等 |
 
 ### 13.4 扩展点
 
@@ -708,3 +711,4 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 | v1.2 | 2026-10-02 | DSH Agent | §13 补 Apple 端与"基准路线"第 4 层锚点，新增 13.3.1 各端一致性对照表 |
 | v1.3 | 2026-10-02 | DSH Agent | 13.3.1 拆分 Swift 核心与 SwiftUI 界面两行；Web 端到端更新为 15 项 |
 | v1.4 | 2026-10-02 | DSH Agent | 分层图加入 render/app-model/presenter；新增小程序端对照行与"第 5 层锚点：同一份渲染契约" |
+| v1.5 | 2026-10-02 | DSH Agent | 渲染契约补充 664 条命令基准的锁定方式；各端对照表新增渲染契约行 |

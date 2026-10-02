@@ -40,6 +40,8 @@ struct MapCanvasView: View {
         let input = MapRenderInput(
           floor: floor,
           viewport: viewport,
+          width: size.width,
+          height: size.height,
           routeNodeIds: routeNodeIds,
           currentRouteIndex: currentRouteIndex,
           startId: startId,

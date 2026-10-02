@@ -114,11 +114,13 @@ final class PresenterTests: XCTestCase {
 
 final class RendererTests: XCTestCase {
   let graph = AirportGraph.shared
+  /// 与 TS 端 packages/core/test/render.test.ts 使用同一组画布尺寸
+  let SIZE = (width: 380.0, height: 320.0)
 
   func testLayerOrderAndRequiredCalls() {
     var vp = MapRenderer.fitFloor(graph, floor: "4F", width: 380, height: 320)
     XCTAssertGreaterThan(vp.zoom, 0)
-    let commands = MapRenderer.render(graph, MapRenderInput(floor: "4F", viewport: vp))
+    let commands = MapRenderer.render(graph, MapRenderInput(floor: "4F", viewport: vp, width: SIZE.width, height: SIZE.height))
 
     // 首条是底色，第二条是楼层底板
     guard case .fillRect(_, _, _, _, let surfaceColor) = commands[0] else {
@@ -144,7 +146,7 @@ final class RendererTests: XCTestCase {
 
   func testRouteLayerOnlyWhenRoutePresent() {
     var vp = MapRenderer.fitFloor(graph, floor: "4F", width: 380, height: 320)
-    let without = MapRenderer.render(graph, MapRenderInput(floor: "4F", viewport: vp))
+    let without = MapRenderer.render(graph, MapRenderInput(floor: "4F", viewport: vp, width: SIZE.width, height: SIZE.height))
     let routeColorPolylines = without.filter { command in
       if case .polyline(_, let color, _) = command { return color == MapRenderer.routeDone }
       return false
@@ -153,7 +155,7 @@ final class RendererTests: XCTestCase {
 
     let route = try! planRoute(graph, startId: "xha_p4_doorW", endId: "xha_p4_gA101", pref: 0)
     let withRoute = MapRenderer.render(graph, MapRenderInput(
-      floor: "4F", viewport: vp, routeNodeIds: route.nodeIds,
+      floor: "4F", viewport: vp, width: SIZE.width, height: SIZE.height, routeNodeIds: route.nodeIds,
       currentRouteIndex: route.nodeIds.count - 1,
       startId: "xha_p4_doorW", endId: "xha_p4_gA101"
     ))
@@ -170,7 +172,7 @@ final class RendererTests: XCTestCase {
 
   func testMarkersAppearOnTheirOwnFloorOnly() {
     var vp = MapRenderer.fitFloor(graph, floor: "4F", width: 380, height: 320)
-    let onFour = MapRenderer.render(graph, MapRenderInput(floor: "4F", viewport: vp, startId: "xha_p4_doorW", endId: "xha_p4_gA101"))
+    let onFour = MapRenderer.render(graph, MapRenderInput(floor: "4F", viewport: vp, width: SIZE.width, height: SIZE.height, startId: "xha_p4_doorW", endId: "xha_p4_gA101"))
     let markerCircles = onFour.filter { command in
       if case .circle(_, _, let radius, let fill, _, _) = command {
         return radius == 11 && (fill == MapRenderer.routeLive || fill == MapRenderer.markerEndColor)
@@ -180,7 +182,7 @@ final class RendererTests: XCTestCase {
     XCTAssertEqual(markerCircles.count, 2, "起终点都在 4F 时应有两个标记")
 
     // B2 站台作起点时，4F 上不应出现起点标记
-    let otherFloor = MapRenderer.render(graph, MapRenderInput(floor: "4F", viewport: vp, startId: "xha_b2_platA"))
+    let otherFloor = MapRenderer.render(graph, MapRenderInput(floor: "4F", viewport: vp, width: SIZE.width, height: SIZE.height, startId: "xha_b2_platA"))
     let strayMarkers = otherFloor.filter { command in
       if case .circle(_, _, let radius, _, _, _) = command { return radius == 11 }
       return false

@@ -47,6 +47,8 @@ public enum DrawCommand: Equatable, Sendable {
 public struct MapRenderInput {
   public var floor: String
   public var viewport: Viewport
+  public var width: Double
+  public var height: Double
   public var routeNodeIds: [String]
   public var currentRouteIndex: Int
   public var startId: String
@@ -56,6 +58,8 @@ public struct MapRenderInput {
   public init(
     floor: String,
     viewport: Viewport,
+    width: Double,
+    height: Double,
     routeNodeIds: [String] = [],
     currentRouteIndex: Int = -1,
     startId: String = "",
@@ -64,12 +68,19 @@ public struct MapRenderInput {
   ) {
     self.floor = floor
     self.viewport = viewport
+    self.width = width
+    self.height = height
     self.routeNodeIds = routeNodeIds
     self.currentRouteIndex = currentRouteIndex
     self.startId = startId
     self.endId = endId
     self.languageEn = languageEn
   }
+}
+
+/// 标签底片宽度估算：与 TS 端 render.ts 的 labelWidth 完全同式（不依赖 measureText，便于逐命令比对）
+public func labelWidth(_ text: String, _ size: Double) -> Double {
+  Double(text.count) * size * 0.62 + 4
 }
 
 /// 可测的地图渲染器
@@ -113,7 +124,7 @@ public enum MapRenderer {
 
     // 1. 底色
     let surface = graph.bundle.tokens.MAP["surface"] ?? "#F6F8F8"
-    commands.append(.fillRect(x: 0, y: 0, width: 1000, height: 1000, color: surface))
+    commands.append(.fillRect(x: 0, y: 0, width: input.width, height: input.height, color: surface))
 
     // 2. 楼层底板（按该层陆/空节点占比选色）
     let nodes = graph.floorNodes(floor)
@@ -184,8 +195,8 @@ public enum MapRenderer {
       let size = vp.zoom >= 1.6 ? 12.0 : 11.0
       let lx = vp.scrX(node.x) + 8
       let ly = vp.scrY(node.y) - 9
-      let width = Double(text.count) * size * 0.62 + 4
-      commands.append(.labelPlate(x: lx - 2, y: ly - size / 2 - 1, width: width, height: size + 2, color: "rgba(255,255,255,0.86)"))
+      let plateWidth = labelWidth(text, size)
+      commands.append(.labelPlate(x: lx - 2, y: ly - size / 2 - 1, width: plateWidth, height: size + 2, color: "rgba(255,255,255,0.86)"))
       commands.append(.text(x: lx, y: ly, string: text, size: size, color: ink, align: .left, baseline: .middle, background: nil))
     }
 
@@ -213,7 +224,7 @@ public enum MapRenderer {
 
     // 8. 楼层水印
     let ink2 = graph.bundle.tokens.MAP["ink2"] ?? "#657582"
-    commands.append(.text(x: 348, y: 10, string: floor, size: 13, color: ink2, align: .right, baseline: .top, background: nil))
+    commands.append(.text(x: input.width - 12, y: 10, string: floor, size: 13, color: ink2, align: .right, baseline: .top, background: nil))
 
     return commands
   }

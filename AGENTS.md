@@ -28,8 +28,8 @@
 | 7 | 注释用中文，代码标识符用英文；沿用现有文件风格（一个文件一个主题）。 | 与既有 4 千行代码保持一致，避免风格撕裂。 |
 | 8 | **`packages/core/src/generated/**` 是生成物，禁止手改。** 文案改 `Loc.ets`、配色改 `Theme.ets`、地图改 `gen_maps.py`，然后跑 `python3 tools/export_shared.py`。 | 生成链是"ArkTS 真源 → 共享核心"的唯一通道；手改会在下次导出时静默丢失。 |
 | 9 | **`packages/core` 不许依赖任何平台 API**（无 DOM、无 `wx.*`、无 ArkTS Kit）。 | 它是 Web / 小程序 / Swift 的共同底座；一旦引入平台依赖，多端共享即失效。 |
-| 10 | **改完核心必须跑 `npm run test:all`**（核心 37 + Web 15 + Apple 42 + 小程序 9）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"各端没走偏"的手段。 |
-| 11 | **改核心后必须重跑导出与打包**：`export_shared.py`（TS/Swift 数据）→ `gen_route_fixture.mjs`（跨语言基准）→ `build_weapp.mjs`（小程序产物）。 | 三处都是生成物，漏跑会让某一端停留在旧逻辑上且不报错。 |
+| 10 | **改完核心必须跑 `npm run test:all`**（核心 37 + Web 15 + Apple 45 + 小程序 9 = 106 项）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"各端没走偏"的手段。 |
+| 11 | **改核心后必须重跑导出与打包**：`export_shared.py`（TS/Swift 数据）→ `npm run fixtures`（寻路 + 渲染两份跨语言基准）→ `build_weapp.mjs`（小程序产物）。 | 都是生成物，漏跑会让某一端停留在旧逻辑上且不报错。 |
 
 ## 3. 快速事实卡
 
@@ -60,7 +60,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── src/app-model.ts             ← ★ 六页状态机（Web/小程序共用）
 │   ├── src/presenter.ts             ← ★ 文案与列表映射（Web/小程序共用）
 │   ├── src/generated/               ← 【生成物】map-data / i18n-data / labels / tokens
-│   └── test/conformance.test.ts     ← 16 项一致性回归（零依赖，Node 直接跑）
+│   └── test/                        ← 37 项回归：conformance 16 + render 13 + app-model 8（零依赖，Node 直接跑）
 ├── apps/web/                        ← ★ Web/PWA 客户端（Vite + TS + Canvas 2D）
 │   ├── index.html  vite.config.ts  src/{main,map-view,storage}.ts  src/styles.css
 │   └── dist/                        ← 构建产物（.gitignore）
@@ -69,7 +69,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── Sources/AirportUI/           ← 呈现层（AppModel/Presenter/MapRenderer，纯逻辑可测）
 │   ├── Sources/AirportGuideApp/     ← SwiftUI 六页 + Canvas 地图
 │   ├── Sources/AirportCLI/          ← 命令行示例（macOS 可直接运行）
-│   ├── Tests/AirportCoreTests/      ← 15 项回归（含 824 条与 TS 逐节点比对）
+│   ├── Tests/AirportCoreTests/      ← 18 项（含 824 条路线 + 664 条绘制命令的跨语言比对）
 │   └── Tests/AirportUITests/        ← 27 项回归（文案/绘制命令/状态机/偏好）
 ├── apps/weapp/                      ← ★ 微信小程序端（开发者工具打开 apps/weapp）
 │   ├── project.config.json
@@ -81,7 +81,8 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── gen_maps.py → gen_model.py   ← 地图数据链
 │   ├── export_shared.py             ← ★ 导出到 packages/core/src/generated
 │   ├── pathfind_reference.py        ← 寻路参考实现（500 组自测）
-│   ├── gen_route_fixture.mjs        ← ★ 用 TS 核心生成跨语言基准（824 条路线）
+│   ├── gen_route_fixture.mjs        ← ★ 跨语言基准：824 条路线（寻路）
+│   ├── gen_render_fixture.mjs       ← ★ 跨语言基准：664 条绘制命令（渲染）
 │   ├── web_smoke.mjs                ← Web 端到端冒烟（15 项断言）
 │   ├── build_weapp.mjs              ← 把核心打包成小程序可 require 的单文件
 │   ├── weapp_smoke.mjs              ← 小程序冒烟（9 项：配置/文案/页面流程/Canvas/包体）
@@ -151,14 +152,14 @@ pnpm web:build        # 产出 apps/web/dist（静态托管 / WKWebView 壳可�
 # Web 端到端冒烟（跑构建产物，覆盖 首页→目的地→起点→路线→指引→完成→楼层地图）
 pnpm test:web
 
-# 跨语言基准（改了寻路/数据后重跑；Swift 与将来的小程序都靠它对齐）
-node tools/gen_route_fixture.mjs
+# 跨语言基准（改了寻路/渲染/数据后重跑；Swift 与小程序都靠它对齐）
+npm run fixtures
 ```
 
 ### Apple 端（macOS / iOS）
 
 ```bash
-npm run test:apple                    # = bash tools/apple_test.sh test —— 42 项 Swift 回归（核心 15 + 呈现 27）
+npm run test:apple                    # = bash tools/apple_test.sh test —— 45 项 Swift 回归（核心 18 + 呈现 27）
 npm run apple:build                   # 编译全部目标（含 SwiftUI 应用）
 npm run apple:run                     # 打印 6 条参考样例（与 pathfind_reference.py 同口径）
 bash tools/apple_test.sh run AirportGuideApp      # 直接启动图形界面
@@ -227,7 +228,7 @@ npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas
     SwiftUI 六页 + Canvas 地图已可编译运行（T-609），呈现层有 27 项测试；但本机无 iOS 模拟器运行时，
     界面只在 macOS 上编译验证过，还没做逐屏视觉核对。
 11. **本机缺少 iOS 模拟器运行时与微信开发者工具**：`xcrun simctl list runtimes` 为空（可编译不可运行）；`/Applications` 里没有微信开发者工具，因此**小程序的 WXML/WXSS 从未真实渲染过**（工程自洽性由 9 项冒烟覆盖，见 `apps/weapp/README.md`）。
-12. **Web 端尚未改用共享的 `AppModel`/`Presenter`**：`apps/web/src/main.ts` 里仍有一份自己的状态与文案映射（行为与共享实现一致，但属重复实现），已登记为 `docs/TODO.md` T-613。
+12. **Web 端已纯视图化**（v1.5）：`apps/web/src/main.ts` 只负责渲染与转发动作，状态机与文案来自共享核心；此处保留一行是因为历史上曾存在重复实现，便于回溯。
 
 ---
 
@@ -240,3 +241,4 @@ npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas
 | v1.2 | 2026-10-02 | DSH Agent | 加入 Apple 端：`apps/apple`（Swift 核心 + CLI，15 项回归含 824 条与 TS 逐节点比对）+ 跨语言基准脚本 |
 | v1.3 | 2026-10-02 | DSH Agent | Apple 端补齐 SwiftUI 六页 + Canvas 地图与呈现层 27 项回归；修复「修改出发位置」误入目的地页的缺陷（Web 端同步修复并加回归） |
 | v1.4 | 2026-10-02 | DSH Agent | 渲染命令流与状态机/呈现层上提到共享核心；交付微信小程序端（六页 + Canvas 2D，9 项冒烟）；新增红线 11 |
+| v1.5 | 2026-10-02 | DSH Agent | Web 端纯视图化（改用共享 AppModel）；新增渲染命令流的跨语言基准（10 场景 / 664 条命令，Swift 逐条比对通过） |

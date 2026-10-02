@@ -517,7 +517,7 @@ git remote -v
 | `packages/core/src/*.ts` | 图/寻路/路线步骤/状态机/检索/双语/视口（11 个模块） | ✅ 手写 |
 | `packages/core/src/generated/**` | 从 ArkTS 真源导出的地图、文案、标签、令牌 | ❌ 生成物，改真源后重跑导出 |
 | `packages/core/test/conformance.test.ts` | 16 项一致性回归 | ✅ 手写 |
-| `apps/web/**` | Web/PWA 客户端（Vite + TS + Canvas 2D） | ✅ 手写 |
+| `apps/web/src/main.ts` | Web 视图层（只渲染 + 转发动作，状态来自核心） | ✅ 手写 |
 | `apps/apple/Sources/AirportCore/**` | Apple 端 Swift 核心移植 | ✅ 手写 |
 | `apps/apple/Sources/AirportUI/**` | Apple 端呈现层（状态机/文案/绘制命令，纯逻辑） | ✅ 手写 |
 | `apps/apple/Sources/AirportGuideApp/**` | SwiftUI 六页 + Canvas 地图（命令流解释器） | ✅ 手写 |
@@ -550,7 +550,9 @@ git remote -v
 | `npm run apple:build` | 编译全部 Apple 目标（含 SwiftUI 应用） | 同上 |
 | `bash tools/apple_test.sh run AirportGuideApp` | 启动 SwiftUI 界面（macOS 14+） | 同上 |
 | `npm run apple:run` | 运行 `airport-cli`，打印 6 条参考样例与四档偏好对比 | 同上 |
-| `node tools/gen_route_fixture.mjs` | 生成跨语言基准 `routes.json`（824 条）到 TS 与 Swift 两处 | 改了寻路/数据之后必须跑 |
+| `npm run fixtures` | 重新生成两份跨语言基准：`routes.json`（824 条路线）与 `render.json`（10 场景 / 664 条命令） | 改了寻路/渲染/数据之后必须跑 |
+| `node tools/gen_route_fixture.mjs` | 只生成寻路基准 | 改了寻路之后 |
+| `node tools/gen_render_fixture.mjs` | 只生成渲染基准 | 改了渲染之后 |
 | `node tools/build_weapp.mjs` | 把共享核心打成小程序可 require 的 CommonJS 单文件（95 KB） | 改了核心之后必须跑 |
 | `npm run test:weapp` | 小程序冒烟：配置/文案/六页 Page 生命周期/Canvas 链路/包体 | 同上 |
 | `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 + Apple 端回归 | 同上 |
@@ -593,3 +595,4 @@ git remote -v
 | v1.2 | 2026-10-02 | DSH Agent | §10 补 Apple 端：目录职责、命令、SwiftPM 沙箱坑与对策（10.5） |
 | v1.3 | 2026-10-02 | DSH Agent | §10 补 Apple 界面目标与 42 项回归；限制说明更新为"未做视觉走查" |
 | v1.4 | 2026-10-02 | DSH Agent | §10 补小程序端目录/命令与"WXML 未渲染"限制 |
+| v1.5 | 2026-10-02 | DSH Agent | §10 补充 `npm run fixtures` 与 Web 视图层说明 |

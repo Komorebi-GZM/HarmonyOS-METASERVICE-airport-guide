@@ -18,7 +18,8 @@
     "apple:run": "bash tools/apple_test.sh run airport-cli",
     "apple:build": "bash tools/apple_test.sh build",
     "weapp:build": "node tools/build_weapp.mjs",
-    "test:weapp": "node tools/weapp_smoke.mjs"
+    "test:weapp": "node tools/weapp_smoke.mjs",
+    "fixtures": "node tools/gen_route_fixture.mjs && node tools/gen_render_fixture.mjs"
   },
   "workspaces": [
     "packages/*",

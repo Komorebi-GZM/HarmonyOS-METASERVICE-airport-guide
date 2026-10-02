@@ -54,9 +54,9 @@ let package = Package(
     ),
     .testTarget(
       name: "AirportCoreTests",
-      dependencies: ["AirportCore"],
+      dependencies: ["AirportCore", "AirportUI"],
       path: "Tests/AirportCoreTests",
-      resources: [.copy("Fixtures/routes.json")],
+      resources: [.copy("Fixtures/routes.json"), .copy("Fixtures/render.json")],
       swiftSettings: [.swiftLanguageMode(.v5)]
     ),
   ]

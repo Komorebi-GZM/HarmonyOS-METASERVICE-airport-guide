@@ -209,6 +209,14 @@ public struct Viewport: Sendable {
 
   public init() {}
 
+  /// 用显式参数复现一个视口（跨语言渲染基准用它注入同一组 zoom/tx/ty）
+  public init(zoom: Double, tx: Double, ty: Double) {
+    self.zoom = zoom
+    self.tx = tx
+    self.ty = ty
+    self.minZoom = zoom * 0.75
+  }
+
   public mutating func reset() {
     zoom = 1
     tx = 0
