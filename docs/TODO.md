@@ -175,6 +175,18 @@
 | T-607 | Web/小程序的视觉收敛：把 `docs/DESIGN.md` 的令牌与字号阶梯落到实现 | P2 | T-201, T-603 | `apps/web/src/styles.css` | 令牌化样式 | 无裸色值/裸字号；与 DESIGN.md 令牌表一一对应 | ☐ |
 | T-608 | 统一离线回归入口：把 `pathfind_reference.py`、`npm test`、`pnpm test:web` 串成一条命令 | P2 | T-604 | 本文件 §3 W0 | 一键脚本 | 一条命令全绿；任一环失败即非零退出 | ☐ |
 
+**目视验证的两条路径**（第 8 轮实测记录）：
+
+1. **人工**：`bash tools/apple_test.sh run AirportGuideApp`（macOS 窗口）／微信开发者工具「导入项目」选 `apps/weapp`。
+2. **自动截图（可让 AI 自己做）**：本机装有 Orca.app，其 CLI 在
+   `/Applications/Orca.app/Contents/Resources/bin/orca`（`/usr/local/bin/orca` 软链不可读，无法自解析路径）。
+   第 8 轮尝试 `orca computer permissions --json` 返回 `runtime_unavailable`：
+   > Could not read Orca runtime metadata at ~/Library/Application Support/orca/orca-runtime.json. Start the Orca app first.
+
+   即：**先启动 Orca 应用**，之后 `orca computer get-app-state --app <bundle-id> --restore-window --json`
+   就能拿到窗口截图，AI 即可自行完成 T-612/T-614 的目视走查。未启动前不擅自拉起桌面应用。
+
+
 决策待拍板见 §5 的 D-08（小程序技术选型）与 D-09（Apple 端实现形态）。
 
 ---
