@@ -163,6 +163,7 @@
 | T-605 | **微信小程序端**：WXML/WXSS + Canvas 2D，复用 `packages/core`（含绘制命令流） | P1 | T-603, D-08 | `apps/weapp/**`、`tools/build_weapp.mjs` | 小程序工程 + 核心 CJS 打包 | `npm run test:weapp` 9 项全绿（配置/文案/六页真实 Page 生命周期/Canvas 链路/包体）；主包 136 KB | ☑ 2026-10-02 |
 | T-613 | Web 端改用共享 `AppModel`/`Presenter`：消除第二份状态机与文案映射 | P2 | — | `apps/web/src/main.ts`、`apps/web/src/storage.ts` | 重构后的 Web 端（本文件现为纯视图层） | 本文件不再持有状态；15 项端到端全绿 | ☑ 2026-10-02 |
 | T-617 | **小程序静态契约检查**：在无法渲染 WXML 的前提下，用静态分析核对数据绑定 / 事件处理 / `wx:key` / class 是否都有对应实现 | P1 | T-605 | `tools/weapp_static.mjs` | 5 项检查纳入 `npm run test:weapp` | 6 页 / 79 数据键 / 74 样式类全部对得上；实测抓出 `.stepFloor` 未定义样式 | ☑ 2026-10-02 |
+| T-620 | **无障碍对比度**：令牌按 WCAG 2.1 AA 逐对核算（正文 4.5:1 / 图形 3:1） | P1 | T-201 | `tools/check_tokens.mjs` | 第 7 项检查（含豁免清单与理由） | 实测：正文 14.55:1、地图文字 13.65:1、全部 15 个类型色 ≥3.58:1 ✔；3 处已记录偏差（`--sub` 在页面底色 4.42、强调色在浅强调底 4.00、走廊底图 1.85） | ◐ 检查已建立；3 处偏差受上游主题色限制，待与走查一起定夺 |
 | T-619 | **Web 端真正成为 PWA**：补 manifest / 图标 / service worker（此前只是"能在浏览器打开"，没有离线与可安装能力） | P2 | — | `apps/web/public/**`、`tools/build_web_pwa.mjs` | manifest + 2 个 SVG 图标 + 带内容指纹的 `sw.js` | 预缓存 6 个文件 / 79 KB；`web:build` 后自动校验（预缓存完整性、manifest 引用、体积上限） | ☑ 2026-10-02 |
 | T-618 | Web 端同类静态契约：源码里 `class: '...'` 用到的类必须在样式表里有定义 | P2 | — | `tools/web_smoke.mjs` | 1 项检查 | 实测抓出 `.step-floor` / `.picker-body` 未定义并已补齐 | ☑ 2026-10-02 |
 | T-614 | **小程序在微信开发者工具中目视验证**：本机未安装开发者工具，WXML/WXSS 从未真实渲染 | P1 | T-605 | `apps/weapp/miniprogram/**` | 走查记录 + 修正 | 六页在开发者工具里排版正常、与 Web 端观感一致 | ☐ |
@@ -256,3 +257,4 @@
 | v1.8 | 2026-10-02 | DSH Agent | T-617/T-618 完成（小程序与 Web 的静态契约检查），并修掉两处未定义样式 |
 | v1.9 | 2026-10-02 | DSH Agent | T-619 完成（Web 端 manifest + service worker，可离线安装） |
 | v2.0 | 2026-10-02 | DSH Agent | T-001/T-002/T-003 结项：修好 ArkTS 源码验证 + 一键门禁 `check_all.sh`（9 步）；M1 完成 |
+| v2.1 | 2026-10-02 | DSH Agent | T-620：令牌门禁增加 WCAG 2.1 AA 对比度核算（第 7 项），记录 3 处已豁免偏差 |
