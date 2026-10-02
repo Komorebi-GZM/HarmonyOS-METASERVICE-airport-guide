@@ -672,7 +672,10 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 2. **同一套断言**：`packages/core/test/conformance.test.ts`（16 项）复刻 `tools/pathfind_reference.py` 的 A–E 自测与 `tools/verify_product.mjs` 的状态机/检索断言，并锁定 6 条样例路线的**米数与节点数**（与 Python 参考实现逐条一致）。
 3. **同一组基准路线**：`tools/gen_route_fixture.mjs` 用 TS 核心算出 **824 条**路线的完整结果（节点序列/米数/是否过安检/legs/transitions/步骤序列/步行米数），Swift 端逐项比对 —— 这保证两端在**并列最短路**里选出的是同一条路径，而不只是"总米数相同"。
 4. **同一个入口**：`npm run test:all` 串起核心回归（37）、Web 端到端（15）、Apple（42）与小程序（9）—— 共 103 项。
-5. **同一份渲染契约**：`packages/core/src/render.ts` 产出绘制命令流，Web 与小程序各自只写"解释器"（Canvas API 调用），
+5. **同一份上游实现回归**：`tools/verify_product.mjs` 用 TypeScript 转译 `harmony_app/.../ets/**` 后**直接运行 ArkTS 源码**
+   （6 套件 / 500 组 × 4 偏好 = 2 000 条路线 / 119 节点 145 边）。这是唯一"以真源本身为被测对象"的检查，
+   与三端移植形成交叉验证。
+6. **同一份渲染契约**：`packages/core/src/render.ts` 产出绘制命令流，Web 与小程序各自只写"解释器"（Canvas API 调用），
    Swift 端是等价实现。三端画同一张图，图层顺序/用色/标签阈值/命中半径只在核心定义一次。
    **该契约由 `tools/gen_render_fixture.mjs` 的 10 个场景 / 664 条命令基准锁定**：Swift 端逐条比对（`RendererParityTests`），
    连标签底片宽度（`len × size × 0.62 + 4`）与楼层水印位置都必须一致。
@@ -716,3 +719,4 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 | v1.5 | 2026-10-02 | DSH Agent | 渲染契约补充 664 条命令基准的锁定方式；各端对照表新增渲染契约行 |
 | v1.6 | 2026-10-02 | DSH Agent | 分层图补充令牌生成物（tokens.css / tokens.wxss / airport-data.json）；扩展点加入改主题色的链路 |
 | v1.7 | 2026-10-02 | DSH Agent | 分层图标注 metrics（字号/间距/圆角）同为生成物 |
+| v2.0 | 2026-10-02 | DSH Agent | §13.3 新增第 5 层锚点：ArkTS 源码回归（verify_product.mjs） |

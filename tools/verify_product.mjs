@@ -6,8 +6,34 @@ import { pathToFileURL } from 'node:url';
 
 const root = path.resolve(import.meta.dirname, '..');
 const etsRoot = path.join(root, 'harmony_app/entry/src/main/ets');
-const tsFile = 'C:/Program Files/Huawei/DevEco Studio/sdk/default/openharmony/ets/build-tools/ets-loader/node_modules/typescript/lib/typescript.js';
-const ts = await import(pathToFileURL(tsFile));
+// TypeScript 编译器的来源（按优先级）：
+//   1. 环境变量 DEVECO_SDK_HOME 指向的 DevEco SDK（Windows/macOS 两种常见布局）
+//   2. 仓库本地依赖（pnpm add -D -w typescript），便于在没装 DevEco 的机器上跑
+//   3. 找不到就给出明确指引，而不是抛 ERR_MODULE_NOT_FOUND
+async function loadTypeScript() {
+  const candidates = [];
+  const sdkHome = process.env.DEVECO_SDK_HOME;
+  if (sdkHome) {
+    candidates.push(path.join(sdkHome, 'default/openharmony/ets/build-tools/ets-loader/node_modules/typescript/lib/typescript.js'));
+    candidates.push(path.join(sdkHome, 'openharmony/ets/build-tools/ets-loader/node_modules/typescript/lib/typescript.js'));
+    candidates.push(path.join(sdkHome, 'ets/build-tools/ets-loader/node_modules/typescript/lib/typescript.js'));
+  }
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) { return import(pathToFileURL(candidate).href); }
+  }
+  const { createRequire } = await import('node:module');
+  const require = createRequire(import.meta.url);
+  try {
+    return await import(pathToFileURL(require.resolve('typescript')).href);
+  } catch (err) {
+    throw new Error(
+      '找不到 TypeScript 编译器。二选一：\n' +
+      '  · 装好 DevEco Studio 并 export DEVECO_SDK_HOME=<sdk 路径>\n' +
+      '  · 或在仓库根执行 pnpm add -D -w typescript（离线回归用）'
+    );
+  }
+}
+const ts = await loadTypeScript();
 const modules = new Map();
 function loadEts(file) {
   const full = path.resolve(file);

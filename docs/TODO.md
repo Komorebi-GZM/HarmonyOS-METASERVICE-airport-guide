@@ -33,7 +33,8 @@
 | 代码 | 22 个 `.ets`（约 4 018 行），其中生成模型 `AirportMap.ets` 2 139 行 | `wc -l` |
 | 工程配置 | 元服务 `atomicService`、`installationFree: true`、compatible/target = `6.1.0(23)`、`signingConfigs: []` | `harmony_app/AppScope/app.json5`、`harmony_app/build-profile.json5` |
 | 离线校验 ① | `python3 tools/pathfind_reference.py` **本机实测通过**：119 节点（land 63 / air 55 / gate 1），500 组随机起终点 5 项断言全通过 | 2026-10-02 实测输出 |
-| 离线校验 ② | `node tools/verify_product.mjs` **本机实测失败**：第 9 行硬编码 Windows 路径 `C:/Program Files/Huawei/DevEco Studio/sdk/.../typescript.js` | `tools/verify_product.mjs:9-10` |
+| 离线校验 ② | `node tools/verify_product.mjs` **本机实测通过**：`PASS 6/6 suites; route cases 2,000; nodes 119; edges 145`——它转译并运行的是 **ArkTS 源码本身** | 2026-10-02 实测（修好 T-001 后） |
+| 一键门禁 | `npm run check:all` = `tools/check_all.sh`：9 步，从漂移检测到三端回归 | 2026-10-02 实测全绿 |
 | 工具链可用性 | `python3 tools/gen_checker.py` **本机实测失败**（`AssertionError: checker.html 缺失注入占位符`，exit 1）；提交版本与 HEAD 版本里占位符均已不存在，取而代之的是已注入的 `window.AIRPORTS = …;` | `tools/gen_checker.py:23`、`tools/checker.html:164`、2026-10-02 实测 |
 | 生成链可复现性 | **本机实测：完全可复现**。`gen_maps.py` + `gen_model.py` 重跑后 `data/XHA_xinghai_t1.map.json` 与 `model/AirportMap.ets` 的 SHA-256 均与提交版本一致（`a61d3d22…` / `191ecc47…`），无漂移 | 2026-10-02 实测：各层节点 4F 55 / 3F 12 / 2F 21 / 1F 11 / B1 14 / B2 6 |
 | 素材脚本 | `capture_product_screens.py` 与 `gen_brand_assets.py` 需要 **Pillow**（≥9.1，用了 `Image.Resampling.LANCZOS`），仓库无 `requirements.txt`；本机 `import PIL` 失败 | `tools/gen_brand_assets.py:3`、`tools/capture_product_screens.py:9`、2026-10-02 实测 |
@@ -74,9 +75,9 @@
 
 | ID | 任务 | 优先级 | 依赖 | 证据起点 | 产出物 | 验收口径 | 状态 |
 |---|---|---|---|---|---|---|---|
-| T-001 | 解除 `verify_product.mjs` 的 SDK 路径硬编码：改为读环境变量（如 `DEVECO_SDK_HOME`）+ 多平台探测，找不到时给出明确报错与安装指引 | **P0** | — | `tools/verify_product.mjs:9` | 修改后的 `tools/verify_product.mjs` | 在 macOS 上 `node tools/verify_product.mjs` 输出 `6/6` 套件通过；无 SDK 时输出可读错误而非 `ERR_MODULE_NOT_FOUND` | ☐ |
-| T-002 | 统一离线回归入口（如 `tools/check.sh`）：`gen_maps.py` → `gen_model.py` → `pathfind_reference.py` → `verify_product.mjs`，任一步失败即非零退出 | P1 | T-001 | `AGENTS.md` §6 命令速查 | 一键脚本 + `development.md` 命令表更新 | 干净工作区跑一次全绿；故意改坏一处数据能红 | ☐ |
-| T-003 | 生成物漂移检测：跑完生成链后 `git diff --exit-code data/ harmony_app/entry/src/main/ets/model/AirportMap.ets` | P1 | T-002 | `AGENTS.md` 红线 1–3；生成链已被验证为可复现（§1） | T-002 脚本内的一步 | 手工改了 `AirportMap.ets` 或漏跑生成器时能被检出 | ☐ |
+| T-001 | 解除 `verify_product.mjs` 的 SDK 路径硬编码：按 `DEVECO_SDK_HOME` → 仓库本地 `typescript` → 明确报错 三级解析 | **P0** | — | `tools/verify_product.mjs:9` | 修改后的脚本 + 根级 `typescript` devDependency | macОS 上 `node tools/verify_product.mjs` 输出 `PASS 6/6 suites; route cases 2,000; nodes 119; edges 145`；无 SDK 时给出可读指引 | ☑ 2026-10-02 |
+| T-002 | 统一离线回归入口 `tools/check_all.sh`：漂移检测 → 导出 → Python 参考实现 → **ArkTS 源码回归** → 核心 → 令牌 → 基准 → Web → Apple → 小程序，共 9 步 | P1 | T-001 | `tools/check_all.sh`、`npm run check:all` | 一键脚本 | 干净工作区一次全绿；任一步失败即非零退出 | ☑ 2026-10-02 |
+| T-003 | 生成物漂移检测：重跑生成链后 `git diff --quiet -- data/*.json harmony_app/.../AirportMap.ets` | P1 | T-002 | `tools/check_all.sh` 第 1 步 | 脚本内的一步（含 diff 输出） | 手改生成物或漏跑生成器时立即红，并打印差异 | ☑ 2026-10-02 |
 | T-004 | 上游文档事实性纠错清单（本工作区不改上游文件，只在本文件登记，等决定是否提 PR）——已登记 8 类：① 案例仓地址 `HarmonyOS-AtomSer-…` 在 `README.md`、`cases/case.json`、`cases/practice.html` 共 12 处；② `data/README.md` 的"改 JSON 再跑 `gen_maps.py`"与覆盖语义相反；③ `data/README.md:23` `meta.floors` 示例缺 2F/1F；④ `data/README.md:45` 列了数据中不存在的 `apm_station`；⑤ `docs/BUILD.md` §6.2 生成顺序写反（应为 `gen_maps.py` → `gen_model.py`）；⑥ `docs/BUILD.md` §7 行数与工具清单过时（漏 `verify_flows.py` 等 6 个文件）；⑦ `docs/开发文档.md` 的 `compileSdkVersion` 与 `Viewport` 钳制参数与代码不符；⑧ `docs/BUILD.md` §2.1 未提 Pillow 依赖 | P2 | D-05 | 逐条见 `project-overview.md` §10 冲突汇总、`development.md` §3.4 | 纠错条目表 | 每条均有原文位置与正确说法 | ☐ |
 | T-005 | **修复 `gen_checker.py`**：占位符 `/*__AIRPORTS_JSON__*/` 已被上一次注入消耗（提交版本与 HEAD 版本都没有），脚本硬断言导致必然失败。改为替换已有的 `window.AIRPORTS = …;` 或把占位符加回 `checker.html` | **P0** | — | `tools/gen_checker.py:23`、`tools/checker.html:164`、2026-10-02 实测 exit 1 | 修好的脚本 + `checker.html` 可重复注入 | `python3 tools/gen_checker.py` 连续跑两次都 exit 0，且 `checker.html` 打开后含最新节点数据 | ☐ |
 | T-006 | Pillow 依赖声明：新增 `tools/requirements.txt`（`Pillow>=9.1`）并在 `development.md` 标注 | P2 | — | `tools/gen_brand_assets.py:3`、`tools/capture_product_screens.py:9` | requirements 文件 | 新环境按文档一次装好，两个脚本可跑 | ☐ |
@@ -183,7 +184,7 @@
 | 里程碑 | 内容 | 完成判据 | 状态 |
 |---|---|---|---|
 | **M0 文档就绪** | 8 份工作区文档（`AGENTS.md` + `docs/` 七份）落地并与代码对齐 | 八份文档可追溯、无编造；`AGENTS.md` 索引齐全 | ☑ 2026-10-02 |
-| **M1 回归可跑** | T-001 → T-002 → T-003 → T-406 | 一条命令跑完离线回归并检出漂移 | ☐ |
+| **M1 回归可跑** | T-001 → T-002 → T-003 → T-406 | 一条命令（`npm run check:all`）跑完 9 步离线回归并检出漂移 | ☑ 2026-10-02 |
 | **M2 规则统一** | T-201、T-202、T-103 | 设计令牌单一来源；无障碍路径可硬约束 | ☐ |
 | **M3 能力扩展** | T-101、T-102、T-401、T-404、T-402 | 多航站楼可用；平台矩阵逐档验证通过 | ☐ |
 | **M4 收口** | T-301~T-304、T-403、T-405、T-204 | 有包体/性能基线，发布链路可用 | ☐ |
@@ -214,6 +215,7 @@
 | 日期 | 变更 | 说明 |
 |---|---|---|
 | 2026-10-02 | 首次创建 | 建立基线快照、四条主线任务池、里程碑与决策清单；基于 `main@8350ff4` 与本机实测（`pathfind_reference.py` 通过、`verify_product.mjs` 与 `gen_checker.py` 因硬编码 Windows 路径 / 占位符被消耗而失败、生成链逐字节可复现） |
+| 2026-10-02 | 一键离线门禁 | 修好 `verify_product.mjs`（三级解析 TypeScript，回到能验证 **ArkTS 源码**的状态，6/6 套件 / 2000 条路线）；新增 `tools/check_all.sh` 与 `npm run check:all`（9 步：漂移检测→导出→Python 参考→ArkTS 源码→核心→令牌→基准→Web→Apple→小程序）；T-001/T-002/T-003 与里程碑 M1 结项 |
 | 2026-10-02 | Web 端补齐 PWA | 新增 manifest（standalone + 品牌色）、2 个 SVG 图标、`tools/build_web_pwa.mjs`（生成带内容指纹的 sw.js 并自检 3 项）；`web:build` 自动串联；生产构建注册 service worker，开发模式不注册 |
 | 2026-10-02 | 两端静态契约检查 | 小程序新增 `tools/weapp_static.mjs`（5 项：绑定/事件/wx:key/样式类/页面登记），Web 端在冒烟里加"源码类名必须已定义"；抓出并修复 `.stepFloor`（WXSS）与 `.step-floor`、`.picker-body`（CSS） |
 | 2026-10-02 | 尺寸阶梯令牌化 | 新增 13 档字号 / 10 档间距 / 6 档圆角令牌；Web 44 处字号 + 6 圆角 + 41 间距、小程序 36 处字号 + 4 圆角 + 45 间距改为令牌引用；Apple 端新增 `Metrics` 读同一份阶梯（+1 项测试），SwiftUI 51 处字号改为 `Theme.font(...)`；检查脚本增至 6 项并输出"阶梯外间距"信息统计 |
@@ -241,3 +243,4 @@
 | v1.7 | 2026-10-02 | DSH Agent | T-202 主体完成（字号/圆角/间距阶梯令牌化，三端共用）；新增 T-216（阶梯外间距收敛） |
 | v1.8 | 2026-10-02 | DSH Agent | T-617/T-618 完成（小程序与 Web 的静态契约检查），并修掉两处未定义样式 |
 | v1.9 | 2026-10-02 | DSH Agent | T-619 完成（Web 端 manifest + service worker，可离线安装） |
+| v2.0 | 2026-10-02 | DSH Agent | T-001/T-002/T-003 结项：修好 ArkTS 源码验证 + 一键门禁 `check_all.sh`（9 步）；M1 完成 |

@@ -22,13 +22,16 @@
     "fixtures": "node tools/gen_route_fixture.mjs && node tools/gen_render_fixture.mjs",
     "test:tokens": "node tools/check_tokens.mjs",
     "check:weapp": "node tools/weapp_static.mjs",
-    "test:pwa": "node tools/build_web_pwa.mjs"
+    "test:pwa": "node tools/build_web_pwa.mjs",
+    "check:all": "bash tools/check_all.sh",
+    "verify:arkts": "node tools/verify_product.mjs"
   },
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "devDependencies": {
-    "esbuild": "^0.28.2"
+    "esbuild": "^0.28.2",
+    "typescript": "^5.9.3"
   }
 }

@@ -534,6 +534,8 @@ git remote -v
 
 ### 10.2 环境
 
+- **TypeScript ≥ 5**（根 devDependency）：`tools/verify_product.mjs` 需要它把 `.ets` 转译后直接跑上游实现；
+  若你装了 DevEco Studio，也可以只 export `DEVECO_SDK_HOME=<sdk 路径>`（脚本会优先用 SDK 自带的编译器）。
 - **Node ≥ 20.11**（`import.meta.dirname`）；本机实测 Node 25.9 可直接运行 `.ts`（原生类型擦除，**核心回归零依赖、无需构建**）。
 - **pnpm ≥ 10**（本机 11.24）。仓库已用 `.npmrc` 把 pnpm 的 store/cache 指到仓库内（`store-dir=.pnpm-store`、`cache-dir=.pnpm-cache`），避免写 `~` 下的目录被沙箱拒绝。
 - **pnpm 11 会拦截依赖构建脚本**：`pnpm-workspace.yaml` 里以 `allowBuilds: { esbuild: true }` 显式放行（vite 依赖 esbuild 的 postinstall）。换机器时若报 `ERR_PNPM_IGNORED_BUILDS`，就是这个开关没生效。
@@ -560,6 +562,8 @@ git remote -v
 | `node tools/build_weapp.mjs` | 把共享核心打成小程序可 require 的 CommonJS 单文件（95 KB） | 改了核心之后必须跑 |
 | `npm run test:weapp` | 小程序冒烟（9 项）+ 静态契约（5 项：绑定/事件/wx:key/样式类/页面登记） | 同上 |
 | `npm run check:weapp` | 只跑小程序静态契约（改 WXML/WXSS 时快速反馈） | 同上 |
+| `npm run check:all` | **一键门禁**：9 步（漂移检测 → 导出 → Python 参考实现 → ArkTS 源码回归 → 核心 → 令牌 → 基准 → Web → Apple → 小程序） | 提交前 |
+| `npm run verify:arkts` | 只跑 ArkTS 源码回归（需 `typescript`，已加入根 devDependencies） | 无 |
 | `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 + Apple 端回归 | 同上 |
 
 ### 10.4 回归覆盖了什么
@@ -605,3 +609,4 @@ git remote -v
 | v1.7 | 2026-10-02 | DSH Agent | §10 令牌检查扩至 6 项（含尺寸阶梯） |
 | v1.8 | 2026-10-02 | DSH Agent | §10 补小程序静态契约与 check:weapp |
 | v1.9 | 2026-10-02 | DSH Agent | §10 补 PWA 构建步骤与 test:pwa |
+| v2.0 | 2026-10-02 | DSH Agent | §10 补 `check:all` / `verify:arkts`；环境要求加入 TypeScript 5 |
