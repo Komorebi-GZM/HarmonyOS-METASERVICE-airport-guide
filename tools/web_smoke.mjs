@@ -265,6 +265,24 @@ check('地图画布真的被绘制（Canvas 2D 调用非空）', () => {
   }
 });
 
+check('「修改出发位置」进入出发位置页（而不是目的地页），且不改动目的地', () => {
+  const before = JSON.parse(localStorageStub.getItem('airport-guide') || '{}');
+  const editBtn = findByText('修改出发位置');
+  if (editBtn === null) { throw new Error('找不到「修改出发位置」'); }
+  editBtn.click();
+  const t = text();
+  if (t.includes('选择目的地')) { throw new Error('错误地进入了目的地页（历史 bug：会覆盖目的地）'); }
+  if (!t.includes('出发位置') && !t.includes('你现在在哪里')) { throw new Error('未进入出发位置页'); }
+  const quick = buttons().find((b) => b.textContent.includes('北出发门'));
+  if (quick === undefined) { throw new Error('找不到「北出发门」'); }
+  quick.click();
+  if (!text().includes('路线预览')) { throw new Error('选完起点未回到路线预览'); }
+  const after = JSON.parse(localStorageStub.getItem('airport-guide') || '{}');
+  if (JSON.stringify(before.recent) !== JSON.stringify(after.recent)) {
+    throw new Error('仅修改起点不应改写最近目的地');
+  }
+});
+
 check('切换偏好到「优先电梯」后仍在预览且偏好态生效', () => {
   const chip = findByText('优先电梯');
   if (chip === null) { throw new Error('找不到偏好 chip'); }

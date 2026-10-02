@@ -14,10 +14,12 @@ import PackageDescription
 
 let package = Package(
   name: "AirportGuide",
-  platforms: [.macOS(.v13), .iOS(.v16)],
+  platforms: [.macOS(.v14), .iOS(.v17)],
   products: [
     .library(name: "AirportCore", targets: ["AirportCore"]),
+    .library(name: "AirportUI", targets: ["AirportUI"]),
     .executable(name: "airport-cli", targets: ["AirportCLI"]),
+    .executable(name: "AirportGuideApp", targets: ["AirportGuideApp"]),
   ],
   targets: [
     .target(
@@ -26,10 +28,28 @@ let package = Package(
       resources: [.copy("Resources/airport-data.json")],
       swiftSettings: [.swiftLanguageMode(.v5)]
     ),
+    .target(
+      name: "AirportUI",
+      dependencies: ["AirportCore"],
+      path: "Sources/AirportUI",
+      swiftSettings: [.swiftLanguageMode(.v5)]
+    ),
+    .executableTarget(
+      name: "AirportGuideApp",
+      dependencies: ["AirportCore", "AirportUI"],
+      path: "Sources/AirportGuideApp",
+      swiftSettings: [.swiftLanguageMode(.v5)]
+    ),
     .executableTarget(
       name: "AirportCLI",
       dependencies: ["AirportCore"],
       path: "Sources/AirportCLI",
+      swiftSettings: [.swiftLanguageMode(.v5)]
+    ),
+    .testTarget(
+      name: "AirportUITests",
+      dependencies: ["AirportCore", "AirportUI"],
+      path: "Tests/AirportUITests",
       swiftSettings: [.swiftLanguageMode(.v5)]
     ),
     .testTarget(

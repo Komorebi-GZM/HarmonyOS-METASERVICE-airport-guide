@@ -519,6 +519,8 @@ git remote -v
 | `packages/core/test/conformance.test.ts` | 16 项一致性回归 | ✅ 手写 |
 | `apps/web/**` | Web/PWA 客户端（Vite + TS + Canvas 2D） | ✅ 手写 |
 | `apps/apple/Sources/AirportCore/**` | Apple 端 Swift 核心移植 | ✅ 手写 |
+| `apps/apple/Sources/AirportUI/**` | Apple 端呈现层（状态机/文案/绘制命令，纯逻辑） | ✅ 手写 |
+| `apps/apple/Sources/AirportGuideApp/**` | SwiftUI 六页 + Canvas 地图（命令流解释器） | ✅ 手写 |
 | `apps/apple/Sources/AirportCore/Resources/*.json` | 跨语言数据包 | ❌ 生成物（export_shared.py） |
 | `apps/apple/Tests/AirportCoreTests/Fixtures/*.json` | 跨语言基准路线 | ❌ 生成物（gen_route_fixture.mjs） |
 | `tools/gen_route_fixture.mjs` | 用 TS 核心生成各端对齐基准 | ✅ 手写 |
@@ -542,7 +544,9 @@ git remote -v
 | `pnpm web` | Web 开发服务器 → http://127.0.0.1:5173 | 先 `pnpm install` |
 | `pnpm web:build` | 产出 `apps/web/dist`（静态托管 / WKWebView 壳可直接用） | 同上 |
 | `pnpm test:web` | Web 端到端冒烟：加载 `dist` 产物，在最小 DOM 桩里走完主链路 | 先 `pnpm web:build` |
-| `npm run test:apple` | Apple 端核心回归：`swift test`，15 项（含 824 条与 TS 逐节点比对） | macOS + Xcode 命令行工具 |
+| `npm run test:apple` | Apple 端回归：`swift test`，42 项（核心 15 + 呈现 27） | macOS + Xcode 命令行工具 |
+| `npm run apple:build` | 编译全部 Apple 目标（含 SwiftUI 应用） | 同上 |
+| `bash tools/apple_test.sh run AirportGuideApp` | 启动 SwiftUI 界面（macOS 14+） | 同上 |
 | `npm run apple:run` | 运行 `airport-cli`，打印 6 条参考样例与四档偏好对比 | 同上 |
 | `node tools/gen_route_fixture.mjs` | 生成跨语言基准 `routes.json`（824 条）到 TS 与 Swift 两处 | 改了寻路/数据之后必须跑 |
 | `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 + Apple 端回归 | 同上 |
@@ -569,7 +573,7 @@ git remote -v
 ### 10.6 已知限制
 
 - Web 端为**视觉近似**：流程与逻辑对齐，字号/间距/圆角尚未收敛到 [DESIGN.md](DESIGN.md) 的令牌（T-607）。
-- Apple 端目前**只有核心与 CLI**，没有 UI（SwiftUI 六页见 `docs/TODO.md` T-609）；本机也没有 iOS 模拟器运行时，iOS 目标可编译但需先下载运行时才能跑。
+- Apple 端（macOS 14+ / iOS 17+）已有界面，但**只做过编译验证与呈现层测试**，尚未逐屏视觉走查（T-612）；本机没有 iOS 模拟器运行时，iOS 目标可编译但需先在 Xcode → Settings → Components 下载运行时才能跑。
 - 共享核心对"平行边"与 `apm` 类型做了**更严格**的处理：前者在加载期直接抛错（ArkTS 端是静默覆盖），后者补上了 350m 权重（ArkTS 端会降级成 25m）。这是有意的差异，已在代码注释与本文件说明。
 
 ---
@@ -582,3 +586,4 @@ git remote -v
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
 | v1.1 | 2026-10-02 | DSH Agent | 新增 §10 多端移植：目录职责、环境（Node≥20.11 / pnpm≥10 / allowBuilds）、命令表、回归覆盖面与已知限制 |
 | v1.2 | 2026-10-02 | DSH Agent | §10 补 Apple 端：目录职责、命令、SwiftPM 沙箱坑与对策（10.5） |
+| v1.3 | 2026-10-02 | DSH Agent | §10 补 Apple 界面目标与 42 项回归；限制说明更新为"未做视觉走查" |

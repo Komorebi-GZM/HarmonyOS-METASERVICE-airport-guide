@@ -677,8 +677,9 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 |---|---|---|---|---|
 | ArkTS（上游） | `harmony_app/entry/src/main/ets/{model,core}` | `pathfind_reference.py` + 设备脚本（需 hdc） | 编译进 `AirportMap.ets` | 只读参照 |
 | TypeScript | `packages/core/src/*.ts` | `npm test`（16 项） | `src/generated/*.ts` | ✅ |
-| Swift | `apps/apple/Sources/AirportCore/*.swift` | `npm run test:apple`（15 项，含 824 条逐节点比对） | `Resources/airport-data.json` | 核心 ✅ / UI 待做 |
-| Web UI | `apps/web/src/*.ts` | `pnpm test:web`（14 项端到端） | 同 TS 核心 | ✅ 视觉近似 |
+| Swift 核心 | `apps/apple/Sources/AirportCore/*.swift` | 核心 15 项（含 824 条逐节点比对） | `Resources/airport-data.json` | ✅ |
+| SwiftUI 界面 | `apps/apple/Sources/{AirportUI,AirportGuideApp}` | 呈现层 27 项（文案/绘制命令/状态机/偏好） | 同 Swift 核心 | ✅ 编译验证 / 视觉走查待做 |
+| Web UI | `apps/web/src/*.ts` | `pnpm test:web`（15 项端到端） | 同 TS 核心 | ✅ 视觉近似 |
 | 小程序 | 待建 `apps/weapp/` | 待定 | `packages/core/assets/airport-data.json` | ☐ |
 
 ### 13.4 扩展点
@@ -702,3 +703,4 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
 | v1.1 | 2026-10-02 | DSH Agent | 新增 §13 多端架构：新分层图、与 ArkTS 端的有意行为差异、三层一致性锚点、扩展点 |
 | v1.2 | 2026-10-02 | DSH Agent | §13 补 Apple 端与"基准路线"第 4 层锚点，新增 13.3.1 各端一致性对照表 |
+| v1.3 | 2026-10-02 | DSH Agent | 13.3.1 拆分 Swift 核心与 SwiftUI 界面两行；Web 端到端更新为 15 项 |

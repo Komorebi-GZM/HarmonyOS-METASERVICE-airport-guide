@@ -13,14 +13,26 @@ apps/apple/
 │   ├── Planner.swift                      行程状态机（值语义）
 │   ├── Support.swift                      地点检索 / 分类 / 双语 / 视口
 │   └── Resources/airport-data.json        【生成物】勿手改，见下
+├── Sources/AirportUI/                     ← 呈现层（纯逻辑，可测）：AppModel / Presenter / MapRenderer / Color
+├── Sources/AirportGuideApp/               ← SwiftUI 应用（六页 + Canvas 地图）
+│   ├── RootView.swift                     外壳/主题/首页/地铁
+│   ├── Views.swift                        目的地/出发位置/路线/楼层地图
+│   └── MapCanvasView.swift                绘制命令流的解释器 + 手势
 ├── Sources/AirportCLI/main.swift          命令行示例（macOS 直接运行）
-└── Tests/AirportCoreTests/                15 项回归，含跨语言逐节点比对
-    └── Fixtures/routes.json               【生成物】824 条 TS 基准路线
+├── Tests/AirportCoreTests/                15 项核心回归，含跨语言逐节点比对
+│   └── Fixtures/routes.json               【生成物】824 条 TS 基准路线
+└── Tests/AirportUITests/                  27 项呈现层回归（文案/绘制命令/状态机/偏好）
 ```
 
 ## 快速开始
 
-**在 Xcode 里**（推荐）：`File → Open…` 选择本目录的 `Package.swift`，选中 `airport-cli` scheme 直接 Run。
+**在 Xcode 里**（推荐）：`File → Open…` 选择本目录的 `Package.swift`，选中 `AirportGuideApp` scheme，Run 即可看到六页界面。
+
+**直接跑图形界面**（终端）：
+
+```bash
+cd apps/apple && swift run AirportGuideApp     # 沙箱环境用 bash tools/apple_test.sh run AirportGuideApp
+```
 
 **在终端里**：
 
@@ -52,7 +64,13 @@ bash tools/apple_test.sh run airport-cli --from xha_p4_doorW --to xha_p4_gC308
 
 ## 一致性怎么保证
 
-`swift test` 共 15 项，其中最有分量的是两条：
+`swift test` 共 **42 项**（核心 15 + 呈现层 27）。呈现层覆盖：步骤文案与主操作按钮（四种 kind × 中英）、
+分类 chips、状态文案、卡片解析、地点筛选；地图**绘制命令流**的图层顺序、走廊双描边、路线层开关、
+标记只在所属楼层出现、标签可见阈值、节点半径规则、命中半径、路线适配不越界、以及全部令牌颜色的可解析性；
+应用状态机的完整流程（首页→目的地→起点→路线→指引→完成→重开）、步骤前后跳转、当前楼层跟随步骤、
+语言与最近列表的持久化与失效过滤。
+
+核心 15 项里最有分量的是两条：
 
 1. **`testAllPairsReachableAndCutVertexEquivalence`**：14 042 组全量有序节点对，
    组组可达；异侧路线与"全图 Dijkstra"逐节点等价，且必经 `xha_p4_sec`。
@@ -71,8 +89,8 @@ bash tools/apple_test.sh run airport-cli --from xha_p4_doorW --to xha_p4_gC308
 
 ## 已知限制（下一步）
 
-- **还没有 UI**：本包只包含核心 + CLI。SwiftUI 界面（六页 + Canvas 地图）是下一步，见
-  `docs/TODO.md` 的 T-609。
+- **UI 已完成但只在本机编译验证**：`AirportGuideApp`（SwiftUI 六页 + Canvas 地图）能编译、其逻辑层有 27 项测试，
+  但没有在真机/模拟器上做过视觉走查（本机没有 iOS 模拟器运行时；macOS 目标可直接运行）。
 - **本机没有 iOS 模拟器运行时**（`xcrun simctl list runtimes` 为空）：iOS 目标能编译，
   要跑模拟器需先在 Xcode → Settings → Components 里下载。macOS 目标不需要模拟器。
 - **米数有两个口径**：`Route.totalMeters`（含换层）与 `RouteView.walkingMeters`（只算 walk 边，

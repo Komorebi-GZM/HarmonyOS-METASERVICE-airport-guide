@@ -338,8 +338,12 @@ function targetView(): HTMLElement {
 
 function startView(): HTMLElement {
   const target = place(AIRPORT, state.planner.draftEnd);
+  const back: ViewName = state.planner.editing === 'start' ? 'route' : 'home';
   return h('div', { class: 'view' },
-    header(L('start_title'), () => go('home')),
+    header(L('start_title'), () => {
+      if (state.planner.editing === 'start') { state.planner = cancelEdit(state.planner); }
+      go(back);
+    }),
     target !== undefined
       ? h('div', { class: 'selected' },
           h('span', { class: 'selected-label', text: L('selected_target') }),
@@ -420,7 +424,7 @@ function routePane(): HTMLElement {
     }))));
     body.push(h('div', { class: 'actions' },
       h('button', { class: 'btn btn-primary', onclick: () => setPlanner(startGuidance(state.planner)) }, L('begin')),
-      h('button', { class: 'btn', onclick: () => setPlanner(beginEdit(state.planner, 'start'), 'target') }, L('edit_from')),
+      h('button', { class: 'btn', onclick: () => setPlanner(beginEdit(state.planner, 'start'), 'start') }, L('edit_from')),
       h('button', { class: 'btn', onclick: () => setPlanner(beginEdit(state.planner, 'end'), 'target') }, L('edit_to')),
       h('button', { class: 'btn', onclick: () => setPlanner(swapJourney(state.planner)) }, L('swap')),
     ));

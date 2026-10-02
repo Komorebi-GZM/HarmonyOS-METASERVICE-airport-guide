@@ -129,6 +129,14 @@ public struct BBox: Sendable, Equatable {
   public let minY: Double
   public let maxX: Double
   public let maxY: Double
+
+  public init(minX: Double, minY: Double, maxX: Double, maxY: Double) {
+    self.minX = minX
+    self.minY = minY
+    self.maxX = maxX
+    self.maxY = maxY
+  }
+
   public var array: [Double] { [minX, minY, maxX, maxY] }
 }
 
