@@ -198,3 +198,21 @@ test('异常状态：missing / same / invalid', () => {
   assert.deepEqual(broken.routeNodeIds, []);
   assert.equal(broken.currentRouteIndex, -1);
 });
+
+test('地图页「我在这里」必须真正写入起点（对齐 ArkTS chooseStart）', () => {
+  const model = new AppModel(AIRPORT, new MemoryStore());
+  model.openBrowse();
+  model.setBrowseFloor('4F');
+  const nodeId = 'xha_p4_doorW';
+  model.setStartFromMap(nodeId);
+
+  assert.equal(model.state.planner.draftStart, nodeId, '未把选中的点写成起点');
+  assert.equal(model.state.toast, '已选择出发位置');
+
+  // 随后「去这里」应基于新起点成行，而不是沿用旧起点
+  model.routeToFromMap('xha_p4_gA101');
+  assert.equal(model.state.planner.stage, 'preview');
+  assert.equal(model.routeView.status, 'ready');
+  const start = model.state.planner.startId;
+  assert.equal(start, nodeId, `确认路线时起点仍是旧值：${start}`);
+});

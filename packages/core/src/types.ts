@@ -23,6 +23,11 @@ export interface RawAirportMeta {
   name: string;
   pxPerMeter: number;
   floors: Record<string, string>;
+  /** 以下字段由数据源写入，运行时不一定存在（类型检查暴露了它们此前未声明） */
+  version?: string;
+  date?: string;
+  note?: string;
+  source?: string;
   nodeTypes?: string[];
   edgeTypes?: string[];
 }

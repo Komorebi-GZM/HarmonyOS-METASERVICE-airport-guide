@@ -28,10 +28,11 @@
 | 7 | 注释用中文，代码标识符用英文；沿用现有文件风格（一个文件一个主题）。 | 与既有 4 千行代码保持一致，避免风格撕裂。 |
 | 8 | **`packages/core/src/generated/**` 是生成物，禁止手改。** 文案改 `Loc.ets`、配色改 `Theme.ets`、地图改 `gen_maps.py`，然后跑 `python3 tools/export_shared.py`。 | 生成链是"ArkTS 真源 → 共享核心"的唯一通道；手改会在下次导出时静默丢失。 |
 | 9 | **`packages/core` 不许依赖任何平台 API**（无 DOM、无 `wx.*`、无 ArkTS Kit）。 | 它是 Web / 小程序 / Swift 的共同底座；一旦引入平台依赖，多端共享即失效。 |
-| 10 | **改完必须跑 `npm run check:all`**（9 步：漂移检测 → 导出 → Python 参考实现 → **ArkTS 源码回归** → 核心 37 → 令牌 6 → 跨语言基准 → Web 15 → Apple 46 → 小程序 14）。只要改动不限于单一端，就别只跑单端脚本。 | 五类检查散着跑必漏；`check:all` 是唯一"真源到底"的入口。 |
+| 10 | **改完必须跑 `npm run check:all`**（10 步：漂移检测 → 导出 → Python 参考实现 → **ArkTS 源码回归** → **TS 类型检查** → 核心 38 → 令牌 7 → 跨语言基准 → Web 15 → Apple 47 → 小程序 14）。只要改动不限于单一端，就别只跑单端脚本。 | 检查散着跑必漏；`check:all` 是唯一"真源到底"的入口。 |
 | 11 | **改核心后必须重跑导出与打包**：`export_shared.py`（TS/Swift 数据）→ `npm run fixtures`（寻路 + 渲染两份跨语言基准）→ `build_weapp.mjs`（小程序产物）。 | 都是生成物，漏跑会让某一端停留在旧逻辑上且不报错。 |
 | 12 | **颜色与尺寸只写令牌引用**：用 `var(--app-accent)` / `var(--font-19)` / `var(--space-16)`；SwiftUI 用 `Theme.font(...)`。`node tools/check_tokens.mjs` 会拒绝与令牌同值的硬编码与字号/圆角字面量。 | 三端观感一致靠的是同一份令牌，不是三处手工同步。 |
 | 13 | **对比度受门禁约束**：正文 4.5:1、图形 3:1（WCAG AA）。改主题色后 `check_tokens.mjs` 会逐对核算；要豁免必须写明理由（现有 3 处豁免见脚本内 `allowed` 表）。 | 无障碍不是事后补的，靠人眼估对比度不可靠。 |
+| 14 | **TS 必须过 strict 类型检查**：`npm run typecheck`。`vite build` 只剥类型不检查，靠构建"通过"不代表类型对。 | 首个 tsconfig 一跑就抓出两端 P0 缺陷（见 T-622）。 |
 
 ## 3. 快速事实卡
 
@@ -54,7 +55,7 @@
 ```
 airport-guide/                       ← 工作区根 = 项目根（pnpm workspace）
 ├── AGENTS.md                        ← 本文件（AI 入口）
-├── package.json / pnpm-workspace.yaml / .npmrc
+├── package.json / pnpm-workspace.yaml / .npmrc / tsconfig.json（strict 类型检查）
 ├── packages/core/                   ← ★ 平台无关共享核心（唯一逻辑真源）
 │   ├── src/types.ts graph.ts pathfinder.ts route-steps.ts planner.ts
 │   │        places.ts categories.ts i18n.ts viewport.ts index.ts
@@ -62,7 +63,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── src/app-model.ts             ← ★ 六页状态机（Web/小程序共用）
 │   ├── src/presenter.ts             ← ★ 文案与列表映射（Web/小程序共用）
 │   ├── src/generated/               ← 【生成物】map-data / i18n-data / labels / tokens
-│   └── test/                        ← 37 项回归（conformance 16 + render 13 + app-model 8）
+│   └── test/                        ← 38 项回归（conformance 16 + render 13 + app-model 9）
 ├── apps/web/                        ← ★ Web/PWA 客户端（Vite + TS + Canvas 2D）
 │   ├── index.html  vite.config.ts  src/{main,map-view,storage}.ts  src/styles.css
 │   ├── public/{manifest.webmanifest,icon*.svg}   ← PWA 清单与图标
@@ -74,7 +75,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── Sources/AirportGuideApp/     ← SwiftUI 六页 + Canvas 地图
 │   ├── Sources/AirportCLI/          ← 命令行示例（macOS 可直接运行）
 │   ├── Tests/AirportCoreTests/      ← 18 项（含 824 条路线 + 664 条绘制命令的跨语言比对）
-│   └── Tests/AirportUITests/        ← 28 项回归（文案/绘制命令/状态机/偏好/尺寸阶梯）
+│   └── Tests/AirportUITests/        ← 29 项回归（文案/绘制命令/状态机/偏好/尺寸阶梯/地图选起点）
 ├── apps/weapp/                      ← ★ 微信小程序端（开发者工具打开 apps/weapp）
 │   ├── project.config.json
 │   └── miniprogram/{app.*, tokens.wxss(生成物), utils/*, pages/*/index.{js,wxml}}
@@ -86,7 +87,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── export_shared.py             ← ★ 导出到 packages/core/src/generated
 │   ├── pathfind_reference.py        ← 寻路参考实现（500 组自测）
 │   ├── verify_product.mjs           ← ★ ArkTS 源码回归（转译 .ets 直接跑上游实现）
-│   ├── check_all.sh                 ← ★ 一键门禁：9 步，从漂移检测到三端回归
+│   ├── check_all.sh                 ← ★ 一键门禁：10 步，从漂移检测到三端回归
 │   ├── gen_route_fixture.mjs        ← ★ 跨语言基准：824 条路线（寻路）
 │   ├── gen_render_fixture.mjs       ← ★ 跨语言基准：664 条绘制命令（渲染）
 │   ├── web_smoke.mjs                ← Web 端到端冒烟（15 项断言）
@@ -150,7 +151,7 @@ python3 tools/pathfind_reference.py
 # 改了 ArkTS 真源（Loc.ets / Theme.ets / gen_maps.py）之后必须重新导出，否则多端看到的是旧数据
 python3 tools/export_shared.py
 
-# 共享核心一致性回归：37 项，含 14 042 组全量节点对、500 组×4 偏好、6 条参考样例、13 项渲染、8 项状态机
+# 共享核心回归：38 项，含 14 042 组全量节点对、500 组×4 偏好、6 条参考样例、13 项渲染、9 项状态机
 npm test
 
 # Web 开发服务器（Mac 本机浏览器直接可用）
@@ -167,14 +168,17 @@ npm run fixtures
 # 设计令牌一致性（三端同源、样式里无硬编码）
 npm run test:tokens
 
-# 一键门禁：上面这些 + ArkTS 源码回归 + 漂移检测，共 9 步（提交前建议跑这个）
+# TS 严格类型检查（vite build 不做类型检查，必须单独跑）
+npm run typecheck
+
+# 一键门禁：上面这些 + ArkTS 源码回归 + 漂移检测，共 10 步（提交前建议跑这个）
 npm run check:all
 ```
 
 ### Apple 端（macOS / iOS）
 
 ```bash
-npm run test:apple                    # = bash tools/apple_test.sh test —— 46 项 Swift 回归（核心 18 + 呈现 28）
+npm run test:apple                    # = bash tools/apple_test.sh test —— 47 项 Swift 回归（核心 18 + 呈现 29）
 npm run apple:build                   # 编译全部目标（含 SwiftUI 应用）
 npm run apple:run                     # 打印 6 条参考样例（与 pathfind_reference.py 同口径）
 bash tools/apple_test.sh run AirportGuideApp      # 直接启动图形界面
@@ -234,13 +238,13 @@ npm run test:weapp             # 9 项冒烟 + 5 项静态契约（绑定/事件
 2. **"改 JSON"的说法有歧义**：`data/README.md` 建议"改 JSON 后重跑 `gen_maps.py`"，但 `gen_maps.py` 实际**覆盖**该 JSON。真源是 `gen_maps.py`，`data/README.md` 待修正。
 3. **平台兼容待更新**：工程 `compatibleSdkVersion`/`targetSdkVersion` 为 `6.1.0(23)`，但 `docs/reports/`、`docs/images/product-20261001/` 中已有 API 24 / API 26 设备的体验记录（大字体、折叠、宽屏）。下一轮升级需明确支持的 API 档位与相应验证。
 4. **`data/README.md` 的楼层说明与数据规模**：其 `meta.floors` 示例只列 4F/3F/B1/B2，而真实数据含 2F/1F 共六层，示例与现状不一致。
-5. **离线校验已统一**（v2.0 起）：`npm run check:all` 一条命令跑完 9 步——生成物漂移检测、真源导出、Python 参考实现、**ArkTS 源码回归**（转译 `.ets` 直接跑上游实现，6/6 套件 / 2 000 条路线）、共享核心 37 项、令牌 6 项、跨语言基准、Web（构建 + PWA + 15 项端到端）、Apple 46 项、小程序 14 项。仍**需要设备**的只有 `verify_flows.py` / `smoke_emulator.py`（要 `hdc` 真机/模拟器）。
+5. **离线校验已统一**（v2.0 起，v2.2 扩至 10 步）：`npm run check:all` —— 生成物漂移检测、真源导出、Python 参考实现、**ArkTS 源码回归**（转译 `.ets` 直接跑上游实现，6/6 套件 / 2 000 条路线）、**TS strict 类型检查**、共享核心 38 项、令牌 7 项、跨语言基准、Web（构建 + PWA + 15 项端到端）、Apple 47 项、小程序 14 项。仍**需要设备**的只有 `verify_flows.py` / `smoke_emulator.py`（要 `hdc` 真机/模拟器）。
 6. **API 23 无实测证据**：工程声明兼容 `6.1.0(23)`，但 `docs/reports/ProductExperience-20261001.md:107` 明确"API 23 设备实测尚未进行"，实测集中在 API 24/26。
 7. **`preview/` 是本地生成物**，已在 `.gitignore` 中；不要把它当作可提交资产。
 8. **视觉令牌已三端同源，但观感未逐屏比对**：颜色/字号/圆角/间距已成令牌（T-201、T-202，由 `check_tokens.mjs` 强制），剩余"阶梯外间距字面量"（混合值声明）会轻微影响布局，收敛需与逐屏走查一起做（T-216 / T-612 / T-614）。
 9. **共享核心的回归是"内部一致 + 参考样例对齐"**：它证明了与 `tools/pathfind_reference.py` 的样例米数一致、割点拆分与全图 Dijkstra 等价，但没有在设备上逐个比对 ArkTS 运行时结果（本机无 DevEco SDK）。
 10. **Apple 端界面已实现但未做真机视觉走查**：核心通过 824 条跨语言逐节点比对（T-606），
-    SwiftUI 六页 + Canvas 地图已可编译运行（T-609），呈现层有 28 项测试；但本机无 iOS 模拟器运行时，
+    SwiftUI 六页 + Canvas 地图已可编译运行（T-609），呈现层有 29 项测试；但本机无 iOS 模拟器运行时，
     界面只在 macOS 上编译验证过，还没做逐屏视觉核对。
 11. **本机缺少 iOS 模拟器运行时与微信开发者工具**：`xcrun simctl list runtimes` 为空（可编译不可运行）；`/Applications` 里没有微信开发者工具，因此**小程序的 WXML/WXSS 从未真实渲染过**（工程自洽性由 9 项冒烟覆盖，见 `apps/weapp/README.md`）。
 12. **Web 端已纯视图化**（v1.5）：`apps/web/src/main.ts` 只负责渲染与转发动作，状态机与文案来自共享核心；此处保留一行是因为历史上曾存在重复实现，便于回溯。
@@ -263,3 +267,4 @@ npm run test:weapp             # 9 项冒烟 + 5 项静态契约（绑定/事件
 | v1.9 | 2026-10-02 | DSH Agent | Web 端补齐 PWA：manifest + 图标 + 带内容指纹的 service worker 与 3 项自检 |
 | v2.0 | 2026-10-02 | DSH Agent | 修好 ArkTS 源码回归（`verify_product.mjs` 三级解析 TypeScript）；新增一键门禁 `tools/check_all.sh`（9 步）；红线 10 改为 `check:all` |
 | v2.1 | 2026-10-02 | DSH Agent | 令牌门禁增加 WCAG AA 对比度核算；新增红线 13 |
+| v2.2 | 2026-10-02 | DSH Agent | 新增 tsconfig（strict）与 `typecheck`，门禁扩至 10 步；修复两端「我在这里」不写起点；新增红线 14 |

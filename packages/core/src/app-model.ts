@@ -228,7 +228,13 @@ export class AppModel {
     this.go('start');
   }
 
+  /**
+   * 地图页"我在这里"。
+   * 与 ArkTS 端 pages/FloorBrowse.ets 的 chooseStart() 对齐：**必须真正把该点写成起点**
+   * （draftStart），只弹提示不写状态会让随后的"去这里"用到旧起点。
+   */
   setStartFromMap(id: string): void {
+    this.state.planner = choosePlace(this.state.planner, id, true);
     this.state.pick = 'start';
     this.setToast(this.t('start_set'));
   }

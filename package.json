@@ -24,7 +24,8 @@
     "check:weapp": "node tools/weapp_static.mjs",
     "test:pwa": "node tools/build_web_pwa.mjs",
     "check:all": "bash tools/check_all.sh",
-    "verify:arkts": "node tools/verify_product.mjs"
+    "verify:arkts": "node tools/verify_product.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "workspaces": [
     "packages/*",

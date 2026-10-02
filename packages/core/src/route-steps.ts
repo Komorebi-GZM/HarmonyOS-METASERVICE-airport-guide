@@ -2,7 +2,7 @@
 // 与 ArkTS 端 core/RouteSteps.ets 逐行对应。
 
 import type { AirportGraph } from './graph.ts';
-import type { Route, RouteStep, RouteView, StepKind } from './types.ts';
+import type { RouteStep, RouteView, StepKind } from './types.ts';
 import { emptyRoute } from './types.ts';
 import { planRoute } from './pathfinder.ts';
 import { place } from './places.ts';

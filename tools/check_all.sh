@@ -15,7 +15,7 @@ cd "$ROOT"
 step() { printf '\n\033[1m== %s ==\033[0m\n' "$1"; }
 ok()   { printf '   \033[32m✔\033[0m %s\n' "$1"; }
 
-step "1/9 生成物漂移检测：重跑 gen_maps.py + gen_model.py，产物必须与提交版本一致"
+step "1/10 生成物漂移检测：重跑 gen_maps.py + gen_model.py，产物必须与提交版本一致"
 python3 tools/gen_maps.py | sed 's/^/   /'
 python3 tools/gen_model.py | sed 's/^/   /'
 if ! git diff --quiet -- data/XHA_xinghai_t1.map.json harmony_app/entry/src/main/ets/model/AirportMap.ets; then
@@ -25,29 +25,33 @@ if ! git diff --quiet -- data/XHA_xinghai_t1.map.json harmony_app/entry/src/main
 fi
 ok "地图数据链可复现，无漂移"
 
-step "2/9 从 ArkTS 真源导出共享核心数据（地图 / 文案 / 标签 / 令牌 / 尺寸阶梯）"
+step "2/10 从 ArkTS 真源导出共享核心数据（地图 / 文案 / 标签 / 令牌 / 尺寸阶梯）"
 python3 tools/export_shared.py | sed 's/^/   /'
 
-step "3/9 ArkTS 寻路参考实现（Python 独立复算，500 组自测）"
+step "3/10 ArkTS 寻路参考实现（Python 独立复算，500 组自测）"
 python3 tools/pathfind_reference.py | tail -8 | sed 's/^/   /'
 
-step "4/9 ArkTS 源码回归（Node 转译 .ets 后直接跑上游实现）"
+step "4/10 ArkTS 源码回归（Node 转译 .ets 后直接跑上游实现）"
 node tools/verify_product.mjs | sed 's/^/   /'
 
-step "5/9 共享核心回归（37 项：全量节点对 / 割点等价 / 渲染 / 状态机）"
+step "5/10 TypeScript 类型检查（核心 + Web，strict）"
+npx tsc --noEmit -p tsconfig.json | sed 's/^/   /'
+ok "类型检查通过（0 error）"
+
+step "6/10 共享核心回归（37 项：全量节点对 / 割点等价 / 渲染 / 状态机）"
 npm test 2>&1 | grep -E "^ℹ (tests|pass|fail)" | sed 's/^/   /'
 
-step "6/9 设计令牌一致性（6 项：三端同源 + 禁止硬编码）"
+step "7/10 设计令牌一致性（6 项：三端同源 + 禁止硬编码）"
 npm run test:tokens 2>&1 | tail -4 | sed 's/^/   /'
 
-step "7/9 跨语言基准（824 条路线 + 664 条绘制命令）"
+step "8/10 跨语言基准（824 条路线 + 664 条绘制命令）"
 npm run fixtures 2>&1 | tail -3 | sed 's/^/   /'
 
-step "8/9 Web：构建 + PWA 自检 + 端到端冒烟"
+step "9/10 Web：构建 + PWA 自检 + 端到端冒烟"
 npm run web:build 2>&1 | tail -4 | sed 's/^/   /'
 npm run test:web 2>&1 | tail -3 | sed 's/^/   /'
 
-step "9/9 Apple（46 项）与微信小程序（9 项冒烟 + 5 项静态契约）"
+step "10/10 Apple（46 项）与微信小程序（9 项冒烟 + 5 项静态契约）"
 npm run test:apple 2>&1 | grep -E "Executed [0-9]+ tests, with" | tail -1 | sed 's/^/   /'
 npm run test:weapp 2>&1 | tail -3 | sed 's/^/   /'
 

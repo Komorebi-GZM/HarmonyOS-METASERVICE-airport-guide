@@ -555,6 +555,7 @@ git remote -v
 | `npm run apple:build` | 编译全部 Apple 目标（含 SwiftUI 应用） | 同上 |
 | `bash tools/apple_test.sh run AirportGuideApp` | 启动 SwiftUI 界面（macOS 14+） | 同上 |
 | `npm run apple:run` | 运行 `airport-cli`，打印 6 条参考样例与四档偏好对比 | 同上 |
+| `npm run typecheck` | TS strict 类型检查（核心 + Web）。**`vite build` 不做类型检查**，改 TS 后必须单独跑 | 无 |
 | `npm run test:tokens` | 令牌一致性（6 项）：生成物与真源一致、两端一致、无同值硬编码、字号/圆角无字面量、间距不用阶梯字面量、无未定义引用、别名集合一致 | 无（零依赖） |
 | `npm run fixtures` | 重新生成两份跨语言基准：`routes.json`（824 条路线）与 `render.json`（10 场景 / 664 条命令） | 改了寻路/渲染/数据之后必须跑 |
 | `node tools/gen_route_fixture.mjs` | 只生成寻路基准 | 改了寻路之后 |
@@ -610,3 +611,4 @@ git remote -v
 | v1.8 | 2026-10-02 | DSH Agent | §10 补小程序静态契约与 check:weapp |
 | v1.9 | 2026-10-02 | DSH Agent | §10 补 PWA 构建步骤与 test:pwa |
 | v2.0 | 2026-10-02 | DSH Agent | §10 补 `check:all` / `verify:arkts`；环境要求加入 TypeScript 5 |
+| v2.2 | 2026-10-02 | DSH Agent | §10 补 `typecheck`；门禁扩至 10 步 |

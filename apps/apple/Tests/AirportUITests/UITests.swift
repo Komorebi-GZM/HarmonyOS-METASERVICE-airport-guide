@@ -245,6 +245,22 @@ final class RendererTests: XCTestCase {
     }
   }
 
+  func testPickStartFromMapActuallySetsTheStart() {
+    let model = AppModel(store: MemoryStore(), graph: .shared)
+    model.openBrowse()
+    model.setBrowseFloor("4F")
+    model.setStartFromMap("xha_p4_doorW")
+
+    XCTAssertEqual(model.state.planner.draftStart, "xha_p4_doorW", "未把选中的点写成起点")
+    XCTAssertEqual(model.state.toast, "已选择出发位置")
+
+    // 随后「去这里」应基于新起点成行
+    model.routeToFromMap("xha_p4_gA101")
+    XCTAssertEqual(model.state.planner.stage, .preview)
+    XCTAssertEqual(model.routeView.status, .ready)
+    XCTAssertEqual(model.state.planner.startId, "xha_p4_doorW", "确认路线时起点仍是旧值")
+  }
+
   func testSizeLadderIsExportedAndCoversTheUI() {
     let metrics = AirportGraph.shared.bundle.metrics
     XCTAssertEqual(metrics.fontSizes.count, 13, "字号阶梯应有 13 档")

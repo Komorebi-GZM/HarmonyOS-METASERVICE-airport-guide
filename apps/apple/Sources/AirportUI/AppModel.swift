@@ -243,8 +243,10 @@ public final class AppModel {
     go(.start)
   }
 
-  /// 地图页"我在这里"
+  /// 地图页"我在这里"。与 ArkTS FloorBrowse.chooseStart() 对齐：必须真正写入起点，
+  /// 否则随后的"去这里"会沿用旧起点（两端曾同时漏掉这一步）。
   public func setStartFromMap(_ id: String) {
+    state.planner = choosePlace(state.planner, id: id, start: true)
     state.pick = .start
     setToast(I18n.t("start_set", en: state.isEn))
   }
