@@ -11,7 +11,7 @@
     "test:core": "node --test packages/core/test/conformance.test.ts packages/core/test/render.test.ts packages/core/test/app-model.test.ts",
     "check": "npm run export && npm run test",
     "web": "pnpm --filter @airport-guide/web dev",
-    "web:build": "pnpm --filter @airport-guide/web build",
+    "web:build": "pnpm --filter @airport-guide/web build && node tools/build_web_pwa.mjs",
     "test:web": "node tools/web_smoke.mjs",
     "test:all": "npm run test && npm run test:tokens && npm run web:build && npm run test:web && npm run test:apple && npm run test:weapp",
     "test:apple": "bash tools/apple_test.sh test",
@@ -21,7 +21,8 @@
     "test:weapp": "node tools/weapp_smoke.mjs && node tools/weapp_static.mjs",
     "fixtures": "node tools/gen_route_fixture.mjs && node tools/gen_render_fixture.mjs",
     "test:tokens": "node tools/check_tokens.mjs",
-    "check:weapp": "node tools/weapp_static.mjs"
+    "check:weapp": "node tools/weapp_static.mjs",
+    "test:pwa": "node tools/build_web_pwa.mjs"
   },
   "workspaces": [
     "packages/*",

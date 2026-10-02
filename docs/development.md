@@ -546,7 +546,8 @@ git remote -v
 | `python3 tools/export_shared.py` | ArkTS 真源 → `packages/core/src/generated/**`；会打印节点/边/文案/英文名统计与源 JSON 的 sha256 | 改过 `Loc.ets`、`Theme.ets`、`gen_maps.py` 之后**必须**跑 |
 | `npm test` | 共享核心一致性回归（16 项） | 无（Node 直接跑 TS） |
 | `pnpm web` | Web 开发服务器 → http://127.0.0.1:5173 | 先 `pnpm install` |
-| `pnpm web:build` | 产出 `apps/web/dist`（静态托管 / WKWebView 壳可直接用） | 同上 |
+| `pnpm web:build` | 产出 `apps/web/dist`：vite 构建 + `build_web_pwa.mjs` 生成 `sw.js`（可离线安装） | 同上 |
+| `npm run test:pwa` | PWA 自检（3 项：预缓存完整、manifest 引用、体积上限） | 先构建 |
 | `pnpm test:web` | Web 端到端冒烟：加载 `dist` 产物，在最小 DOM 桩里走完主链路 | 先 `pnpm web:build` |
 | `npm run test:apple` | Apple 端回归：`swift test`，42 项（核心 15 + 呈现 27） | macOS + Xcode 命令行工具 |
 | `npm run apple:build` | 编译全部 Apple 目标（含 SwiftUI 应用） | 同上 |
@@ -603,3 +604,4 @@ git remote -v
 | v1.6 | 2026-10-02 | DSH Agent | §10 补充令牌生成物与 `test:tokens` |
 | v1.7 | 2026-10-02 | DSH Agent | §10 令牌检查扩至 6 项（含尺寸阶梯） |
 | v1.8 | 2026-10-02 | DSH Agent | §10 补小程序静态契约与 check:weapp |
+| v1.9 | 2026-10-02 | DSH Agent | §10 补 PWA 构建步骤与 test:pwa |

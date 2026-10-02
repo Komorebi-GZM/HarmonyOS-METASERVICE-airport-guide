@@ -64,6 +64,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   └── test/                        ← 37 项回归（conformance 16 + render 13 + app-model 8）
 ├── apps/web/                        ← ★ Web/PWA 客户端（Vite + TS + Canvas 2D）
 │   ├── index.html  vite.config.ts  src/{main,map-view,storage}.ts  src/styles.css
+│   ├── public/{manifest.webmanifest,icon*.svg}   ← PWA 清单与图标
 │   ├── src/tokens.css               ← 【生成物】令牌：颜色 + 字号/间距/圆角
 │   └── dist/                        ← 构建产物（.gitignore）
 ├── apps/apple/                      ← ★ Apple 端（SwiftPM，Xcode 打开 Package.swift）
@@ -89,6 +90,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── build_weapp.mjs              ← 把核心打包成小程序可 require 的单文件
 │   ├── weapp_smoke.mjs              ← 小程序冒烟（9 项：配置/文案/页面流程/Canvas/包体）
 │   ├── weapp_static.mjs             ← ★ 小程序静态契约（绑定/事件/wx:key/样式类/页面登记）
+│   ├── build_web_pwa.mjs            ← ★ 生成 service worker 并自检（PWA 离线）
 │   ├── check_tokens.mjs             ← ★ 设计令牌一致性检查（三端同源 + 禁止硬编码）
 │   └── apple_test.sh                ← swift test/run 的沙箱友好包装
 ├── docs/                            ← 8 份工作区文档 + 上游 BUILD/需求/开发文档
@@ -151,7 +153,7 @@ npm test
 # Web 开发服务器（Mac 本机浏览器直接可用）
 pnpm install          # 首次
 pnpm web              # -> http://127.0.0.1:5173
-pnpm web:build        # 产出 apps/web/dist（静态托管 / WKWebView 壳可直接用）
+pnpm web:build        # 产出 apps/web/dist（含 manifest + sw.js，可离线安装 / 静态托管 / WKWebView 壳）
 
 # Web 端到端冒烟（跑构建产物，覆盖 首页→目的地→起点→路线→指引→完成→楼层地图）
 pnpm test:web
@@ -252,3 +254,4 @@ npm run test:weapp             # 9 项冒烟 + 5 项静态契约（绑定/事件
 | v1.6 | 2026-10-02 | DSH Agent | 设计令牌三端同源：`export_shared.py` 生成 `tokens.css`/`tokens.wxss`，Web 与小程序样式全部改为令牌引用；新增 `check_tokens.mjs` 与红线 12 |
 | v1.7 | 2026-10-02 | DSH Agent | 尺寸阶梯令牌化：13 字号 / 10 间距 / 6 圆角，三端共用（Apple 走 `Metrics`）；检查脚本增至 6 项 |
 | v1.8 | 2026-10-02 | DSH Agent | 两端静态契约检查：小程序 `weapp_static.mjs`（5 项）、Web 类名契约；修复两处未定义样式 |
+| v1.9 | 2026-10-02 | DSH Agent | Web 端补齐 PWA：manifest + 图标 + 带内容指纹的 service worker 与 3 项自检 |

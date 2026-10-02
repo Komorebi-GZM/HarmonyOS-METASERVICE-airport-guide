@@ -1,0 +1,26 @@
+{
+  "name": "星海机场导航 · Xinghai Airport Guide",
+  "short_name": "机场导航",
+  "description": "纯端侧的机场室内导航：六层示意图、跨层最短路径、中央安检必经、中英双语。数据随包，无网络请求。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F7F9",
+  "theme_color": "#F4F7F9",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

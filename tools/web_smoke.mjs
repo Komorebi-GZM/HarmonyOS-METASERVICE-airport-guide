@@ -170,6 +170,7 @@ globalThis.window = {
   matchMedia: () => ({ matches: false, addEventListener: () => {} }),
 };
 globalThis.localStorage = localStorageStub;
+// 注：Node 自带 navigator 且没有 serviceWorker，PWA 注册分支会自然跳过，无需额外打桩
 globalThis.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
 globalThis.MutationObserver = class { observe() {} disconnect() {} takeRecords() { return []; } };
 globalThis.fetch = () => Promise.resolve({ ok: true, text: () => Promise.resolve('') });

@@ -426,6 +426,15 @@ function render(): void {
 
 render();
 
+// PWA：生产构建下注册 service worker（离线可用）。开发模式下不注册，避免缓存干扰调试。
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {
+      // 注册失败不影响在线使用（本应用本身无网络请求）
+    });
+  });
+}
+
 // 便于调试与控制台验证
 (window as unknown as { __airport: unknown }).__airport = {
   model,

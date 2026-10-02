@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 星海机场导航图标：品牌色圆底 + 定位针 + 跑道斜线 -->
+  <rect width="64" height="64" fill="#007F7A"/>
+  <path d="M32 14c-6.6 0-12 5.4-12 12 0 9 12 23 12 23s12-14 12-23c0-6.6-5.4-12-12-12z"
+        fill="#FFFFFF"/>
+  <circle cx="32" cy="26" r="5" fill="#007F7A"/>
+  <path d="M14 52h36" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 5"/>
+</svg>
