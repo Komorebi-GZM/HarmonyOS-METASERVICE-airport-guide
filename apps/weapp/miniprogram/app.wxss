@@ -226,6 +226,7 @@ page {
 }
 .stepHead { display: flex; justify-content: space-between; font-size: var(--font-12); color: var(--sub); }
 .stepIndex { color: var(--accent); font-weight: 600; }
+.stepFloor { color: var(--sub); }
 .stepTitle { display: block; font-size: var(--font-19); font-weight: 700; margin-top: var(--space-4); }
 .stepMeters { display: block; font-size: var(--font-14); color: var(--accent); font-weight: 600; }
 .stepHint { display: block; font-size: var(--font-12); color: var(--sub); }

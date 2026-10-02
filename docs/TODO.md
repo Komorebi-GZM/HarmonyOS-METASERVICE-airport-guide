@@ -42,6 +42,7 @@
 | 共享核心 | **已抽取并通过回归**：`packages/core`（3 000 余行 TS，含生成数据）；`npm test` 16 项全绿，含 14 042 组全量节点对与 6 条参考样例米数复现 | 2026-10-02 实测 |
 | 设计令牌 | **三端同源**：颜色 37 + 字号 13 + 间距 10 + 圆角 6 项，由 `export_shared.py` 生成到 `tokens.css`、`tokens.wxss` 与 `airport-data.json(metrics)`；`tools/check_tokens.mjs` **6 项**检查（含"字号/圆角不得写死""间距不得使用阶梯字面量"） | 2026-10-02 实测 |
 | 跨语言渲染基准 | **已建立**：`tools/gen_render_fixture.mjs` 产出 10 个场景 / 664 条命令；Swift 端逐条比对通过（同一份文件也被 TS 端作为契约） | 2026-10-02 实测 |
+| 小程序静态契约 | **5 项检查**：数据绑定可由 `present.*` 产出、事件处理函数都在 `Page` 里、每个 `wx:for` 带 `wx:key`、class 都在 `app.wxss` 里、页面登记一致；实测抓出 `.stepFloor` 缺样式（Web 端同类问题 `.step-floor`/`.picker-body` 一并修复） | 2026-10-02 实测 |
 | 小程序端 | **已交付**：`apps/weapp`（六页 WXML + Canvas 2D），核心经 esbuild 打成 95 KB CommonJS 单文件；`npm run test:weapp` 9 项全绿（含用 `wx` 桩跑通六页真实 Page 生命周期与 470 次绘制调用）；主包 136 KB | 2026-10-02 实测 |
 | Apple 端 | **核心 + 界面均已实现**：`apps/apple`（SwiftPM，macOS 14+/iOS 17+）；`npm run test:apple` **42 项**全绿（核心 15 + 呈现 27），824 条路线与 TS 在节点序列/米数/步骤上逐项相等；`AirportGuideApp`（SwiftUI 六页 + Canvas 地图）可编译运行；`airport-cli` 打印与参考实现同口径的样例（635/505/630/445/250/300 米） | 2026-10-02 实测 |
 | Web 客户端 | **已可用**：`apps/web`（Vite 7 + TS + Canvas 2D），构建产物 62 KB JS / 7.6 KB CSS；`pnpm test:web` 14 项端到端断言全绿 | 2026-10-02 实测 |
@@ -159,6 +160,8 @@
 | T-604 | Web 端到端回归：跑构建产物验证主链路与关键分支 | P1 | T-603 | `tools/web_smoke.mjs` | 14 项断言脚本 | `pnpm test:web` 全绿（首页→目的地→起点→预览→指引→完成→楼层地图→双语→本地存储） | ☑ 2026-10-02 |
 | T-605 | **微信小程序端**：WXML/WXSS + Canvas 2D，复用 `packages/core`（含绘制命令流） | P1 | T-603, D-08 | `apps/weapp/**`、`tools/build_weapp.mjs` | 小程序工程 + 核心 CJS 打包 | `npm run test:weapp` 9 项全绿（配置/文案/六页真实 Page 生命周期/Canvas 链路/包体）；主包 136 KB | ☑ 2026-10-02 |
 | T-613 | Web 端改用共享 `AppModel`/`Presenter`：消除第二份状态机与文案映射 | P2 | — | `apps/web/src/main.ts`、`apps/web/src/storage.ts` | 重构后的 Web 端（本文件现为纯视图层） | 本文件不再持有状态；15 项端到端全绿 | ☑ 2026-10-02 |
+| T-617 | **小程序静态契约检查**：在无法渲染 WXML 的前提下，用静态分析核对数据绑定 / 事件处理 / `wx:key` / class 是否都有对应实现 | P1 | T-605 | `tools/weapp_static.mjs` | 5 项检查纳入 `npm run test:weapp` | 6 页 / 79 数据键 / 74 样式类全部对得上；实测抓出 `.stepFloor` 未定义样式 | ☑ 2026-10-02 |
+| T-618 | Web 端同类静态契约：源码里 `class: '...'` 用到的类必须在样式表里有定义 | P2 | — | `tools/web_smoke.mjs` | 1 项检查 | 实测抓出 `.step-floor` / `.picker-body` 未定义并已补齐 | ☑ 2026-10-02 |
 | T-614 | **小程序在微信开发者工具中目视验证**：本机未安装开发者工具，WXML/WXSS 从未真实渲染 | P1 | T-605 | `apps/weapp/miniprogram/**` | 走查记录 + 修正 | 六页在开发者工具里排版正常、与 Web 端观感一致 | ☐ |
 | T-615 | 渲染器跨语言逐命令比对：TS（`render.ts`）与 Swift（`MapRenderer.swift`）两份实现用基准锁死 | P2 | T-609 | `tools/gen_render_fixture.mjs`、`RendererParityTests.swift` | 10 场景 / 664 条命令基准 | `swift test` 逐条相等（含标签底片宽度、缩放阈值、水印位置） | ☑ 2026-10-02 |
 | T-606 | **Apple 端核心移植**：Swift 版图/寻路/步骤/状态机/检索/双语/视口，读同一份导出 JSON | P1 | D-09 | `apps/apple/Sources/AirportCore/**` | SwiftPM 包 `AirportCore` + CLI | `npm run test:apple` 15 项全绿，含 **824 条路线与 TS 逐节点一致**、14 042 组全量节点对与割点等价 | ☑ 2026-10-02 |
@@ -209,6 +212,7 @@
 | 日期 | 变更 | 说明 |
 |---|---|---|
 | 2026-10-02 | 首次创建 | 建立基线快照、四条主线任务池、里程碑与决策清单；基于 `main@8350ff4` 与本机实测（`pathfind_reference.py` 通过、`verify_product.mjs` 与 `gen_checker.py` 因硬编码 Windows 路径 / 占位符被消耗而失败、生成链逐字节可复现） |
+| 2026-10-02 | 两端静态契约检查 | 小程序新增 `tools/weapp_static.mjs`（5 项：绑定/事件/wx:key/样式类/页面登记），Web 端在冒烟里加"源码类名必须已定义"；抓出并修复 `.stepFloor`（WXSS）与 `.step-floor`、`.picker-body`（CSS） |
 | 2026-10-02 | 尺寸阶梯令牌化 | 新增 13 档字号 / 10 档间距 / 6 档圆角令牌；Web 44 处字号 + 6 圆角 + 41 间距、小程序 36 处字号 + 4 圆角 + 45 间距改为令牌引用；Apple 端新增 `Metrics` 读同一份阶梯（+1 项测试），SwiftUI 51 处字号改为 `Theme.font(...)`；检查脚本增至 6 项并输出"阶梯外间距"信息统计 |
 | 2026-10-02 | 设计令牌三端同源 | `export_shared.py` 增出 `tokens.css`/`tokens.wxss`；Web 与小程序样式全部改为令牌引用（小程序 58 处、Web 11 处）；新增 `tools/check_tokens.mjs` 5 项检查（令牌完整性、两端一致、无同值硬编码、无未定义引用、别名集合一致） |
 | 2026-10-02 | Web 端改用共享状态机 + 渲染器逐命令比对 | Web `main.ts` 重构为纯视图层（删除第二份状态机与文案映射，15 项端到端仍全绿）；新增 10 场景 / 664 条命令的渲染基准，Swift 与 TS 逐条相等 |
@@ -232,3 +236,4 @@
 | v1.5 | 2026-10-02 | DSH Agent | T-613/T-615 完成（Web 纯视图化 + 渲染器跨语言逐命令比对） |
 | v1.6 | 2026-10-02 | DSH Agent | T-201 完成（设计令牌三端同源 + 检查脚本）；T-202 拆出为字号/间距收敛 |
 | v1.7 | 2026-10-02 | DSH Agent | T-202 主体完成（字号/圆角/间距阶梯令牌化，三端共用）；新增 T-216（阶梯外间距收敛） |
+| v1.8 | 2026-10-02 | DSH Agent | T-617/T-618 完成（小程序与 Web 的静态契约检查），并修掉两处未定义样式 |

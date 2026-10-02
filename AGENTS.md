@@ -88,6 +88,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── web_smoke.mjs                ← Web 端到端冒烟（15 项断言）
 │   ├── build_weapp.mjs              ← 把核心打包成小程序可 require 的单文件
 │   ├── weapp_smoke.mjs              ← 小程序冒烟（9 项：配置/文案/页面流程/Canvas/包体）
+│   ├── weapp_static.mjs             ← ★ 小程序静态契约（绑定/事件/wx:key/样式类/页面登记）
 │   ├── check_tokens.mjs             ← ★ 设计令牌一致性检查（三端同源 + 禁止硬编码）
 │   └── apple_test.sh                ← swift test/run 的沙箱友好包装
 ├── docs/                            ← 8 份工作区文档 + 上游 BUILD/需求/开发文档
@@ -179,7 +180,7 @@ Xcode 里直接 `File → Open…` 选 `apps/apple/Package.swift` 即可；终�
 
 ```bash
 node tools/build_weapp.mjs     # 生成 apps/weapp/miniprogram/utils/core.js（改了核心必须重跑）
-npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas 链路/包体
+npm run test:weapp             # 9 项冒烟 + 5 项静态契约（绑定/事件/wx:key/样式类/页面登记）
 # 再用微信开发者工具「导入项目」选择 apps/weapp 目录
 ```
 
@@ -250,3 +251,4 @@ npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas
 | v1.5 | 2026-10-02 | DSH Agent | Web 端纯视图化（改用共享 AppModel）；新增渲染命令流的跨语言基准（10 场景 / 664 条命令，Swift 逐条比对通过） |
 | v1.6 | 2026-10-02 | DSH Agent | 设计令牌三端同源：`export_shared.py` 生成 `tokens.css`/`tokens.wxss`，Web 与小程序样式全部改为令牌引用；新增 `check_tokens.mjs` 与红线 12 |
 | v1.7 | 2026-10-02 | DSH Agent | 尺寸阶梯令牌化：13 字号 / 10 间距 / 6 圆角，三端共用（Apple 走 `Metrics`）；检查脚本增至 6 项 |
+| v1.8 | 2026-10-02 | DSH Agent | 两端静态契约检查：小程序 `weapp_static.mjs`（5 项）、Web 类名契约；修复两处未定义样式 |

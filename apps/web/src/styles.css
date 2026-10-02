@@ -265,6 +265,7 @@ html, body {
 }
 .step-head { display: flex; justify-content: space-between; font-size: var(--font-12); color: var(--sub); font-weight: 600; }
 .step-index { color: var(--accent); }
+.step-floor { color: var(--sub); }
 .step-title { margin: 2px 0 0; font-size: var(--font-19); font-weight: 700; }
 .step-meters { margin: 0; font-size: var(--font-14); color: var(--accent); font-weight: 600; }
 .step-hint { margin: 0; font-size: var(--font-12); color: var(--sub); }

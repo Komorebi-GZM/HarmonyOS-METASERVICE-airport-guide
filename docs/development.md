@@ -557,7 +557,8 @@ git remote -v
 | `node tools/gen_route_fixture.mjs` | 只生成寻路基准 | 改了寻路之后 |
 | `node tools/gen_render_fixture.mjs` | 只生成渲染基准 | 改了渲染之后 |
 | `node tools/build_weapp.mjs` | 把共享核心打成小程序可 require 的 CommonJS 单文件（95 KB） | 改了核心之后必须跑 |
-| `npm run test:weapp` | 小程序冒烟：配置/文案/六页 Page 生命周期/Canvas 链路/包体 | 同上 |
+| `npm run test:weapp` | 小程序冒烟（9 项）+ 静态契约（5 项：绑定/事件/wx:key/样式类/页面登记） | 同上 |
+| `npm run check:weapp` | 只跑小程序静态契约（改 WXML/WXSS 时快速反馈） | 同上 |
 | `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 + Apple 端回归 | 同上 |
 
 ### 10.4 回归覆盖了什么
@@ -601,3 +602,4 @@ git remote -v
 | v1.5 | 2026-10-02 | DSH Agent | §10 补充 `npm run fixtures` 与 Web 视图层说明 |
 | v1.6 | 2026-10-02 | DSH Agent | §10 补充令牌生成物与 `test:tokens` |
 | v1.7 | 2026-10-02 | DSH Agent | §10 令牌检查扩至 6 项（含尺寸阶梯） |
+| v1.8 | 2026-10-02 | DSH Agent | §10 补小程序静态契约与 check:weapp |
