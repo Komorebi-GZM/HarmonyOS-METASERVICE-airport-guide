@@ -28,6 +28,19 @@ export {
   LOC_KEYS, I18N_KEYS, t, hasKey, floorLabel, floorShort, typeLabel, nodeName, nodeNameEn,
   floorOrder, facilityLabel,
 } from './i18n.ts';
+export type { PlaceCard, Chip, MetroDirection } from './presenter.ts';
+export {
+  meters, summary, stepTitle, stepAction, preferenceLabel, preferenceChips, statusTitle,
+  categoryChips, rowTitle, rowSubtitle, popularCards, quickStartCards, metroDirections,
+  metroSteps, allSteps,
+} from './presenter.ts';
+export type { AppState, AppView, AppLang, PickMode, PreferencesStore } from './app-model.ts';
+export { AppModel, MemoryStore, initialAppState } from './app-model.ts';
 export { Viewport, PAN_MARGIN, MAX_ZOOM, ROUTE_INSETS, BROWSE_INSETS } from './viewport.ts';
+export type { DrawCommand, DrawPoint, RenderInput } from './render.ts';
+export {
+  CANVAS, renderFloor, hitTest, nodeRadius, shouldLabel, typeColor, labelWidth,
+  fitFloorViewport, fitRouteViewport,
+} from './render.ts';
 export { APP, MAP, ROUTE, HIT, TYPE_COLOR } from './generated/tokens.ts';
 export { MAP_SHA256 } from './generated/map-data.ts';

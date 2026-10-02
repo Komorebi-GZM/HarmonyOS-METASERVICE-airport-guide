@@ -7,19 +7,24 @@
   "packageManager": "pnpm@11.24.0",
   "scripts": {
     "export": "python3 tools/export_shared.py",
-    "test": "node --test packages/core/test/conformance.test.ts",
-    "test:core": "node --test packages/core/test/conformance.test.ts",
+    "test": "node --test packages/core/test/conformance.test.ts packages/core/test/render.test.ts packages/core/test/app-model.test.ts",
+    "test:core": "node --test packages/core/test/conformance.test.ts packages/core/test/render.test.ts packages/core/test/app-model.test.ts",
     "check": "npm run export && npm run test",
     "web": "pnpm --filter @airport-guide/web dev",
     "web:build": "pnpm --filter @airport-guide/web build",
     "test:web": "node tools/web_smoke.mjs",
-    "test:all": "npm run test && npm run web:build && npm run test:web && npm run test:apple",
+    "test:all": "npm run test && npm run web:build && npm run test:web && npm run test:apple && npm run test:weapp",
     "test:apple": "bash tools/apple_test.sh test",
     "apple:run": "bash tools/apple_test.sh run airport-cli",
-    "apple:build": "bash tools/apple_test.sh build"
+    "apple:build": "bash tools/apple_test.sh build",
+    "weapp:build": "node tools/build_weapp.mjs",
+    "test:weapp": "node tools/weapp_smoke.mjs"
   },
   "workspaces": [
     "packages/*",
     "apps/*"
-  ]
+  ],
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
 }

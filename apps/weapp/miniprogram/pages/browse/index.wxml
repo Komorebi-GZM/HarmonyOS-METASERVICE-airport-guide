@@ -1,0 +1,46 @@
+<view class="page">
+  <view class="top">
+    <view class="pill" bindtap="onBack">‹</view>
+    <text class="title">{{title}}</text>
+    <view class="spacer"></view>
+    <view class="pill" bindtap="onToggleLang">{{langLabel}}</view>
+  </view>
+
+  <text class="hint">{{hint}}</text>
+
+  <scroll-view class="chips" scroll-x="true">
+    <view class="chip {{item.active ? 'chipOn' : ''}}"
+          wx:for="{{floors}}" wx:key="key" data-key="{{item.key}}" bindtap="onFloor">{{item.label}}</view>
+  </scroll-view>
+
+  <view class="mapBox tall">
+    <canvas type="2d" id="map" class="mapCanvas"
+            bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"></canvas>
+    <view class="mapTools">
+      <view class="tool" bindtap="onFitFloor">⤢</view>
+      <view class="tool" bindtap="onZoomIn">+</view>
+      <view class="tool" bindtap="onZoomOut">−</view>
+    </view>
+  </view>
+
+  <view class="detail" wx:if="{{hasSelection}}">
+    <text class="detailName">{{selectedName}}</text>
+    <text class="detailSub">{{selectedSub}}</text>
+    <view class="actions">
+      <view class="btn" bindtap="onPickStart">{{pickStart}}</view>
+      <view class="btn primary" bindtap="onPickDest">{{pickDest}}</view>
+    </view>
+  </view>
+
+  <block wx:else>
+    <text class="section">{{legend}}</text>
+    <view class="row" wx:for="{{nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="onSelect">
+      <view class="dot"></view>
+      <view class="rowMain">
+        <text class="rowTitle">{{item.title}}</text>
+        <text class="rowSub">{{item.subtitle}}</text>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+  </block>
+</view>

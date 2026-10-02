@@ -1,0 +1,81 @@
+<view class="page">
+  <view class="top">
+    <view class="pill" bindtap="onBack">‹</view>
+    <text class="title">{{title}}</text>
+    <view class="spacer"></view>
+    <view class="pill" bindtap="onToggleLang">{{langLabel}}</view>
+  </view>
+
+  <block wx:if="{{!ready}}">
+    <view class="empty">
+      <text class="emptyTitle">{{statusTitle}}</text>
+      <text class="emptySub">{{errorHint}}</text>
+    </view>
+    <view class="actions">
+      <view class="btn primary" bindtap="onChooseAgain">{{chooseAgain}}</view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="summary">
+      <view class="summaryLine"><view class="dotStart"></view><text>{{startName}}</text></view>
+      <view class="summaryLine"><view class="dotEnd"></view><text>{{endName}}</text></view>
+      <text class="summaryMeta">{{summary}}</text>
+      <text class="badge {{viaSecurity ? 'badgeWarn' : ''}}">{{securityNote}}</text>
+    </view>
+
+    <view class="mapBox">
+      <canvas type="2d" id="map" class="mapCanvas"
+              bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"></canvas>
+      <view class="mapTools">
+        <view class="tool" bindtap="onZoomIn">+</view>
+        <view class="tool" bindtap="onZoomOut">−</view>
+        <view class="tool" bindtap="onFitRoute">⤢</view>
+      </view>
+    </view>
+
+    <scroll-view class="chips" scroll-x="true">
+      <view class="chip {{item.key === activePreference ? 'chipOn' : ''}}"
+            wx:for="{{preferences}}" wx:key="key" data-key="{{item.key}}" bindtap="onPreference">{{item.label}}</view>
+    </scroll-view>
+
+    <block wx:if="{{stagePreview}}">
+      <view class="btn primary" bindtap="onBegin">{{begin}}</view>
+      <view class="actions">
+        <view class="btn" bindtap="onEditFrom">{{editFrom}}</view>
+        <view class="btn" bindtap="onEditTo">{{editTo}}</view>
+      </view>
+      <view class="btn" bindtap="onSwap">{{swap}}</view>
+    </block>
+
+    <block wx:if="{{stageGuiding}}">
+      <view class="stepCard">
+        <view class="stepHead">
+          <text class="stepIndex">{{stepIndexText}}</text>
+          <text class="stepFloor">{{stepFloor}}</text>
+        </view>
+        <text class="stepTitle">{{stepTitle}}</text>
+        <text class="stepMeters" wx:if="{{stepMeters}}">{{stepMeters}}</text>
+        <text class="stepHint">{{manual}}</text>
+      </view>
+      <view class="btn primary" bindtap="onAdvance">{{actionLabel}}</view>
+      <view class="btn {{previousDisabled ? 'disabled' : ''}}" bindtap="onPrevious">{{previousLabel}}</view>
+    </block>
+
+    <block wx:if="{{stageCompleted}}">
+      <view class="empty">
+        <text class="emptyTitle">{{completeTitle}}</text>
+        <text class="emptySub">{{completeHint}}</text>
+      </view>
+      <view class="btn primary" bindtap="onRestart">{{newJourney}}</view>
+    </block>
+
+    <view class="steps">
+      <text class="section">{{allStepsLabel}}</text>
+      <view class="stepRow {{item.current ? 'stepOn' : ''}}" wx:for="{{steps}}" wx:key="text"
+            data-index="{{index}}" bindtap="onJumpStep">
+        <text>{{item.text}}</text>
+      </view>
+    </view>
+  </block>
+</view>

@@ -67,7 +67,9 @@ public enum Presenter {
     case .transfer:
       let facility = I18n.facilityLabel(step.facility, en: en)
       let floor = I18n.floorLabel(step.toFloor, en: en)
-      return "\(I18n.t("take", en: en))\(facility) \(I18n.t("to_floor", en: en)) \(floor)"
+      // 英文需要空格分隔（ArkTS 原文 "Take"+"elevator" 会拼成 Takeelevator，见 docs/TODO.md T-014）
+      let join = en ? " " : ""
+      return "\(I18n.t("take", en: en))\(join)\(facility) \(I18n.t("to_floor", en: en)) \(floor)"
     case .destination:
       guard let node = AirportGraph.shared.node(step.toId) else {
         return I18n.t("destination_step", en: en)

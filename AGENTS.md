@@ -13,7 +13,7 @@
 - 上游仓库：`https://gitcode.com/harmony-practice-center/HarmonyOS-METASERVICE-airport-guide.git`（git remote 名 **`upstream`**）
 - 本工作区：**个人本地 fork 开发环境**，分支 `main`。原工程基线 `8350ff4`，文档基线 `3a1a5d3`。**默认不推送到任何远程**。
 - 许可：MIT。教学案例，六页流程、119 节点 / 145 边。
-- 多端布局：`harmony_app/`（上游 ArkTS 原工程，**只读参照**）+ `packages/core/`（共享核心，唯一逻辑真源）+ `apps/web/`（Web/PWA，已可用）+ `apps/apple/`（Swift 核心 + SwiftUI 六页界面，核心已通过跨语言比对）+ 后续 `apps/weapp/`。
+- 多端布局：`harmony_app/`（上游 ArkTS 原工程，**只读参照**）+ `packages/core/`（共享核心，唯一逻辑真源）+ `apps/web/`（Web/PWA，已可用）+ `apps/apple/`（Swift 核心 + SwiftUI 六页界面，核心已通过跨语言比对）+ `apps/weapp/`（微信小程序，复用同一份核心）。
 
 ## 2. 红线（改代码前必须接受）
 
@@ -28,7 +28,8 @@
 | 7 | 注释用中文，代码标识符用英文；沿用现有文件风格（一个文件一个主题）。 | 与既有 4 千行代码保持一致，避免风格撕裂。 |
 | 8 | **`packages/core/src/generated/**` 是生成物，禁止手改。** 文案改 `Loc.ets`、配色改 `Theme.ets`、地图改 `gen_maps.py`，然后跑 `python3 tools/export_shared.py`。 | 生成链是"ArkTS 真源 → 共享核心"的唯一通道；手改会在下次导出时静默丢失。 |
 | 9 | **`packages/core` 不许依赖任何平台 API**（无 DOM、无 `wx.*`、无 ArkTS Kit）。 | 它是 Web / 小程序 / Swift 的共同底座；一旦引入平台依赖，多端共享即失效。 |
-| 10 | **改完核心必须跑 `npm test`**（16 项一致性回归，含 14 042 组全量节点对与 6 条参考样例）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"两边没走偏"的手段。 |
+| 10 | **改完核心必须跑 `npm run test:all`**（核心 37 + Web 15 + Apple 42 + 小程序 9）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"各端没走偏"的手段。 |
+| 11 | **改核心后必须重跑导出与打包**：`export_shared.py`（TS/Swift 数据）→ `gen_route_fixture.mjs`（跨语言基准）→ `build_weapp.mjs`（小程序产物）。 | 三处都是生成物，漏跑会让某一端停留在旧逻辑上且不报错。 |
 
 ## 3. 快速事实卡
 
@@ -55,6 +56,9 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 ├── packages/core/                   ← ★ 平台无关共享核心（唯一逻辑真源）
 │   ├── src/types.ts graph.ts pathfinder.ts route-steps.ts planner.ts
 │   │        places.ts categories.ts i18n.ts viewport.ts index.ts
+│   ├── src/render.ts                ← ★ 绘制命令流（Web/小程序/Swift 三端共同的渲染契约）
+│   ├── src/app-model.ts             ← ★ 六页状态机（Web/小程序共用）
+│   ├── src/presenter.ts             ← ★ 文案与列表映射（Web/小程序共用）
 │   ├── src/generated/               ← 【生成物】map-data / i18n-data / labels / tokens
 │   └── test/conformance.test.ts     ← 16 项一致性回归（零依赖，Node 直接跑）
 ├── apps/web/                        ← ★ Web/PWA 客户端（Vite + TS + Canvas 2D）
@@ -67,6 +71,9 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── Sources/AirportCLI/          ← 命令行示例（macOS 可直接运行）
 │   ├── Tests/AirportCoreTests/      ← 15 项回归（含 824 条与 TS 逐节点比对）
 │   └── Tests/AirportUITests/        ← 27 项回归（文案/绘制命令/状态机/偏好）
+├── apps/weapp/                      ← ★ 微信小程序端（开发者工具打开 apps/weapp）
+│   ├── project.config.json
+│   └── miniprogram/{app.*, utils/*, pages/*/index.{js,wxml}}
 ├── harmony_app/                     ← 上游 HarmonyOS ArkTS 原工程（只读参照）
 │   ├── AppScope/  entry/src/main/{ets,resources}/
 ├── data/                            ← 地图数据真源产物（XHA_xinghai_t1.map.json）
@@ -75,7 +82,9 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── export_shared.py             ← ★ 导出到 packages/core/src/generated
 │   ├── pathfind_reference.py        ← 寻路参考实现（500 组自测）
 │   ├── gen_route_fixture.mjs        ← ★ 用 TS 核心生成跨语言基准（824 条路线）
-│   ├── web_smoke.mjs                ← Web 端到端冒烟（14 项断言）
+│   ├── web_smoke.mjs                ← Web 端到端冒烟（15 项断言）
+│   ├── build_weapp.mjs              ← 把核心打包成小程序可 require 的单文件
+│   ├── weapp_smoke.mjs              ← 小程序冒烟（9 项：配置/文案/页面流程/Canvas/包体）
 │   └── apple_test.sh                ← swift test/run 的沙箱友好包装
 ├── docs/                            ← 8 份工作区文档 + 上游 BUILD/需求/开发文档
 ├── cases/                           ← 案例交付包（只读）
@@ -159,6 +168,14 @@ bash tools/apple_test.sh run airport-cli --from xha_p1_taxi --to xha_p4_gA101 --
 Xcode 里直接 `File → Open…` 选 `apps/apple/Package.swift` 即可；终端下若报 `sandbox_apply`/权限错误，
 就用 `tools/apple_test.sh`（它把 SwiftPM 缓存指到仓库内并加 `--disable-sandbox`）。详见 `apps/apple/README.md`。
 
+### 微信小程序端
+
+```bash
+node tools/build_weapp.mjs     # 生成 apps/weapp/miniprogram/utils/core.js（改了核心必须重跑）
+npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas 链路/包体
+# 再用微信开发者工具「导入项目」选择 apps/weapp 目录
+```
+
 ## 7. 改动配方（最短路径）
 
 | 想做什么 | 改哪里 | 然后跑 |
@@ -209,7 +226,8 @@ Xcode 里直接 `File → Open…` 选 `apps/apple/Package.swift` 即可；终�
 10. **Apple 端界面已实现但未做真机视觉走查**：核心通过 824 条跨语言逐节点比对（T-606），
     SwiftUI 六页 + Canvas 地图已可编译运行（T-609），呈现层有 27 项测试；但本机无 iOS 模拟器运行时，
     界面只在 macOS 上编译验证过，还没做逐屏视觉核对。
-11. **本机缺少 iOS 模拟器运行时与微信开发者工具**：`xcrun simctl list runtimes` 为空（可编译不可运行），`/Applications` 里没有微信开发者工具。iOS/macOS 与小程序端开工前需先补这两项。
+11. **本机缺少 iOS 模拟器运行时与微信开发者工具**：`xcrun simctl list runtimes` 为空（可编译不可运行）；`/Applications` 里没有微信开发者工具，因此**小程序的 WXML/WXSS 从未真实渲染过**（工程自洽性由 9 项冒烟覆盖，见 `apps/weapp/README.md`）。
+12. **Web 端尚未改用共享的 `AppModel`/`Presenter`**：`apps/web/src/main.ts` 里仍有一份自己的状态与文案映射（行为与共享实现一致，但属重复实现），已登记为 `docs/TODO.md` T-613。
 
 ---
 
@@ -221,3 +239,4 @@ Xcode 里直接 `File → Open…` 选 `apps/apple/Package.swift` 即可；终�
 | v1.1 | 2026-10-02 | DSH Agent | 加入多端移植：共享核心 `packages/core`（16 项回归）+ Web/PWA `apps/web`（14 项端到端）；新增红线 8–10 与多端命令 |
 | v1.2 | 2026-10-02 | DSH Agent | 加入 Apple 端：`apps/apple`（Swift 核心 + CLI，15 项回归含 824 条与 TS 逐节点比对）+ 跨语言基准脚本 |
 | v1.3 | 2026-10-02 | DSH Agent | Apple 端补齐 SwiftUI 六页 + Canvas 地图与呈现层 27 项回归；修复「修改出发位置」误入目的地页的缺陷（Web 端同步修复并加回归） |
+| v1.4 | 2026-10-02 | DSH Agent | 渲染命令流与状态机/呈现层上提到共享核心；交付微信小程序端（六页 + Canvas 2D，9 项冒烟）；新增红线 11 |

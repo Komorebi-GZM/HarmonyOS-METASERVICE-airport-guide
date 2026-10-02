@@ -521,6 +521,8 @@ git remote -v
 | `apps/apple/Sources/AirportCore/**` | Apple 端 Swift 核心移植 | ✅ 手写 |
 | `apps/apple/Sources/AirportUI/**` | Apple 端呈现层（状态机/文案/绘制命令，纯逻辑） | ✅ 手写 |
 | `apps/apple/Sources/AirportGuideApp/**` | SwiftUI 六页 + Canvas 地图（命令流解释器） | ✅ 手写 |
+| `apps/weapp/miniprogram/**` | 微信小程序端（页面 + Canvas 解释器 + 数据构造） | ✅ 手写 |
+| `apps/weapp/miniprogram/utils/core.js` | 小程序侧共享核心（esbuild 打包） | ❌ 生成物（build_weapp.mjs） |
 | `apps/apple/Sources/AirportCore/Resources/*.json` | 跨语言数据包 | ❌ 生成物（export_shared.py） |
 | `apps/apple/Tests/AirportCoreTests/Fixtures/*.json` | 跨语言基准路线 | ❌ 生成物（gen_route_fixture.mjs） |
 | `tools/gen_route_fixture.mjs` | 用 TS 核心生成各端对齐基准 | ✅ 手写 |
@@ -549,6 +551,8 @@ git remote -v
 | `bash tools/apple_test.sh run AirportGuideApp` | 启动 SwiftUI 界面（macOS 14+） | 同上 |
 | `npm run apple:run` | 运行 `airport-cli`，打印 6 条参考样例与四档偏好对比 | 同上 |
 | `node tools/gen_route_fixture.mjs` | 生成跨语言基准 `routes.json`（824 条）到 TS 与 Swift 两处 | 改了寻路/数据之后必须跑 |
+| `node tools/build_weapp.mjs` | 把共享核心打成小程序可 require 的 CommonJS 单文件（95 KB） | 改了核心之后必须跑 |
+| `npm run test:weapp` | 小程序冒烟：配置/文案/六页 Page 生命周期/Canvas 链路/包体 | 同上 |
 | `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 + Apple 端回归 | 同上 |
 
 ### 10.4 回归覆盖了什么
@@ -574,6 +578,7 @@ git remote -v
 
 - Web 端为**视觉近似**：流程与逻辑对齐，字号/间距/圆角尚未收敛到 [DESIGN.md](DESIGN.md) 的令牌（T-607）。
 - Apple 端（macOS 14+ / iOS 17+）已有界面，但**只做过编译验证与呈现层测试**，尚未逐屏视觉走查（T-612）；本机没有 iOS 模拟器运行时，iOS 目标可编译但需先在 Xcode → Settings → Components 下载运行时才能跑。
+- **小程序的 WXML/WXSS 从未真实渲染过**（本机没有微信开发者工具）：9 项冒烟覆盖了配置、文案、页面生命周期、Canvas 链路与包体，但排版仍需在开发者工具里目视核对（T-614）。
 - 共享核心对"平行边"与 `apm` 类型做了**更严格**的处理：前者在加载期直接抛错（ArkTS 端是静默覆盖），后者补上了 350m 权重（ArkTS 端会降级成 25m）。这是有意的差异，已在代码注释与本文件说明。
 
 ---
@@ -587,3 +592,4 @@ git remote -v
 | v1.1 | 2026-10-02 | DSH Agent | 新增 §10 多端移植：目录职责、环境（Node≥20.11 / pnpm≥10 / allowBuilds）、命令表、回归覆盖面与已知限制 |
 | v1.2 | 2026-10-02 | DSH Agent | §10 补 Apple 端：目录职责、命令、SwiftPM 沙箱坑与对策（10.5） |
 | v1.3 | 2026-10-02 | DSH Agent | §10 补 Apple 界面目标与 42 项回归；限制说明更新为"未做视觉走查" |
+| v1.4 | 2026-10-02 | DSH Agent | §10 补小程序端目录/命令与"WXML 未渲染"限制 |

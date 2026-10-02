@@ -9,6 +9,7 @@
 // 真源：tools/gen_model.py（side/bbox）、harmony_app/.../core/Pathfinder.ets（邻接表）
 
 import { MAP_RAW } from './generated/map-data.ts';
+import { APP, MAP, ROUTE, HIT, TYPE_COLOR } from './generated/tokens.ts';
 import type { MapNode, MapEdge, RawAirportMap, Side } from './types.ts';
 
 export const PX_PER_METER: number = MAP_RAW.meta.pxPerMeter;
@@ -29,6 +30,8 @@ export class AirportGraph {
   readonly securityId: string;
   readonly floorOrder: string[];
   readonly floorLabels: Record<string, string>;
+  /** 设计令牌（来自 ArkTS 的 Theme.ets，见 tools/export_shared.py） */
+  readonly tokens = { APP, MAP, ROUTE, HIT, TYPE_COLOR };
 
   constructor(raw: RawAirportMap) {
     this.raw = raw;

@@ -1,0 +1,18 @@
+{
+  "description": "星海机场导航 · 微信小程序端（复用 packages/core 共享核心）",
+  "appid": "touristappid",
+  "compileType": "miniprogram",
+  "libVersion": "3.5.0",
+  "miniprogramRoot": "miniprogram/",
+  "projectname": "airport-guide-weapp",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "bigPackageSizeSupport": false,
+    "ignoreDevUnusedFiles": false
+  },
+  "condition": {}
+}

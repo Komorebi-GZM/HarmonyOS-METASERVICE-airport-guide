@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/target/index",
+    "pages/start/index",
+    "pages/route/index",
+    "pages/metro/index",
+    "pages/browse/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F4F7F9",
+    "navigationBarTitleText": "星海机场导航",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F4F7F9"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

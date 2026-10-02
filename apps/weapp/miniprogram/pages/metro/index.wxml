@@ -1,0 +1,25 @@
+<view class="page">
+  <view class="top">
+    <view class="pill" bindtap="onBack">‹</view>
+    <text class="title">{{title}}</text>
+    <view class="spacer"></view>
+    <view class="pill" bindtap="onToggleLang">{{langLabel}}</view>
+  </view>
+
+  <text class="hero">{{heading}}</text>
+  <text class="hint">{{hint}}</text>
+
+  <view class="card" wx:for="{{directions}}" wx:key="targetId" data-id="{{item.targetId}}" bindtap="onDirection">
+    <text class="ico">◆</text>
+    <view class="cardStack">
+      <text class="cardText">{{item.title}}</text>
+      <text class="cardSub">{{item.subtitle}}</text>
+    </view>
+  </view>
+
+  <text class="section">{{stepsTitle}}</text>
+  <view class="stepRow" wx:for="{{steps}}" wx:key="*this">
+    <text class="stepNo">{{index + 1}}.</text>
+    <text class="stepText">{{item}}</text>
+  </view>
+</view>
