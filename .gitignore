@@ -43,3 +43,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 apps/*/dist/
+
+# ===== Swift / SwiftPM（Apple 端）=====
+.build/
+apps/apple/.build/
+apps/apple/.swiftpm/
+apps/apple/.module-cache/

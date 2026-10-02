@@ -40,6 +40,7 @@
 | 图标资源 | 3 个 PNG（`app_icon.png`/`icon.png`/`startIcon.png`）当前提交版本均为 **512×512**（brand_assets 产物），但 `gen_icons.py` 会写 216/108/216——两条生成路径互相覆盖，未约定谁是权威 | 实测尺寸；`tools/gen_icons.py:73`、`tools/gen_brand_assets.py:6` |
 | 设备级校验 | `verify_flows.py` / `smoke_emulator.py` 需 `hdc` 设备；历史结果为 API 24/26 通过 | `docs/reports/ProductExperience-20261001.md:67-83` |
 | 共享核心 | **已抽取并通过回归**：`packages/core`（3 000 余行 TS，含生成数据）；`npm test` 16 项全绿，含 14 042 组全量节点对与 6 条参考样例米数复现 | 2026-10-02 实测 |
+| Apple 端 | **核心已移植并通过跨语言比对**：`apps/apple`（SwiftPM）；`npm run test:apple` 15 项全绿，824 条路线与 TS 在节点序列/米数/步骤上逐项相等；`airport-cli` 可打印与参考实现同口径的样例（635/505/630/445/250/300 米） | 2026-10-02 实测 |
 | Web 客户端 | **已可用**：`apps/web`（Vite 7 + TS + Canvas 2D），构建产物 62 KB JS / 7.6 KB CSS；`pnpm test:web` 14 项端到端断言全绿 | 2026-10-02 实测 |
 | 本机工具链 | Python 3.14.7 ✔、Node v25.9.0 ✔；**未安装 DevEco Studio / hdc / hvigorw** ✘ → 本机无法构建 HAP、无法跑设备脚本 | 2026-10-02 `which` 探测 |
 | 平台证据 | 编译用 API 26、声明兼容 API 23、实测 API 24/26；**API 23 未实测** | `docs/reports/ProductExperience-20261001.md:35,107` |
@@ -152,7 +153,9 @@
 | T-603 | **Web/PWA 客户端**：六页流程 + Canvas 2D 地图渲染 + 手势 + 本地存储 + 中英切换 | P1 | T-601, T-602 | `apps/web/src/**` | `apps/web`（Vite 构建） | `pnpm web` 在浏览器可用；六页流程走通 | ◐ 流程已通，视觉仍为近似 |
 | T-604 | Web 端到端回归：跑构建产物验证主链路与关键分支 | P1 | T-603 | `tools/web_smoke.mjs` | 14 项断言脚本 | `pnpm test:web` 全绿（首页→目的地→起点→预览→指引→完成→楼层地图→双语→本地存储） | ☑ 2026-10-02 |
 | T-605 | **微信小程序端**：WXML/WXSS + Canvas 2D，复用 `packages/core` | P1 | T-603, 决策 D-08 | 待建 `apps/weapp/` | 小程序工程 | 微信开发者工具里六页流程可用；主包体积 ≤ 2 MB | ☐ |
-| T-606 | **macOS/iOS 原生端**：SwiftUI + Swift 移植核心，用同一套 JSON 与断言对齐 | P1 | 决策 D-09 | 待建 `apps/apple/` | Xcode 工程 | macOS 直接运行；iOS 模拟器/真机通过同一套寻路断言 | ☐ |
+| T-606 | **Apple 端核心移植**：Swift 版图/寻路/步骤/状态机/检索/双语/视口，读同一份导出 JSON | P1 | D-09 | `apps/apple/Sources/AirportCore/**` | SwiftPM 包 `AirportCore` + CLI | `npm run test:apple` 15 项全绿，含 **824 条路线与 TS 逐节点一致**、14 042 组全量节点对与割点等价 | ☑ 2026-10-02 |
+| T-609 | **Apple 端 UI**：SwiftUI 六页 + Canvas 地图渲染（对齐 `docs/DESIGN.md`） | P1 | T-606 | 待建 `apps/apple/Sources/AirportGuideApp/` | Xcode 可运行的 App | macOS 直接运行；iOS 模拟器（需先下载运行时）走通六页流程 | ☐ |
+| T-610 | 跨语言基准机制：用 TS 核心生成固定路线集，各端逐项比对 | P1 | T-601 | `tools/gen_route_fixture.mjs` | 824 条基准 + 两端消费 | 任一端选路/步骤偏移即测试变红；`sourceMapSha256` 能检出数据漂移 | ☑ 2026-10-02 |
 | T-607 | Web/小程序的视觉收敛：把 `docs/DESIGN.md` 的令牌与字号阶梯落到实现 | P2 | T-201, T-603 | `apps/web/src/styles.css` | 令牌化样式 | 无裸色值/裸字号；与 DESIGN.md 令牌表一一对应 | ☐ |
 | T-608 | 统一离线回归入口：把 `pathfind_reference.py`、`npm test`、`pnpm test:web` 串成一条命令 | P2 | T-604 | 本文件 §3 W0 | 一键脚本 | 一条命令全绿；任一环失败即非零退出 | ☐ |
 
@@ -169,7 +172,7 @@
 | **M2 规则统一** | T-201、T-202、T-103 | 设计令牌单一来源；无障碍路径可硬约束 | ☐ |
 | **M3 能力扩展** | T-101、T-102、T-401、T-404、T-402 | 多航站楼可用；平台矩阵逐档验证通过 | ☐ |
 | **M4 收口** | T-301~T-304、T-403、T-405、T-204 | 有包体/性能基线，发布链路可用 | ☐ |
-| **M5 多端可用** | T-601~T-606 | Web/PWA 已可用；小程序与 macOS/iOS 各自能本地运行，且共用同一套回归 | ◐ Web ✔ / 小程序·Apple 未开始 |
+| **M5 多端可用** | T-601~T-606、T-610 | Web/PWA 已可用；Apple 核心已通过跨语言比对；小程序未开始 | ◐ Web ✔ / Apple 核心 ✔（UI 待做 T-609）/ 小程序 ☐ |
 
 ---
 
@@ -196,6 +199,7 @@
 | 日期 | 变更 | 说明 |
 |---|---|---|
 | 2026-10-02 | 首次创建 | 建立基线快照、四条主线任务池、里程碑与决策清单；基于 `main@8350ff4` 与本机实测（`pathfind_reference.py` 通过、`verify_product.mjs` 与 `gen_checker.py` 因硬编码 Windows 路径 / 占位符被消耗而失败、生成链逐字节可复现） |
+| 2026-10-02 | Apple 端核心 + 跨语言基准 | Swift 移植 `AirportCore`（图/寻路/步骤/状态机/检索/双语/视口）与 `airport-cli`；新增 `tools/gen_route_fixture.mjs` 生成 824 条基准，Swift 端逐节点比对通过；`tools/apple_test.sh` 解决沙箱下的 SwiftPM 限制 |
 | 2026-10-02 | 多端移植第一步：共享核心 + Web/PWA | 抽出 `packages/core`（零平台依赖，Node 原生跑 TS）与 `tools/export_shared.py` 导出链；`apps/web` 六页流程可用；新增 16 项核心回归 + 14 项 Web 端到端断言；新增 W6 任务段与 D-08/D-09 决策 |
 | 2026-10-02 | 补入 W5 一致性与 W2 设计侧取证 | 汇总五份专项文档撰写过程中在代码里发现的 20 余项事实性问题（令牌零引用、色值漂移、双语双轨、动效缺失、apm 类型降级、状态竞态等），全部带文件位置 |
 
@@ -207,3 +211,4 @@
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
 | v1.1 | 2026-10-02 | DSH Agent | 新增 W6 多端移植任务段（T-601~T-608）、D-08/D-09 决策与 M5 里程碑；基线快照补共享核心与 Web 客户端实测 |
+| v1.2 | 2026-10-02 | DSH Agent | T-606/T-610 完成（Apple 核心 + 跨语言基准）；新增 T-609（Apple UI）；基线补 Apple 端实测 |

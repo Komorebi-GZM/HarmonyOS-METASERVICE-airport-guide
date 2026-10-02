@@ -633,9 +633,9 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 
 ```
 ┌──────────────────────── 客户端壳（各自独立）────────────────────────┐
-│  harmony_app/ (ArkTS)   apps/web/ (TS+Canvas)   apps/weapp/  apps/apple/  │
-└───────┬────────────────────────┬──────────────────────┬─────────────┘
-        │ 原生重写 UI            │ 直接用               │ Swift 移植
+│  harmony_app/ (ArkTS)   apps/web/ (TS+Canvas)   apps/apple/ (Swift)   apps/weapp/ │
+└───────┬────────────────────────┬──────────────────────┬──────────────────┘
+        │ 原生重写 UI            │ 直接用               │ Swift 移植（已完成核心）
         ▼                        ▼                      ▼
 ┌─────────────────── packages/core（平台无关，唯一逻辑真源）───────────────────┐
 │ graph  pathfinder  route-steps  planner  places  categories  i18n  viewport │
@@ -664,11 +664,22 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 
 ### 13.3 一致性怎么保证
 
-三层锚点，缺一不可：
+四层锚点，缺一不可：
 
-1. **同一份数据**：`tools/export_shared.py` 从 ArkTS 真源导出，生成物带源 JSON 的 sha256。
-2. **同一套断言**：`packages/core/test/conformance.test.ts` 复刻 `tools/pathfind_reference.py` 的 A–E 自测与 `tools/verify_product.mjs` 的状态机/检索断言，并额外锁定 6 条样例路线的**米数与节点数**（与 Python 参考实现逐条一致）。
-3. **同一个入口**：`npm run test:all` 串起核心回归与 Web 端到端；后续小程序与 Apple 端各加一条同样性质的回归即可接入。
+1. **同一份数据**：`tools/export_shared.py` 从 ArkTS 真源导出 TS 模块与 `airport-data.json`（后者被 Swift 端直接读取），生成物带源 JSON 的 sha256；Swift 测试用 `sourceMapSha256` 检出数据漂移。
+2. **同一套断言**：`packages/core/test/conformance.test.ts`（16 项）复刻 `tools/pathfind_reference.py` 的 A–E 自测与 `tools/verify_product.mjs` 的状态机/检索断言，并锁定 6 条样例路线的**米数与节点数**（与 Python 参考实现逐条一致）。
+3. **同一组基准路线**：`tools/gen_route_fixture.mjs` 用 TS 核心算出 **824 条**路线的完整结果（节点序列/米数/是否过安检/legs/transitions/步骤序列/步行米数），Swift 端逐项比对 —— 这保证两端在**并列最短路**里选出的是同一条路径，而不只是"总米数相同"。
+4. **同一个入口**：`npm run test:all` 串起核心回归、Web 端到端与 Apple 端回归；小程序端接入时只需再加一条同性质的回归。
+
+### 13.3.1 各端一致性对照
+
+| 端 | 实现 | 回归 | 数据入口 | 状态 |
+|---|---|---|---|---|
+| ArkTS（上游） | `harmony_app/entry/src/main/ets/{model,core}` | `pathfind_reference.py` + 设备脚本（需 hdc） | 编译进 `AirportMap.ets` | 只读参照 |
+| TypeScript | `packages/core/src/*.ts` | `npm test`（16 项） | `src/generated/*.ts` | ✅ |
+| Swift | `apps/apple/Sources/AirportCore/*.swift` | `npm run test:apple`（15 项，含 824 条逐节点比对） | `Resources/airport-data.json` | 核心 ✅ / UI 待做 |
+| Web UI | `apps/web/src/*.ts` | `pnpm test:web`（14 项端到端） | 同 TS 核心 | ✅ 视觉近似 |
+| 小程序 | 待建 `apps/weapp/` | 待定 | `packages/core/assets/airport-data.json` | ☐ |
 
 ### 13.4 扩展点
 
@@ -678,7 +689,8 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 | 加文案 | `Loc.ets` | 同上；共享核心的 `t()` 未命中会回落 key，容易漏翻 |
 | 加配色/类型 | `Theme.ets` 的 `TYPE_COLOR`、`Localization.ets` 的 `TYPE_ZH/EN` | 导出的 `tokens.ts`/`labels.ts` 会一并更新 |
 | 加一个端 | 新建 `apps/<name>/` | 只允许依赖 `packages/core`，禁止反向依赖 |
-| 换渲染方式 | 各端自己的 renderer（如 `apps/web/src/map-view.ts`） | 绘制顺序与用色以 [DESIGN.md](DESIGN.md) 为准 |
+| 换渲染方式 | 各端自己的 renderer（如 `apps/web/src/map-view.ts`、将来的 SwiftUI Canvas） | 绘制顺序与用色以 [DESIGN.md](DESIGN.md) 为准 |
+| 加一种语言的移植 | 新建 `apps/<name>/`，读 `packages/core/assets/airport-data.json` | 必须消费第 3 层锚点（基准路线）做逐节点比对，否则"看起来一样"不算数 |
 
 ---
 
@@ -689,3 +701,4 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
 | v1.1 | 2026-10-02 | DSH Agent | 新增 §13 多端架构：新分层图、与 ArkTS 端的有意行为差异、三层一致性锚点、扩展点 |
+| v1.2 | 2026-10-02 | DSH Agent | §13 补 Apple 端与"基准路线"第 4 层锚点，新增 13.3.1 各端一致性对照表 |

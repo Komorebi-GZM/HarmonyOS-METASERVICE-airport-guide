@@ -518,6 +518,11 @@ git remote -v
 | `packages/core/src/generated/**` | 从 ArkTS 真源导出的地图、文案、标签、令牌 | ❌ 生成物，改真源后重跑导出 |
 | `packages/core/test/conformance.test.ts` | 16 项一致性回归 | ✅ 手写 |
 | `apps/web/**` | Web/PWA 客户端（Vite + TS + Canvas 2D） | ✅ 手写 |
+| `apps/apple/Sources/AirportCore/**` | Apple 端 Swift 核心移植 | ✅ 手写 |
+| `apps/apple/Sources/AirportCore/Resources/*.json` | 跨语言数据包 | ❌ 生成物（export_shared.py） |
+| `apps/apple/Tests/AirportCoreTests/Fixtures/*.json` | 跨语言基准路线 | ❌ 生成物（gen_route_fixture.mjs） |
+| `tools/gen_route_fixture.mjs` | 用 TS 核心生成各端对齐基准 | ✅ 手写 |
+| `tools/apple_test.sh` | swift test/run 的沙箱友好包装 | ✅ 手写 |
 | `tools/export_shared.py` | ArkTS 真源 → 共享核心的导出器 | ✅ 手写 |
 | `tools/web_smoke.mjs` | Web 端到端冒烟（跑构建产物） | ✅ 手写 |
 
@@ -537,7 +542,10 @@ git remote -v
 | `pnpm web` | Web 开发服务器 → http://127.0.0.1:5173 | 先 `pnpm install` |
 | `pnpm web:build` | 产出 `apps/web/dist`（静态托管 / WKWebView 壳可直接用） | 同上 |
 | `pnpm test:web` | Web 端到端冒烟：加载 `dist` 产物，在最小 DOM 桩里走完主链路 | 先 `pnpm web:build` |
-| `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 | 同上 |
+| `npm run test:apple` | Apple 端核心回归：`swift test`，15 项（含 824 条与 TS 逐节点比对） | macOS + Xcode 命令行工具 |
+| `npm run apple:run` | 运行 `airport-cli`，打印 6 条参考样例与四档偏好对比 | 同上 |
+| `node tools/gen_route_fixture.mjs` | 生成跨语言基准 `routes.json`（824 条）到 TS 与 Swift 两处 | 改了寻路/数据之后必须跑 |
+| `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 + Apple 端回归 | 同上 |
 
 ### 10.4 回归覆盖了什么
 
@@ -545,9 +553,23 @@ git remote -v
 - `pnpm test:web` 14 项：首页渲染 → 目的地分类/搜索过滤 → 出发位置 → 路线预览（米数/中央安检提示/四档偏好）→ Canvas 实际绘制调用 → 切偏好 → 开始指引（步骤计数）→ 逐步确认到完成 → 返回首页 → 本地存储写入 → 中英切换 → 楼层地图切层与选点。
 - **未覆盖**：ArkTS 运行时逐值比对（本机无 DevEco SDK）、真机/模拟器形态、小程序与 Apple 端（尚未开工）。
 
-### 10.5 已知限制
+### 10.5 Apple 端的环境坑（实测）
+
+本机沙箱下 SwiftPM 会连报两类错误，都属于**环境限制而非工程问题**：
+
+1. `You don't have permission to save the file "manifests" in the folder "org.swift.swiftpm"` —— SwiftPM 想写 `~/Library/Caches`；
+2. `sandbox-exec: sandbox_apply: Operation not permitted` —— SwiftPM 要给自己套一层 sandbox，被外层拒绝。
+
+对策（已封装进 `tools/apple_test.sh`）：把 `CLANG_MODULE_CACHE_PATH`、`--scratch-path`、`--cache-path`、
+`--config-path`、`--security-path` 全部指到 `apps/apple/` 内，并加 `--disable-sandbox`。
+注意 `swift run <目标> ...` 里**目标名之后的参数会传给目标本身**，所以 SwiftPM 选项必须写在目标名之前。
+
+**在 Xcode 里打开 `apps/apple/Package.swift` 不需要任何这些参数。**
+
+### 10.6 已知限制
 
 - Web 端为**视觉近似**：流程与逻辑对齐，字号/间距/圆角尚未收敛到 [DESIGN.md](DESIGN.md) 的令牌（T-607）。
+- Apple 端目前**只有核心与 CLI**，没有 UI（SwiftUI 六页见 `docs/TODO.md` T-609）；本机也没有 iOS 模拟器运行时，iOS 目标可编译但需先下载运行时才能跑。
 - 共享核心对"平行边"与 `apm` 类型做了**更严格**的处理：前者在加载期直接抛错（ArkTS 端是静默覆盖），后者补上了 350m 权重（ArkTS 端会降级成 25m）。这是有意的差异，已在代码注释与本文件说明。
 
 ---
@@ -559,3 +581,4 @@ git remote -v
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
 | v1.1 | 2026-10-02 | DSH Agent | 新增 §10 多端移植：目录职责、环境（Node≥20.11 / pnpm≥10 / allowBuilds）、命令表、回归覆盖面与已知限制 |
+| v1.2 | 2026-10-02 | DSH Agent | §10 补 Apple 端：目录职责、命令、SwiftPM 沙箱坑与对策（10.5） |

@@ -13,7 +13,7 @@
 - 上游仓库：`https://gitcode.com/harmony-practice-center/HarmonyOS-METASERVICE-airport-guide.git`（git remote 名 **`upstream`**）
 - 本工作区：**个人本地 fork 开发环境**，分支 `main`。原工程基线 `8350ff4`，文档基线 `3a1a5d3`。**默认不推送到任何远程**。
 - 许可：MIT。教学案例，六页流程、119 节点 / 145 边。
-- 多端布局：`harmony_app/`（上游 ArkTS 原工程，**只读参照**）+ `packages/core/`（共享核心，唯一逻辑真源）+ `apps/web/`（Web/PWA，已可用）+ 后续 `apps/weapp/`、`apps/apple/`。
+- 多端布局：`harmony_app/`（上游 ArkTS 原工程，**只读参照**）+ `packages/core/`（共享核心，唯一逻辑真源）+ `apps/web/`（Web/PWA，已可用）+ `apps/apple/`（Swift 核心 + CLI，已通过跨语言比对）+ 后续 `apps/weapp/`。
 
 ## 2. 红线（改代码前必须接受）
 
@@ -60,6 +60,10 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 ├── apps/web/                        ← ★ Web/PWA 客户端（Vite + TS + Canvas 2D）
 │   ├── index.html  vite.config.ts  src/{main,map-view,storage}.ts  src/styles.css
 │   └── dist/                        ← 构建产物（.gitignore）
+├── apps/apple/                      ← ★ Apple 端（SwiftPM，Xcode 打开 Package.swift）
+│   ├── Sources/AirportCore/         ← Swift 核心移植 + Resources/airport-data.json（生成物）
+│   ├── Sources/AirportCLI/          ← 命令行示例（macOS 可直接运行）
+│   └── Tests/AirportCoreTests/      ← 15 项回归（含 824 条与 TS 逐节点比对）
 ├── harmony_app/                     ← 上游 HarmonyOS ArkTS 原工程（只读参照）
 │   ├── AppScope/  entry/src/main/{ets,resources}/
 ├── data/                            ← 地图数据真源产物（XHA_xinghai_t1.map.json）
@@ -67,7 +71,9 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── gen_maps.py → gen_model.py   ← 地图数据链
 │   ├── export_shared.py             ← ★ 导出到 packages/core/src/generated
 │   ├── pathfind_reference.py        ← 寻路参考实现（500 组自测）
-│   └── web_smoke.mjs                ← Web 端到端冒烟（14 项断言）
+│   ├── gen_route_fixture.mjs        ← ★ 用 TS 核心生成跨语言基准（824 条路线）
+│   ├── web_smoke.mjs                ← Web 端到端冒烟（14 项断言）
+│   └── apple_test.sh                ← swift test/run 的沙箱友好包装
 ├── docs/                            ← 8 份工作区文档 + 上游 BUILD/需求/开发文档
 ├── cases/                           ← 案例交付包（只读）
 └── README.md                        ← 上游教学案例说明（只读）
@@ -132,7 +138,21 @@ pnpm web:build        # 产出 apps/web/dist（静态托管 / WKWebView 壳可�
 
 # Web 端到端冒烟（跑构建产物，覆盖 首页→目的地→起点→路线→指引→完成→楼层地图）
 pnpm test:web
+
+# 跨语言基准（改了寻路/数据后重跑；Swift 与将来的小程序都靠它对齐）
+node tools/gen_route_fixture.mjs
 ```
+
+### Apple 端（macOS / iOS）
+
+```bash
+npm run test:apple        # = bash tools/apple_test.sh test —— 15 项 Swift 回归
+npm run apple:run         # 打印 6 条参考样例（与 pathfind_reference.py 同口径）
+bash tools/apple_test.sh run airport-cli --from xha_p1_taxi --to xha_p4_gA101 --steps
+```
+
+Xcode 里直接 `File → Open…` 选 `apps/apple/Package.swift` 即可；终端下若报 `sandbox_apply`/权限错误，
+就用 `tools/apple_test.sh`（它把 SwiftPM 缓存指到仓库内并加 `--disable-sandbox`）。详见 `apps/apple/README.md`。
 
 ## 7. 改动配方（最短路径）
 
@@ -181,7 +201,9 @@ pnpm test:web
 7. **`preview/` 是本地生成物**，已在 `.gitignore` 中；不要把它当作可提交资产。
 8. **Web 端目前是"视觉近似"**：六页流程、寻路、双语、异常提示都已对齐，但字号/间距/圆角尚未逐项收敛到 `docs/DESIGN.md` 的令牌（该文件 §11 有落地清单）。
 9. **共享核心的回归是"内部一致 + 参考样例对齐"**：它证明了与 `tools/pathfind_reference.py` 的样例米数一致、割点拆分与全图 Dijkstra 等价，但没有在设备上逐个比对 ArkTS 运行时结果（本机无 DevEco SDK）。
-10. **本机缺少 iOS 模拟器运行时与微信开发者工具**：`xcrun simctl list runtimes` 为空（可编译不可运行），`/Applications` 里没有微信开发者工具。iOS/macOS 与小程序端开工前需先补这两项。
+10. **Apple 端只有核心与 CLI，还没有 UI**：Swift 核心已通过 824 条跨语言逐节点比对（T-606），
+    SwiftUI 六页界面尚未开工（T-609）。
+11. **本机缺少 iOS 模拟器运行时与微信开发者工具**：`xcrun simctl list runtimes` 为空（可编译不可运行），`/Applications` 里没有微信开发者工具。iOS/macOS 与小程序端开工前需先补这两项。
 
 ---
 
@@ -191,3 +213,4 @@ pnpm test:web
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4；建立 8 份工作区文档的入口与红线 |
 | v1.1 | 2026-10-02 | DSH Agent | 加入多端移植：共享核心 `packages/core`（16 项回归）+ Web/PWA `apps/web`（14 项端到端）；新增红线 8–10 与多端命令 |
+| v1.2 | 2026-10-02 | DSH Agent | 加入 Apple 端：`apps/apple`（Swift 核心 + CLI，15 项回归含 824 条与 TS 逐节点比对）+ 跨语言基准脚本 |

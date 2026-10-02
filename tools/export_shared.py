@@ -70,7 +70,7 @@ def palette(text, name):
     return out
 
 
-def export_tokens():
+def export_tokens() -> dict:
     text = read(os.path.join(ETS, "ui", "Theme.ets"))
     lines = []
     for name in ("APP", "MAP", "ROUTE"):
@@ -94,7 +94,13 @@ def export_tokens():
     lines.append("};")
     lines.append("")
     write("tokens.ts", "harmony_app/entry/src/main/ets/ui/Theme.ets", "\n".join(lines))
-    return dict(APP=dict(palette(text, "APP")), TYPE_COLOR=dict(type_color))
+    return {
+        "APP": dict(palette(text, "APP")),
+        "MAP": dict(palette(text, "MAP")),
+        "ROUTE": dict(palette(text, "ROUTE")),
+        "HIT": hit.group(1),
+        "TYPE_COLOR": dict(type_color),
+    }
 
 
 # ---------------------------------------------------------------- Loc.ets
@@ -115,7 +121,7 @@ def export_i18n():
     lines.append("];")
     lines.append("")
     write("i18n-data.ts", "harmony_app/entry/src/main/ets/model/Loc.ets", "\n".join(lines))
-    return len(rows)
+    return [{"key": k, "zh": zh, "en": en} for k, zh, en in rows]
 
 
 # ------------------------------------------------- Localization.ets + gen_model.py
@@ -131,10 +137,12 @@ def load_gen_model():
 def export_labels():
     text = read(os.path.join(ETS, "model", "Localization.ets"))
     out = []
+    collected = {}
     for const in ("TYPE_ZH", "TYPE_EN"):
         pairs = re.findall(r"%s\.set\('([^']+)', '([^']*)'\)" % const, text)
         if len(pairs) != 15:
             raise SystemExit(f"{const} 期望 15 项，实际 {len(pairs)}")
+        collected[const] = pairs
         out.append("export const %s: Record<string, string> = {" % const)
         for key, value in pairs:
             out.append("  %s: %s," % (ts_string(key), ts_string(value)))
@@ -169,7 +177,15 @@ def export_labels():
     write("labels.ts",
           "harmony_app/entry/src/main/ets/model/Localization.ets + tools/gen_model.py",
           "\n".join(out))
-    return len(node_en), fallback
+    zh_map = dict(collected["TYPE_ZH"])
+    en_map = dict(collected["TYPE_EN"])
+    labels = {
+        "typeLabels": {k: {"zh": zh_map[k], "en": en_map[k]} for k in zh_map},
+        "floorLabels": {f: {"zh": data["meta"]["floors"][f], "en": gen.FLOOR_EN[f]}
+                        for f in data["meta"]["floors"]},
+        "nodeEn": node_en,
+    }
+    return labels, fallback
 
 
 # ---------------------------------------------------------------- map data
@@ -192,12 +208,45 @@ def export_map():
     return data, digest
 
 
+def export_bundle(data, digest, texts, labels, tokens):
+    """给非 TS 消费端（Swift / 小程序 / 其他）产出一份合并 JSON。
+
+    同一份内容写两处：
+      packages/core/assets/airport-data.json          —— 平台无关资产（小程序等）
+      apps/apple/Sources/AirportCore/Resources/...    —— SwiftPM 资源（Bundle.module 读取）
+    """
+    bundle = {
+        "schema": 1,
+        "sourceMapSha256": digest,
+        "map": data,
+        "i18n": texts,
+        "typeLabels": labels["typeLabels"],
+        "floorLabels": labels["floorLabels"],
+        "nodeEn": labels["nodeEn"],
+        "tokens": tokens,
+    }
+    body = json.dumps(bundle, ensure_ascii=False, separators=(",", ":"))
+    targets = [
+        os.path.join(ROOT, "packages", "core", "assets", "airport-data.json"),
+        os.path.join(ROOT, "apps", "apple", "Sources", "AirportCore", "Resources", "airport-data.json"),
+    ]
+    for path in targets:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(body)
+        print(f"  写出 {os.path.relpath(path, ROOT)}  ({len(body)} 字节)")
+    return bundle
+
+
 def main():
     print("导出共享核心数据（真源 -> packages/core/src/generated）")
     data, digest = export_map()
-    n_texts = export_i18n()
-    n_nodes, fallback = export_labels()
-    export_tokens()
+    texts = export_i18n()
+    labels, fallback = export_labels()
+    tokens = export_tokens()
+    export_bundle(data, digest, texts, labels, tokens)
+    n_texts = len(texts)
+    n_nodes = len(labels["nodeEn"])
     floors = {}
     for n in data["nodes"]:
         floors[n["floor"]] = floors.get(n["floor"], 0) + 1
@@ -207,6 +256,7 @@ def main():
     print("  ✔ 文案      : %d 条（Loc.ets）" % n_texts)
     print("  ✔ 英文名    : %d 条（其中 %d 条回落中文）" % (n_nodes, fallback))
     print("  ✔ 令牌      : APP / MAP / ROUTE / HIT / TYPE_COLOR(15)")
+    print("  ✔ 跨语言包  : packages/core/assets + apps/apple/Sources/AirportCore/Resources")
     print("  ✔ 源 JSON   : sha256:%s" % digest[:16])
     return 0
 

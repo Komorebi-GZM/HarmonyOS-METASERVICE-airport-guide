@@ -13,7 +13,9 @@
     "web": "pnpm --filter @airport-guide/web dev",
     "web:build": "pnpm --filter @airport-guide/web build",
     "test:web": "node tools/web_smoke.mjs",
-    "test:all": "npm run test && npm run web:build && npm run test:web"
+    "test:all": "npm run test && npm run web:build && npm run test:web && npm run test:apple",
+    "test:apple": "bash tools/apple_test.sh test",
+    "apple:run": "bash tools/apple_test.sh run airport-cli"
   },
   "workspaces": [
     "packages/*",
