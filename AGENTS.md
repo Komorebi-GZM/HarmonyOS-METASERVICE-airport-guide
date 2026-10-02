@@ -165,7 +165,7 @@ npm run test:tokens
 ### Apple 端（macOS / iOS）
 
 ```bash
-npm run test:apple                    # = bash tools/apple_test.sh test —— 45 项 Swift 回归（核心 18 + 呈现 27）
+npm run test:apple                    # = bash tools/apple_test.sh test —— 46 项 Swift 回归（核心 18 + 呈现 28）
 npm run apple:build                   # 编译全部目标（含 SwiftUI 应用）
 npm run apple:run                     # 打印 6 条参考样例（与 pathfind_reference.py 同口径）
 bash tools/apple_test.sh run AirportGuideApp      # 直接启动图形界面
@@ -228,10 +228,10 @@ npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas
 5. **离线校验两极化**：`python3 tools/pathfind_reference.py`（500 组随机起终点）本机实测**通过**；`node tools/verify_product.mjs`（6 套件 / 500 组 × 4 偏好 = 2 000 条路线）在 Windows + DevEco 环境通过，但第 9 行硬编码了 Windows 的 `typescript.js` 绝对路径，**在 macOS 上实测直接报错**；其余流程校验依赖 `hdc` 设备（`verify_flows.py`、`smoke_emulator.py`）。两条离线校验也缺统一入口（"一键回归"），这是本轮工程质量提升的入口。
 6. **API 23 无实测证据**：工程声明兼容 `6.1.0(23)`，但 `docs/reports/ProductExperience-20261001.md:107` 明确"API 23 设备实测尚未进行"，实测集中在 API 24/26。
 7. **`preview/` 是本地生成物**，已在 `.gitignore` 中；不要把它当作可提交资产。
-8. **Web/小程序的视觉仍是"近似"**：颜色与圆角已三端同源（T-201，由 `check_tokens.mjs` 强制），但**字号与间距**尚未逐档映射到 `docs/DESIGN.md` §5/§6 的阶梯（T-202）；排版观感也未做逐屏比对（T-612 / T-614）。
+8. **视觉令牌已三端同源，但观感未逐屏比对**：颜色/字号/圆角/间距已成令牌（T-201、T-202，由 `check_tokens.mjs` 强制），剩余"阶梯外间距字面量"（混合值声明）会轻微影响布局，收敛需与逐屏走查一起做（T-216 / T-612 / T-614）。
 9. **共享核心的回归是"内部一致 + 参考样例对齐"**：它证明了与 `tools/pathfind_reference.py` 的样例米数一致、割点拆分与全图 Dijkstra 等价，但没有在设备上逐个比对 ArkTS 运行时结果（本机无 DevEco SDK）。
 10. **Apple 端界面已实现但未做真机视觉走查**：核心通过 824 条跨语言逐节点比对（T-606），
-    SwiftUI 六页 + Canvas 地图已可编译运行（T-609），呈现层有 27 项测试；但本机无 iOS 模拟器运行时，
+    SwiftUI 六页 + Canvas 地图已可编译运行（T-609），呈现层有 28 项测试；但本机无 iOS 模拟器运行时，
     界面只在 macOS 上编译验证过，还没做逐屏视觉核对。
 11. **本机缺少 iOS 模拟器运行时与微信开发者工具**：`xcrun simctl list runtimes` 为空（可编译不可运行）；`/Applications` 里没有微信开发者工具，因此**小程序的 WXML/WXSS 从未真实渲染过**（工程自洽性由 9 项冒烟覆盖，见 `apps/weapp/README.md`）。
 12. **Web 端已纯视图化**（v1.5）：`apps/web/src/main.ts` 只负责渲染与转发动作，状态机与文案来自共享核心；此处保留一行是因为历史上曾存在重复实现，便于回溯。
