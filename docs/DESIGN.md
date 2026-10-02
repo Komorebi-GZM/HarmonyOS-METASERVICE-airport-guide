@@ -614,7 +614,7 @@
 |---|---|---|
 | Web (CSS) | `apps/web/src/tokens.css` 的 `:root` 自定义属性 | 由 `tools/export_shared.py` 生成 |
 | 小程序 (WXSS) | `apps/weapp/miniprogram/tokens.wxss` 的 `page` 自定义属性 | 同上（px → rpx 按 1:2） |
-| Apple (SwiftUI) | `airport-data.json` 的 `tokens` 字段，由 `AirportUI/Theme` 读取 | 同上 |
+| Apple (SwiftUI) | `airport-data.json` 的 `tokens` + `metrics` 字段，由 `AirportUI/{Theme,Metrics}` 读取 | 同上 |
 | ArkTS（上游） | 直接 import `Theme.ets` | 真源 |
 
 真源：`harmony_app/entry/src/main/ets/ui/Theme.ets`（颜色）+ `resources/base/element/float.json`（圆角）。
@@ -627,11 +627,24 @@
 3. 所有 `var(--x)` 引用必须有定义（防拼错、防删定义留引用）；
 4. Web 与小程序暴露的语义别名集合必须一致（两端观感不能靠人自觉）。
 
-仍未收敛的是**字号与间距**（T-202）：两端目前按"视觉近似"给值，尚未逐档映射到 §5/§6 的阶梯。
+### 12.1 尺寸阶梯（v1.7 起）
+
+字号、间距、圆角同样由 `export_shared.py` 的 `FONT_LADDER` / `SPACE_LADDER` / `RADIUS_LADDER` 声明并生成：
+
+| 类别 | 档位（px；小程序 = ×2 rpx） | 数量 |
+|---|---|---|
+| 字号 | 11 · 12 · 13 · 14 · 15 · 16 · 17 · 18 · 19 · 20 · 22 · 24 · 28 | 13 |
+| 间距 | 4 · 6 · 8 · 10 · 12 · 14 · 16 · 20 · 24 · 32 | 10 |
+| 圆角 | 9 · 11 · 14 · 16（+ `--radius-pill: 999`） | 4 + 1 |
+
+`check_tokens.mjs` 的规则相应扩展：**字号与圆角不得出现字面量**；间距声明只要整条落在阶梯上就必须用令牌。
+仍在阶梯外的间距（多为 `padding: 2px 0 6px` 这类混合值）由脚本以信息统计输出，收敛见 T-216：
+这类改动会轻微改变观感，需与逐屏走查（T-612 / T-614）一起做。
 
 ## 变更记录
 
 | 版本 | 日期 | 修改人 | 说明 |
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
-| v1.6 | 2026-10-02 | DSH Agent | 新增 §12 令牌落地方式：三端生成物 + check_tokens 5 项强制约束 |
+| v1.6 | 2026-10-02 | DSH Agent | 新增 §12 令牌落地方式：三端生成物 + check_tokens 5 项强制约束 
+| v1.7 | 2026-10-02 | DSH Agent | 尺寸阶梯令牌化（13 字号 / 10 间距 / 6 圆角，三端共用）；§12.1 记录阶梯与检查规则 ||

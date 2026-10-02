@@ -216,6 +216,37 @@ def css_var_name(group, key):
     return "--%s-%s" % (group.lower(), kebab)
 
 
+# ---------------------------------------------------------------- 尺寸令牌阶梯
+#
+# 真源说明：字号/间距/圆角的"设计阶梯"目前由本表声明（上游 ArkTS 侧是散落的字面量，
+# 且 harmony_app 只读），阶梯的取值与用途记录在 docs/DESIGN.md §5/§6。
+# 平台单位换算：Web 用 px，小程序用 rpx（1px = 2rpx）。
+FONT_LADDER = [
+    (11, "地图标签、极小的辅助文字"),
+    (12, "徽标、步骤小注"),
+    (13, "次要说明、副标题"),
+    (14, "正文（列表副标题、提示）"),
+    (15, "列表主文、按钮"),
+    (16, "卡片正文、搜索框"),
+    (17, "卡片标题"),
+    (18, "地铁方向卡标题"),
+    (19, "页面标题、步骤标题"),
+    (20, "区块标题"),
+    (22, "首屏副标题"),
+    (24, "大标题（小屏收敛）"),
+    (28, "首屏主标题"),
+]
+SPACE_LADDER = [
+    (4, "紧凑内边距"), (6, "行内间距"), (8, "列表项间距"),
+    (10, "卡片内间距"), (12, "区块间距"), (14, "卡片内边距"),
+    (16, "页面左右边距"), (20, "区块外边距"), (24, "页面上下留白"),
+    (32, "大区块留白"),
+]
+RADIUS_LADDER = [
+    (9, "小图标容器"), (11, "图标方块"), (14, "列表项 / 按钮"), (16, "卡片"),
+]
+
+
 def export_css_tokens(tokens):
     """把令牌写成交付给 Web (CSS) 与小程序 (WXSS) 的自定义属性。
 
@@ -236,13 +267,21 @@ def export_css_tokens(tokens):
     lines.append("  --hit: %s;" % tokens["HIT"])
     for key, value in tokens["TYPE_COLOR"].items():
         lines.append("  %s: %s;" % (css_var_name("TYPE_COLOR", key), value))
-    # 尺寸令牌：真源是 resources/base/element/float.json（card_radius 16vp / pill_radius 999vp）
+    for size, note in FONT_LADDER:
+        lines.append("  --font-%d: %dpx;   /* %s */" % (size, size, note))
+    for size, note in SPACE_LADDER:
+        lines.append("  --space-%d: %dpx;  /* %s */" % (size, size, note))
+    for size, note in RADIUS_LADDER:
+        lines.append("  --radius-%d: %dpx; /* %s */" % (size, size, note))
+    # 资源层圆角：真源是 resources/base/element/float.json（card_radius 16vp / pill_radius 999vp）
     lines.append("  --radius-card: 16px;")
     lines.append("  --radius-pill: 999px;")
     lines.append("}")
     lines.append("")
     css = "\n".join(lines)
-    wxss = css.replace(":root {", "page {").replace("--radius-card: 16px;", "--radius-card: 32rpx;") \
+    wxss = css.replace(":root {", "page {")
+    wxss = re.sub(r"(--(?:font|space|radius)-[0-9]+: )(\d+)px", lambda m: m.group(1) + str(int(m.group(2)) * 2) + "rpx", wxss)
+    wxss = wxss.replace("--radius-card: 16px;", "--radius-card: 32rpx;") \
         .replace("--radius-pill: 999px;", "--radius-pill: 999rpx;")
 
     for path, body, source in (
@@ -274,6 +313,11 @@ def export_bundle(data, digest, texts, labels, tokens):
         "floorLabels": labels["floorLabels"],
         "nodeEn": labels["nodeEn"],
         "tokens": tokens,
+        "metrics": {
+            "fonts": {str(size): note for size, note in FONT_LADDER},
+            "spaces": {str(size): note for size, note in SPACE_LADDER},
+            "radii": {str(size): note for size, note in RADIUS_LADDER},
+        },
     }
     body = json.dumps(bundle, ensure_ascii=False, separators=(",", ":"))
     targets = [

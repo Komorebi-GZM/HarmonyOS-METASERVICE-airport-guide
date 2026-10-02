@@ -58,6 +58,17 @@ public struct Tokens: Codable, Sendable {
 }
 
 /// `airport-data.json` 的整体结构（由 tools/export_shared.py 生成）
+public struct Metrics: Codable, Sendable {
+  /// "19" -> "页面标题、步骤标题"（键是 px 值；小程序端按 1:2 转 rpx）
+  public let fonts: [String: String]
+  public let spaces: [String: String]
+  public let radii: [String: String]
+
+  public var fontSizes: [Double] { fonts.keys.compactMap(Double.init).sorted() }
+  public var spaceSizes: [Double] { spaces.keys.compactMap(Double.init).sorted() }
+  public var radiusSizes: [Double] { radii.keys.compactMap(Double.init).sorted() }
+}
+
 public struct AirportDataBundle: Codable, Sendable {
   public let schema: Int
   public let sourceMapSha256: String
@@ -67,6 +78,7 @@ public struct AirportDataBundle: Codable, Sendable {
   public let floorLabels: [String: LocalizedText]
   public let nodeEn: [String: String]
   public let tokens: Tokens
+  public let metrics: Metrics
 
   public static func load() throws -> AirportDataBundle {
     guard let url = Bundle.module.url(forResource: "airport-data", withExtension: "json") else {

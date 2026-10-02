@@ -51,6 +51,18 @@ enum Theme {
 
   static let cardRadius: CGFloat = 16
   static let touch: CGFloat = 48
+
+  // MARK: 尺寸阶梯（真源：tools/export_shared.py 的 FONT/SPACE/RADIUS_LADDER，见 docs/DESIGN.md §5/§6）
+
+  /// 尺寸阶梯来自 AirportUI.Metrics（与 Web / 小程序同一份导出数据）
+  static func fontSize(_ size: Double) -> Double { Metrics.fontSize(size) }
+  static func font(_ size: Double, _ weight: Font.Weight = .regular) -> Font {
+    .system(size: Metrics.fontSize(size), weight: weight)
+  }
+  static func space(_ value: Double) -> CGFloat { CGFloat(Metrics.space(value)) }
+  static var fontLadder: [Double] { Metrics.fontLadder }
+  static var spaceLadder: [Double] { Metrics.spaceLadder }
+  static var radiusLadder: [Double] { Metrics.radiusLadder }
 }
 
 // MARK: - 通用组件
@@ -67,7 +79,7 @@ struct Header: View {
       if let onBack {
         Button(action: onBack) {
           Image(systemName: "chevron.left")
-            .font(.system(size: 16, weight: .semibold))
+            .font(Theme.font(16, .semibold))
             .frame(width: 36, height: 36)
             .background(Theme.card, in: Circle())
             .overlay(Circle().stroke(Theme.line))
@@ -75,13 +87,13 @@ struct Header: View {
         .buttonStyle(.plain)
         .accessibilityLabel("back")
       } else {
-        Text(brand).font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.accent)
+        Text(brand).font(Theme.font(15, .bold)).foregroundStyle(Theme.accent)
       }
-      Text(title).font(.system(size: 19, weight: .bold)).foregroundStyle(Theme.text)
+      Text(title).font(Theme.font(19, .bold)).foregroundStyle(Theme.text)
       Spacer()
       Button(action: onToggleLanguage) {
         Text(langLabel)
-          .font(.system(size: 13, weight: .semibold))
+          .font(Theme.font(13, .semibold))
           .frame(width: 36, height: 36)
           .background(Theme.card, in: Circle())
           .overlay(Circle().stroke(Theme.line))
@@ -97,7 +109,7 @@ struct SectionTitle: View {
   let text: String
   var body: some View {
     Text(text)
-      .font(.system(size: 14, weight: .bold))
+      .font(Theme.font(14, .bold))
       .foregroundStyle(Theme.sub)
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(.top, 6)
@@ -115,14 +127,14 @@ struct PrimaryCard: View {
     Button(action: action) {
       HStack(spacing: 14) {
         Text(icon)
-          .font(.system(size: 18))
+          .font(Theme.font(18))
           .frame(width: 34, height: 34)
           .background(isPrimary ? Color.white.opacity(0.2) : Theme.accentSoft, in: RoundedRectangle(cornerRadius: 11))
           .foregroundStyle(isPrimary ? Color.white : Theme.accent)
         VStack(alignment: .leading, spacing: 2) {
-          Text(title).font(.system(size: 17, weight: .semibold))
+          Text(title).font(Theme.font(17, .semibold))
           if let subtitle {
-            Text(subtitle).font(.system(size: 13)).foregroundStyle(isPrimary ? Color.white.opacity(0.85) : Theme.sub)
+            Text(subtitle).font(Theme.font(13)).foregroundStyle(isPrimary ? Color.white.opacity(0.85) : Theme.sub)
           }
         }
         Spacer()
@@ -145,8 +157,8 @@ struct QuickCard: View {
   var body: some View {
     Button(action: action) {
       VStack(alignment: .leading, spacing: 2) {
-        Text(title).font(.system(size: 15, weight: .semibold)).foregroundStyle(Theme.text)
-        Text(subtitle).font(.system(size: 12)).foregroundStyle(Theme.sub)
+        Text(title).font(Theme.font(15, .semibold)).foregroundStyle(Theme.text)
+        Text(subtitle).font(Theme.font(12)).foregroundStyle(Theme.sub)
       }
       .padding(12)
       .frame(maxWidth: .infinity, minHeight: Theme.touch, alignment: .leading)
@@ -168,7 +180,7 @@ struct ChipRow: View {
         ForEach(items) { item in
           Button { onSelect(item.key) } label: {
             Text(item.label)
-              .font(.system(size: 13, weight: .semibold))
+              .font(Theme.font(13, .semibold))
               .padding(.horizontal, 14)
               .frame(height: 36)
               .background(item.key == activeKey ? Theme.accent : Theme.card, in: Capsule())
@@ -192,13 +204,13 @@ struct PlaceRow: View {
     Button(action: action) {
       HStack(spacing: 12) {
         Circle().fill(Theme.card2).frame(width: 30, height: 30)
-          .overlay(Image(systemName: "mappin").font(.system(size: 13)).foregroundStyle(Theme.accent))
+          .overlay(Image(systemName: "mappin").font(Theme.font(13)).foregroundStyle(Theme.accent))
         VStack(alignment: .leading, spacing: 1) {
-          Text(title).font(.system(size: 15, weight: .semibold)).foregroundStyle(Theme.text)
-          Text(subtitle).font(.system(size: 12)).foregroundStyle(Theme.sub)
+          Text(title).font(Theme.font(15, .semibold)).foregroundStyle(Theme.text)
+          Text(subtitle).font(Theme.font(12)).foregroundStyle(Theme.sub)
         }
         Spacer()
-        Image(systemName: "chevron.right").font(.system(size: 13)).foregroundStyle(Theme.sub)
+        Image(systemName: "chevron.right").font(Theme.font(13)).foregroundStyle(Theme.sub)
       }
       .padding(.horizontal, 14)
       .frame(minHeight: Theme.touch)
@@ -237,7 +249,7 @@ struct RootView: View {
     .overlay(alignment: .bottom) {
       if !state.toast.isEmpty {
         Text(state.toast)
-          .font(.system(size: 14))
+          .font(Theme.font(14))
           .padding(.horizontal, 18)
           .padding(.vertical, 10)
           .background(Color(hex: "#172B3A")?.opacity(0.92) ?? .black, in: Capsule())
@@ -266,10 +278,10 @@ struct HomeView: View {
     )
 
     Text(I18n.t("home_title", en: en))
-      .font(.system(size: 28, weight: .bold))
+      .font(Theme.font(28, .bold))
       .foregroundStyle(Theme.text)
     Text(I18n.t("home_sub", en: en))
-      .font(.system(size: 14))
+      .font(Theme.font(14))
       .foregroundStyle(Theme.sub)
 
     PrimaryCard(icon: "✈", title: I18n.t("go_gate", en: en), isPrimary: true) {
@@ -316,7 +328,7 @@ struct HomeView: View {
     .padding(.top, 4)
 
     Text(I18n.t("sample", en: en))
-      .font(.system(size: 12))
+      .font(Theme.font(12))
       .foregroundStyle(Theme.sub)
       .padding(.top, 6)
   }
@@ -325,7 +337,7 @@ struct HomeView: View {
 struct SecondaryButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
-      .font(.system(size: 15, weight: .semibold))
+      .font(Theme.font(15, .semibold))
       .foregroundStyle(Theme.text)
       .background(Theme.card, in: RoundedRectangle(cornerRadius: 14))
       .overlay(RoundedRectangle(cornerRadius: 14).stroke(Theme.line))
@@ -336,7 +348,7 @@ struct SecondaryButtonStyle: ButtonStyle {
 struct PrimaryButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
-      .font(.system(size: 15, weight: .semibold))
+      .font(Theme.font(15, .semibold))
       .foregroundStyle(.white)
       .background(Theme.accent, in: RoundedRectangle(cornerRadius: 14))
       .opacity(configuration.isPressed ? 0.8 : 1)
@@ -359,8 +371,8 @@ struct MetroView: View {
       onToggleLanguage: { obs.perform { $0.toggleLanguage() } }
     )
 
-    Text(I18n.t("metro_heading", en: en)).font(.system(size: 22, weight: .bold)).foregroundStyle(Theme.text)
-    Text(I18n.t("metro_hint", en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+    Text(I18n.t("metro_heading", en: en)).font(Theme.font(22, .bold)).foregroundStyle(Theme.text)
+    Text(I18n.t("metro_hint", en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
 
     ForEach(Presenter.metroDirections(en: en)) { direction in
       PrimaryCard(icon: "◆", title: direction.title, subtitle: direction.subtitle) {
@@ -372,8 +384,8 @@ struct MetroView: View {
     let metroSteps = Presenter.metroSteps(en: en)
     ForEach(Array(metroSteps.indices), id: \.self) { index in
       HStack(alignment: .top, spacing: 8) {
-        Text("\(index + 1).").font(.system(size: 14, weight: .semibold)).foregroundStyle(Theme.accent)
-        Text(metroSteps[index]).font(.system(size: 14)).foregroundStyle(Theme.sub)
+        Text("\(index + 1).").font(Theme.font(14, .semibold)).foregroundStyle(Theme.accent)
+        Text(metroSteps[index]).font(Theme.font(14)).foregroundStyle(Theme.sub)
       }
     }
   }

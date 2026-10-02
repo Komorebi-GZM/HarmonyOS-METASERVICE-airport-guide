@@ -644,7 +644,7 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
         │ import（构建期）
         ▼
 ┌──── packages/core/src/generated（生成物，勿手改）────┐
-│ map-data  i18n-data  labels  tokens(颜色/圆角)         │
+│ map-data  i18n-data  labels  tokens(颜色)  metrics(尺寸)│
 │ + tokens.css / tokens.wxss / airport-data.json(tokens) │
 └───────┬─────────────────────────────────────────────┘
         │ tools/export_shared.py（唯一通道）
@@ -715,3 +715,4 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 | v1.4 | 2026-10-02 | DSH Agent | 分层图加入 render/app-model/presenter；新增小程序端对照行与"第 5 层锚点：同一份渲染契约" |
 | v1.5 | 2026-10-02 | DSH Agent | 渲染契约补充 664 条命令基准的锁定方式；各端对照表新增渲染契约行 |
 | v1.6 | 2026-10-02 | DSH Agent | 分层图补充令牌生成物（tokens.css / tokens.wxss / airport-data.json）；扩展点加入改主题色的链路 |
+| v1.7 | 2026-10-02 | DSH Agent | 分层图标注 metrics（字号/间距/圆角）同为生成物 |

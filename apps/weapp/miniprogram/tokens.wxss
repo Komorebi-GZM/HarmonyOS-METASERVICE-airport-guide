@@ -40,6 +40,33 @@ page {
   --type-toilet: #486A85;
   --type-hall: #486A85;
   --type-corridor: #A6B6BF;
+  --font-11: 22rpx;   /* 地图标签、极小的辅助文字 */
+  --font-12: 24rpx;   /* 徽标、步骤小注 */
+  --font-13: 26rpx;   /* 次要说明、副标题 */
+  --font-14: 28rpx;   /* 正文（列表副标题、提示） */
+  --font-15: 30rpx;   /* 列表主文、按钮 */
+  --font-16: 32rpx;   /* 卡片正文、搜索框 */
+  --font-17: 34rpx;   /* 卡片标题 */
+  --font-18: 36rpx;   /* 地铁方向卡标题 */
+  --font-19: 38rpx;   /* 页面标题、步骤标题 */
+  --font-20: 40rpx;   /* 区块标题 */
+  --font-22: 44rpx;   /* 首屏副标题 */
+  --font-24: 48rpx;   /* 大标题（小屏收敛） */
+  --font-28: 56rpx;   /* 首屏主标题 */
+  --space-4: 8rpx;  /* 紧凑内边距 */
+  --space-6: 12rpx;  /* 行内间距 */
+  --space-8: 16rpx;  /* 列表项间距 */
+  --space-10: 20rpx;  /* 卡片内间距 */
+  --space-12: 24rpx;  /* 区块间距 */
+  --space-14: 28rpx;  /* 卡片内边距 */
+  --space-16: 32rpx;  /* 页面左右边距 */
+  --space-20: 40rpx;  /* 区块外边距 */
+  --space-24: 48rpx;  /* 页面上下留白 */
+  --space-32: 64rpx;  /* 大区块留白 */
+  --radius-9: 18rpx; /* 小图标容器 */
+  --radius-11: 22rpx; /* 图标方块 */
+  --radius-14: 28rpx; /* 列表项 / 按钮 */
+  --radius-16: 32rpx; /* 卡片 */
   --radius-card: 32rpx;
   --radius-pill: 999rpx;
 }

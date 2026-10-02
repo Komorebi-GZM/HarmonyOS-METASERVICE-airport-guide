@@ -29,7 +29,7 @@ struct PickerList: View {
         }
       ))
       .textFieldStyle(.plain)
-      .font(.system(size: 15))
+      .font(Theme.font(15))
       if !query.isEmpty {
         Button {
           if isTarget { obs.perform { $0.setQuery("") } } else { searchText = "" }
@@ -46,8 +46,8 @@ struct PickerList: View {
 
     if places.isEmpty {
       VStack(spacing: 6) {
-        Text(I18n.t("no_results", en: en)).font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.text)
-        Text(I18n.t("no_results_hint", en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+        Text(I18n.t("no_results", en: en)).font(Theme.font(17, .semibold)).foregroundStyle(Theme.text)
+        Text(I18n.t("no_results_hint", en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
       }
       .frame(maxWidth: .infinity)
       .padding(.vertical, 28)
@@ -79,7 +79,7 @@ struct TargetView: View {
       onBack: { obs.perform { $0.backFromTarget() } },
       onToggleLanguage: { obs.perform { $0.toggleLanguage() } }
     )
-    Text(I18n.t("target_hint", en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+    Text(I18n.t("target_hint", en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
 
     ChipRow(items: Presenter.categoryChips(en: en), activeKey: state.category) { key in
       obs.perform { $0.setCategory(key) }
@@ -110,8 +110,8 @@ struct StartView: View {
 
     if let target = model.node(state.planner.draftEnd) {
       HStack(spacing: 8) {
-        Text(I18n.t("selected_target", en: en)).font(.system(size: 12, weight: .bold)).foregroundStyle(Theme.gold)
-        Text(Presenter.rowTitle(target, en: en)).font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.text)
+        Text(I18n.t("selected_target", en: en)).font(Theme.font(12, .bold)).foregroundStyle(Theme.gold)
+        Text(Presenter.rowTitle(target, en: en)).font(Theme.font(15, .bold)).foregroundStyle(Theme.text)
         Spacer()
       }
       .padding(.horizontal, 14)
@@ -119,7 +119,7 @@ struct StartView: View {
       .background(Theme.accentSoft, in: RoundedRectangle(cornerRadius: 14))
     }
 
-    Text(I18n.t("start_hint", en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+    Text(I18n.t("start_hint", en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
 
     SectionTitle(text: I18n.t("quick_starts", en: en))
     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
@@ -134,7 +134,7 @@ struct StartView: View {
       Image(systemName: "magnifyingglass").foregroundStyle(Theme.sub)
       TextField(I18n.t("search", en: en), text: $searchText)
         .textFieldStyle(.plain)
-        .font(.system(size: 15))
+        .font(Theme.font(15))
     }
     .padding(.horizontal, 16)
     .frame(minHeight: Theme.touch)
@@ -180,8 +180,8 @@ struct RoutePageView: View {
     if view.status != .ready {
       VStack(spacing: 6) {
         Text(Presenter.statusTitle(view.status, en: en))
-          .font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.text)
-        Text(I18n.t("error_hint", en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+          .font(Theme.font(17, .semibold)).foregroundStyle(Theme.text)
+        Text(I18n.t("error_hint", en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
       }
       .frame(maxWidth: .infinity)
       .padding(.vertical, 28)
@@ -202,8 +202,8 @@ struct RoutePageView: View {
         stepCard(model: model, view: view, en: en)
       case .completed:
         VStack(spacing: 6) {
-          Text(I18n.t("route_complete", en: en)).font(.system(size: 17, weight: .semibold)).foregroundStyle(Theme.text)
-          Text(I18n.t("route_complete_hint", en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+          Text(I18n.t("route_complete", en: en)).font(Theme.font(17, .semibold)).foregroundStyle(Theme.text)
+          Text(I18n.t("route_complete_hint", en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
@@ -224,16 +224,16 @@ struct RoutePageView: View {
       HStack(spacing: 8) {
         Circle().fill(Theme.accent).frame(width: 10, height: 10)
         Text(model.node(model.state.planner.startId).map { Presenter.rowTitle($0, en: en) } ?? "")
-          .font(.system(size: 15, weight: .semibold)).foregroundStyle(Theme.text)
+          .font(Theme.font(15, .semibold)).foregroundStyle(Theme.text)
       }
       HStack(spacing: 8) {
         Circle().fill(Theme.gold).frame(width: 10, height: 10)
         Text(model.node(model.state.planner.endId).map { Presenter.rowTitle($0, en: en) } ?? "")
-          .font(.system(size: 15, weight: .semibold)).foregroundStyle(Theme.text)
+          .font(Theme.font(15, .semibold)).foregroundStyle(Theme.text)
       }
-      Text(Presenter.summary(view, en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+      Text(Presenter.summary(view, en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
       Text(I18n.t(view.route.viaSecurity ? "via_security" : "same_side", en: en))
-        .font(.system(size: 12, weight: .bold))
+        .font(Theme.font(12, .bold))
         .padding(.horizontal, 10).padding(.vertical, 4)
         .background(view.route.viaSecurity ? (Color(hex: "#FFF2DF") ?? Theme.card) : Theme.accentSoft, in: Capsule())
         .foregroundStyle(view.route.viaSecurity ? Theme.gold : Theme.accent)
@@ -304,18 +304,18 @@ struct RoutePageView: View {
     return VStack(alignment: .leading, spacing: 6) {
       HStack {
         Text("\(I18n.t("step", en: en)) \(index + 1)/\(view.steps.count)")
-          .font(.system(size: 12, weight: .semibold)).foregroundStyle(Theme.accent)
+          .font(Theme.font(12, .semibold)).foregroundStyle(Theme.accent)
         Spacer()
         Text(step.map { I18n.floorLabel($0.floor, en: en) } ?? "")
-          .font(.system(size: 12)).foregroundStyle(Theme.sub)
+          .font(Theme.font(12)).foregroundStyle(Theme.sub)
       }
       Text(step.map { Presenter.stepTitle($0, en: en) } ?? "")
-        .font(.system(size: 19, weight: .bold)).foregroundStyle(Theme.text)
+        .font(Theme.font(19, .bold)).foregroundStyle(Theme.text)
       if let step, step.meters > 0 {
         Text("\(Presenter.meters(step.meters)) \(I18n.t("meters", en: en))")
-          .font(.system(size: 14, weight: .semibold)).foregroundStyle(Theme.accent)
+          .font(Theme.font(14, .semibold)).foregroundStyle(Theme.accent)
       }
-      Text(I18n.t("manual", en: en)).font(.system(size: 12)).foregroundStyle(Theme.sub)
+      Text(I18n.t("manual", en: en)).font(Theme.font(12)).foregroundStyle(Theme.sub)
 
       VStack(spacing: 10) {
         Button { obs.perform { $0.advance() } } label: {
@@ -346,7 +346,7 @@ struct RoutePageView: View {
         let steps = Presenter.allSteps(view, en: en)
         ForEach(Array(steps.indices), id: \.self) { index in
           Text(steps[index])
-            .font(.system(size: 14, weight: index == model.state.planner.stepIndex ? .bold : .regular))
+            .font(Theme.font(14, index == model.state.planner.stepIndex ? .bold : .regular))
             .foregroundStyle(index == model.state.planner.stepIndex ? Theme.text : Theme.sub)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
@@ -355,7 +355,7 @@ struct RoutePageView: View {
       }
       .padding(.top, 8)
     } label: {
-      Text(I18n.t("all_steps", en: en)).font(.system(size: 14, weight: .bold)).foregroundStyle(Theme.accent)
+      Text(I18n.t("all_steps", en: en)).font(Theme.font(14, .bold)).foregroundStyle(Theme.accent)
     }
     .padding(16)
     .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
@@ -382,7 +382,7 @@ struct BrowseView: View {
       onBack: { obs.perform { $0.backFromBrowse() } },
       onToggleLanguage: { obs.perform { $0.toggleLanguage() } }
     )
-    Text(I18n.t("browse_hint", en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+    Text(I18n.t("browse_hint", en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
 
     ChipRow(items: floors.map { Chip(key: $0, label: $0) }, activeKey: state.browseFloor) { key in
       obs.perform { $0.setBrowseFloor(key) }
@@ -405,8 +405,8 @@ struct BrowseView: View {
 
     if let selected = model.node(state.selectedId) {
       VStack(alignment: .leading, spacing: 4) {
-        Text(Presenter.rowTitle(selected, en: en)).font(.system(size: 17, weight: .bold)).foregroundStyle(Theme.text)
-        Text(Presenter.rowSubtitle(selected, en: en)).font(.system(size: 13)).foregroundStyle(Theme.sub)
+        Text(Presenter.rowTitle(selected, en: en)).font(Theme.font(17, .bold)).foregroundStyle(Theme.text)
+        Text(Presenter.rowSubtitle(selected, en: en)).font(Theme.font(13)).foregroundStyle(Theme.sub)
         HStack(spacing: 10) {
           Button { obs.perform { $0.setStartFromMap(selected.id) } } label: {
             Text(I18n.t("pick_start", en: en)).frame(maxWidth: .infinity, minHeight: Theme.touch)

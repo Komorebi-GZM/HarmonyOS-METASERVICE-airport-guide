@@ -40,7 +40,7 @@
 | 图标资源 | 3 个 PNG（`app_icon.png`/`icon.png`/`startIcon.png`）当前提交版本均为 **512×512**（brand_assets 产物），但 `gen_icons.py` 会写 216/108/216——两条生成路径互相覆盖，未约定谁是权威 | 实测尺寸；`tools/gen_icons.py:73`、`tools/gen_brand_assets.py:6` |
 | 设备级校验 | `verify_flows.py` / `smoke_emulator.py` 需 `hdc` 设备；历史结果为 API 24/26 通过 | `docs/reports/ProductExperience-20261001.md:67-83` |
 | 共享核心 | **已抽取并通过回归**：`packages/core`（3 000 余行 TS，含生成数据）；`npm test` 16 项全绿，含 14 042 组全量节点对与 6 条参考样例米数复现 | 2026-10-02 实测 |
-| 设计令牌 | **三端同源**：颜色 37 项 + 圆角 2 项由 `export_shared.py` 从 `Theme.ets`/`float.json` 生成到 `tokens.css`、`tokens.wxss` 与 `airport-data.json`；`tools/check_tokens.mjs` 5 项检查（含"业务样式里不得出现与令牌同值的硬编码"） | 2026-10-02 实测 |
+| 设计令牌 | **三端同源**：颜色 37 + 字号 13 + 间距 10 + 圆角 6 项，由 `export_shared.py` 生成到 `tokens.css`、`tokens.wxss` 与 `airport-data.json(metrics)`；`tools/check_tokens.mjs` **6 项**检查（含"字号/圆角不得写死""间距不得使用阶梯字面量"） | 2026-10-02 实测 |
 | 跨语言渲染基准 | **已建立**：`tools/gen_render_fixture.mjs` 产出 10 个场景 / 664 条命令；Swift 端逐条比对通过（同一份文件也被 TS 端作为契约） | 2026-10-02 实测 |
 | 小程序端 | **已交付**：`apps/weapp`（六页 WXML + Canvas 2D），核心经 esbuild 打成 95 KB CommonJS 单文件；`npm run test:weapp` 9 项全绿（含用 `wx` 桩跑通六页真实 Page 生命周期与 470 次绘制调用）；主包 136 KB | 2026-10-02 实测 |
 | Apple 端 | **核心 + 界面均已实现**：`apps/apple`（SwiftPM，macOS 14+/iOS 17+）；`npm run test:apple` **42 项**全绿（核心 15 + 呈现 27），824 条路线与 TS 在节点序列/米数/步骤上逐项相等；`AirportGuideApp`（SwiftUI 六页 + Canvas 地图）可编译运行；`airport-cli` 打印与参考实现同口径的样例（635/505/630/445/250/300 米） | 2026-10-02 实测 |
@@ -99,7 +99,8 @@
 | ID | 任务 | 优先级 | 依赖 | 证据起点 | 产出物 | 验收口径 | 状态 |
 |---|---|---|---|---|---|---|---|
 | T-201 | **设计令牌单一来源**：颜色与圆角以 `Theme.ets` / `float.json` 为真源，经 `export_shared.py` 生成到三端 | P1 | — | `tools/export_shared.py`、`tools/check_tokens.mjs` | `tokens.css` / `tokens.wxss` / `airport-data.json(tokens)` | `npm run test:tokens` 全绿：37 色 + 2 圆角令牌三端同源；Web/小程序样式里无与令牌同值的硬编码 | ☑ 2026-10-02 |
-| T-202 | 字号 / 间距阶梯收敛：Web 与小程序目前按"视觉近似"给值，尚未逐档对齐 `DESIGN.md` §5/§6 | P2 | T-201 | `apps/web/src/styles.css`、`apps/weapp/miniprogram/app.wxss` | 字号/间距令牌 | 每个字号与间距可追溯到令牌表的一档 | ☐ |
+| T-202 | 字号 / 圆角 / 间距阶梯：生成 `--font-* / --space-* / --radius-*` 并强制引用 | P1 | T-201 | `tools/export_shared.py`、`apps/web/src/styles.css`、`apps/weapp/miniprogram/app.wxss`、`apps/apple/Sources/AirportUI/Metrics.swift` | 13 档字号 + 10 档间距 + 6 档圆角令牌 | `npm run test:tokens` 拒绝任何字号/圆角字面量；Apple 端 `Metrics` 读同一份阶梯（含覆盖测试） | ◐ 字号与圆角已全量令牌化；间距仍有混合值声明待收敛 |
+| T-216 | 间距收敛：把"混合值"声明（如 `padding: 2px 0 6px`）里的阶梯外数值收敛到阶梯（`2px`/`3px`/`18px`/`28px` 等） | P2 | T-202 | `check_tokens.mjs` 的信息性统计 | 收敛后的样式 | 阶梯外间距字面量归零；观感需目视确认（与 T-612/T-614 一起做） | ☐ |
 | T-202 | 字号 / 间距 / 圆角阶梯收敛：把散落在各页面的数值收进常量或资源 | P1 | T-201 | `pages/*.ets`、`ui/*.ets` 中的 `fontSize`/`padding`/`borderRadius` | 阶梯表 + 常量定义 | 每处视觉数值可追溯到令牌 | ☐ |
 | T-203 | `TYPE_COLOR` 语义可区分性复核：`baggage` 与 `metro` 同为 `#007F7A`，`toilet`/`hall`/`coach`/`parking` 同为 `#486A85`，需确认是否有意为之 | P2 | T-201 | `ui/Theme.ets` | 调整后的配色表 | 同类语义同色、异类可区分；对比度达标 | ☐ |
 | T-204 | 可读性与触控基线：正文对比度 ≥ 4.5:1、主操作触控高度 ≥ 48vp（历史报告称主按钮已是 48vp，需复核全量） | P2 | T-201 | `docs/reports/ProductExperience-20261001.md:15` | 检查清单 + 修正 | 六页在大字体下无截断、按钮可达 | ☐ |
@@ -208,6 +209,7 @@
 | 日期 | 变更 | 说明 |
 |---|---|---|
 | 2026-10-02 | 首次创建 | 建立基线快照、四条主线任务池、里程碑与决策清单；基于 `main@8350ff4` 与本机实测（`pathfind_reference.py` 通过、`verify_product.mjs` 与 `gen_checker.py` 因硬编码 Windows 路径 / 占位符被消耗而失败、生成链逐字节可复现） |
+| 2026-10-02 | 尺寸阶梯令牌化 | 新增 13 档字号 / 10 档间距 / 6 档圆角令牌；Web 44 处字号 + 6 圆角 + 41 间距、小程序 36 处字号 + 4 圆角 + 45 间距改为令牌引用；Apple 端新增 `Metrics` 读同一份阶梯（+1 项测试），SwiftUI 51 处字号改为 `Theme.font(...)`；检查脚本增至 6 项并输出"阶梯外间距"信息统计 |
 | 2026-10-02 | 设计令牌三端同源 | `export_shared.py` 增出 `tokens.css`/`tokens.wxss`；Web 与小程序样式全部改为令牌引用（小程序 58 处、Web 11 处）；新增 `tools/check_tokens.mjs` 5 项检查（令牌完整性、两端一致、无同值硬编码、无未定义引用、别名集合一致） |
 | 2026-10-02 | Web 端改用共享状态机 + 渲染器逐命令比对 | Web `main.ts` 重构为纯视图层（删除第二份状态机与文案映射，15 项端到端仍全绿）；新增 10 场景 / 664 条命令的渲染基准，Swift 与 TS 逐条相等 |
 | 2026-10-02 | 共享渲染器 + 微信小程序端 | 把绘制逻辑上提为 `packages/core/src/render.ts`（命令流，Web/小程序共用，+13 项回归）；新增 `app-model.ts`/`presenter.ts` 与 8 项回归；交付 `apps/weapp`（六页 + Canvas 2D + 核心打包）与 9 项冒烟；修复英文换层文案缺空格（两端） |
@@ -229,3 +231,4 @@
 | v1.4 | 2026-10-02 | DSH Agent | T-605 完成（微信小程序端）；渲染命令流/状态机/呈现层上提共享核心；新增 T-613/T-614/T-615 |
 | v1.5 | 2026-10-02 | DSH Agent | T-613/T-615 完成（Web 纯视图化 + 渲染器跨语言逐命令比对） |
 | v1.6 | 2026-10-02 | DSH Agent | T-201 完成（设计令牌三端同源 + 检查脚本）；T-202 拆出为字号/间距收敛 |
+| v1.7 | 2026-10-02 | DSH Agent | T-202 主体完成（字号/圆角/间距阶梯令牌化，三端共用）；新增 T-216（阶梯外间距收敛） |

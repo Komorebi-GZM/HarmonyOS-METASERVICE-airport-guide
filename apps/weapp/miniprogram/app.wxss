@@ -20,7 +20,7 @@ page {
 
   background: var(--bg);
   color: var(--text);
-  font-size: 30rpx;
+  font-size: var(--font-15);
 }
 
 .page {
@@ -33,66 +33,66 @@ page {
 .top {
   display: flex;
   align-items: center;
-  padding: 16rpx 0 8rpx;
+  padding: var(--space-8) 0 var(--space-4);
 }
-.brand { font-size: 30rpx; font-weight: 700; color: var(--accent); }
-.title { font-size: 38rpx; font-weight: 700; }
+.brand { font-size: var(--font-15); font-weight: 700; color: var(--accent); }
+.title { font-size: var(--font-19); font-weight: 700; }
 .spacer { flex: 1; }
 .pill {
   min-width: 72rpx;
   height: 72rpx;
   line-height: 72rpx;
   text-align: center;
-  border-radius: 999rpx;
+  border-radius: var(--radius-pill);
   background: var(--card);
   border: 1rpx solid var(--line);
-  font-size: 28rpx;
+  font-size: var(--font-14);
   color: var(--accent);
 }
 
 /* ---------------------------------------------------------------- 首页 */
-.hero { font-size: 56rpx; font-weight: 700; margin-top: 8rpx; }
-.heroSub { font-size: 28rpx; color: var(--sub); margin-top: 4rpx; }
+.hero { font-size: var(--font-28); font-weight: 700; margin-top: var(--space-4); }
+.heroSub { font-size: var(--font-14); color: var(--sub); margin-top: 4rpx; }
 
 .card {
   display: flex;
   align-items: center;
   min-height: 96rpx;
-  padding: 24rpx 28rpx;
-  margin-top: 20rpx;
+  padding: var(--space-12) var(--space-14);
+  margin-top: var(--space-10);
   background: var(--card);
   border: 1rpx solid var(--line);
-  border-radius: 32rpx;
+  border-radius: var(--radius-card);
 }
 .card.primary { background: var(--accent); border-color: var(--accent); }
 .card.primary .cardText, .card.primary .cardSub { color: var(--card); }
 .ico {
   width: 68rpx; height: 68rpx; line-height: 68rpx; text-align: center;
-  border-radius: 22rpx; background: var(--accent-soft); color: var(--accent); margin-right: 24rpx;
+  border-radius: var(--radius-11); background: var(--accent-soft); color: var(--accent); margin-right: var(--space-12);
 }
 .card.primary .ico { background: rgba(255, 255, 255, 0.2); color: var(--card); }
 .cardStack { display: flex; flex-direction: column; }
-.cardText { font-size: 34rpx; font-weight: 600; }
-.cardSub { font-size: 26rpx; color: var(--sub); }
+.cardText { font-size: var(--font-17); font-weight: 600; }
+.cardSub { font-size: var(--font-13); color: var(--sub); }
 
-.section { font-size: 28rpx; font-weight: 700; color: var(--sub); margin: 28rpx 0 12rpx; }
+.section { font-size: var(--font-14); font-weight: 700; color: var(--sub); margin: var(--space-14) 0 var(--space-6); }
 
-.grid { display: flex; flex-wrap: wrap; margin: -8rpx; }
+.grid { display: flex; flex-wrap: wrap; margin: -var(--space-4); }
 .quick {
   width: 50%;
   box-sizing: border-box;
-  padding: 8rpx;
+  padding: var(--space-4);
 }
-.quickTitle { display: block; font-size: 30rpx; font-weight: 600; }
-.quickSub { display: block; font-size: 24rpx; color: var(--sub); }
+.quickTitle { display: block; font-size: var(--font-15); font-weight: 600; }
+.quickSub { display: block; font-size: var(--font-12); color: var(--sub); }
 .quick > .quickTitle, .quick > .quickSub {
   background: var(--card);
   border-left: 1rpx solid var(--line);
   border-right: 1rpx solid var(--line);
-  padding: 0 20rpx;
+  padding: 0 var(--space-10);
 }
-.quick > .quickTitle { border-top: 1rpx solid var(--line); border-radius: 28rpx 28rpx 0 0; padding-top: 20rpx; }
-.quick > .quickSub { border-bottom: 1rpx solid var(--line); border-radius: 0 0 28rpx 28rpx; padding-bottom: 20rpx; }
+.quick > .quickTitle { border-top: 1rpx solid var(--line); border-radius: 28rpx 28rpx 0 0; padding-top: var(--space-10); }
+.quick > .quickSub { border-bottom: 1rpx solid var(--line); border-radius: 0 0 28rpx 28rpx; padding-bottom: var(--space-10); }
 
 /* ---------------------------------------------------------------- 列表 */
 .row {
@@ -100,98 +100,98 @@ page {
   align-items: center;
   min-height: 96rpx;
   padding: 18rpx 28rpx;
-  margin-top: 16rpx;
+  margin-top: var(--space-8);
   background: var(--card);
   border: 1rpx solid var(--line);
-  border-radius: 28rpx;
+  border-radius: var(--radius-14);
 }
-.dot { width: 20rpx; height: 20rpx; border-radius: 50%; background: var(--accent-soft); margin-right: 20rpx; }
+.dot { width: 20rpx; height: 20rpx; border-radius: 50%; background: var(--accent-soft); margin-right: var(--space-10); }
 .rowMain { flex: 1; display: flex; flex-direction: column; }
-.rowTitle { font-size: 30rpx; font-weight: 600; }
-.rowSub { font-size: 24rpx; color: var(--sub); }
-.arrow { color: var(--sub); font-size: 36rpx; }
+.rowTitle { font-size: var(--font-15); font-weight: 600; }
+.rowSub { font-size: var(--font-12); color: var(--sub); }
+.arrow { color: var(--sub); font-size: var(--font-18); }
 
-.actions { display: flex; margin-top: 20rpx; }
+.actions { display: flex; margin-top: var(--space-10); }
 .btn {
   flex: 1;
   min-height: 96rpx;
   line-height: 96rpx;
   text-align: center;
-  margin-right: 16rpx;
+  margin-right: var(--space-8);
   background: var(--card);
   border: 1rpx solid var(--line);
-  border-radius: 28rpx;
-  font-size: 30rpx;
+  border-radius: var(--radius-14);
+  font-size: var(--font-15);
   font-weight: 600;
 }
 .btn:last-child { margin-right: 0; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--card); }
 .btn.disabled { opacity: 0.45; }
-.footnote { font-size: 24rpx; color: var(--sub); margin-top: 20rpx; }
-.hint { font-size: 26rpx; color: var(--sub); margin-top: 8rpx; }
+.footnote { font-size: var(--font-12); color: var(--sub); margin-top: var(--space-10); }
+.hint { font-size: var(--font-13); color: var(--sub); margin-top: var(--space-4); }
 
 /* ---------------------------------------------------------------- 选择器 */
-.chips { white-space: nowrap; margin-top: 16rpx; }
+.chips { white-space: nowrap; margin-top: var(--space-8); }
 .chip {
   display: inline-block;
-  padding: 12rpx 28rpx;
-  margin-right: 16rpx;
-  border-radius: 999rpx;
+  padding: var(--space-6) var(--space-14);
+  margin-right: var(--space-8);
+  border-radius: var(--radius-pill);
   background: var(--card);
   border: 1rpx solid var(--line);
   color: var(--sub);
-  font-size: 26rpx;
+  font-size: var(--font-13);
   font-weight: 600;
 }
 .chipOn { background: var(--accent); border-color: var(--accent); color: var(--card); }
 
-.searchRow { display: flex; align-items: center; margin-top: 16rpx; }
+.searchRow { display: flex; align-items: center; margin-top: var(--space-8); }
 .search {
   flex: 1;
   min-height: 96rpx;
-  padding: 0 32rpx;
+  padding: 0 var(--space-16);
   background: var(--card);
   border: 1rpx solid var(--line);
-  border-radius: 999rpx;
-  font-size: 28rpx;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-14);
 }
-.clear { padding-left: 20rpx; color: var(--accent); font-size: 26rpx; }
+.clear { padding-left: var(--space-10); color: var(--accent); font-size: var(--font-13); }
 
 .empty { padding: 60rpx 0; text-align: center; }
-.emptyTitle { display: block; font-size: 34rpx; font-weight: 600; }
-.emptySub { display: block; font-size: 26rpx; color: var(--sub); margin-top: 8rpx; }
+.emptyTitle { display: block; font-size: var(--font-17); font-weight: 600; }
+.emptySub { display: block; font-size: var(--font-13); color: var(--sub); margin-top: var(--space-4); }
 
 .selected {
   display: flex;
   align-items: center;
-  padding: 20rpx 28rpx;
-  margin-top: 16rpx;
+  padding: var(--space-10) var(--space-14);
+  margin-top: var(--space-8);
   background: var(--accent-soft);
-  border-radius: 28rpx;
+  border-radius: var(--radius-14);
 }
-.selectedLabel { font-size: 24rpx; font-weight: 700; color: var(--gtext); margin-right: 12rpx; }
-.selectedName { font-size: 30rpx; font-weight: 700; }
+.selectedLabel { font-size: var(--font-12); font-weight: 700; color: var(--gtext); margin-right: var(--space-6); }
+.selectedName { font-size: var(--font-15); font-weight: 700; }
 
 /* ---------------------------------------------------------------- 路线 */
 .summary {
-  padding: 28rpx 32rpx;
-  margin-top: 16rpx;
+  padding: var(--space-14) var(--space-16);
+  margin-top: var(--space-8);
   background: var(--card);
   border: 1rpx solid var(--line);
-  border-radius: 32rpx;
+  border-radius: var(--radius-card);
 }
-.summaryLine { display: flex; align-items: center; font-size: 30rpx; font-weight: 600; margin-bottom: 8rpx; }
-.dotStart { width: 18rpx; height: 18rpx; border-radius: 50%; background: var(--accent); margin-right: 16rpx; }
-.dotEnd { width: 18rpx; height: 18rpx; border-radius: 50%; background: var(--gold); margin-right: 16rpx; }
-.summaryMeta { display: block; font-size: 26rpx; color: var(--sub); }
+.summaryLine { display: flex; align-items: center; font-size: var(--font-15); font-weight: 600; margin-bottom: var(--space-4); }
+.dotStart { width: 18rpx; height: 18rpx; border-radius: 50%; background: var(--accent); margin-right: var(--space-8); }
+.dotEnd { width: 18rpx; height: 18rpx; border-radius: 50%; background: var(--gold); margin-right: var(--space-8); }
+.summaryMeta { display: block; font-size: var(--font-13); color: var(--sub); }
 .badge {
   display: inline-block;
-  margin-top: 12rpx;
-  padding: 8rpx 20rpx;
-  border-radius: 999rpx;
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-10);
+  border-radius: var(--radius-pill);
   background: var(--accent-soft);
   color: var(--accent);
-  font-size: 24rpx;
+  font-size: var(--font-12);
   font-weight: 700;
 }
 .badgeWarn { background: var(--warn-bg); color: var(--gtext); }
@@ -199,9 +199,9 @@ page {
 .mapBox {
   position: relative;
   height: 600rpx;
-  margin-top: 20rpx;
+  margin-top: var(--space-10);
   border: 1rpx solid var(--line);
-  border-radius: 32rpx;
+  border-radius: var(--radius-card);
   overflow: hidden;
   background: var(--map-surface);
 }
@@ -210,45 +210,45 @@ page {
 .mapTools { position: absolute; right: 20rpx; bottom: 20rpx; display: flex; }
 .tool {
   width: 68rpx; height: 68rpx; line-height: 68rpx; text-align: center;
-  margin-left: 12rpx;
+  margin-left: var(--space-6);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.92);
   border: 1rpx solid var(--line);
-  font-size: 30rpx;
+  font-size: var(--font-15);
 }
 
 .stepCard {
-  padding: 28rpx 32rpx;
-  margin-top: 20rpx;
+  padding: var(--space-14) var(--space-16);
+  margin-top: var(--space-10);
   background: var(--card);
   border: 1rpx solid var(--line);
-  border-radius: 32rpx;
+  border-radius: var(--radius-card);
 }
-.stepHead { display: flex; justify-content: space-between; font-size: 24rpx; color: var(--sub); }
+.stepHead { display: flex; justify-content: space-between; font-size: var(--font-12); color: var(--sub); }
 .stepIndex { color: var(--accent); font-weight: 600; }
-.stepTitle { display: block; font-size: 38rpx; font-weight: 700; margin-top: 8rpx; }
-.stepMeters { display: block; font-size: 28rpx; color: var(--accent); font-weight: 600; }
-.stepHint { display: block; font-size: 24rpx; color: var(--sub); }
+.stepTitle { display: block; font-size: var(--font-19); font-weight: 700; margin-top: var(--space-4); }
+.stepMeters { display: block; font-size: var(--font-14); color: var(--accent); font-weight: 600; }
+.stepHint { display: block; font-size: var(--font-12); color: var(--sub); }
 
 .steps {
-  margin-top: 20rpx;
-  padding: 20rpx 28rpx;
+  margin-top: var(--space-10);
+  padding: var(--space-10) var(--space-14);
   background: var(--card);
   border: 1rpx solid var(--line);
-  border-radius: 32rpx;
+  border-radius: var(--radius-card);
 }
-.stepRow { padding: 10rpx 0; font-size: 28rpx; color: var(--sub); }
+.stepRow { padding: 10rpx 0; font-size: var(--font-14); color: var(--sub); }
 .stepOn { color: var(--text); font-weight: 700; }
-.stepNo { color: var(--accent); font-weight: 600; margin-right: 12rpx; }
-.stepText { font-size: 28rpx; color: var(--sub); }
+.stepNo { color: var(--accent); font-weight: 600; margin-right: var(--space-6); }
+.stepText { font-size: var(--font-14); color: var(--sub); }
 
 /* ---------------------------------------------------------------- 详情 */
 .detail {
-  padding: 28rpx 32rpx;
-  margin-top: 20rpx;
+  padding: var(--space-14) var(--space-16);
+  margin-top: var(--space-10);
   background: var(--card);
   border: 1rpx solid var(--line);
-  border-radius: 32rpx;
+  border-radius: var(--radius-card);
 }
-.detailName { display: block; font-size: 34rpx; font-weight: 700; }
-.detailSub { display: block; font-size: 26rpx; color: var(--sub); margin-bottom: 12rpx; }
+.detailName { display: block; font-size: var(--font-17); font-weight: 700; }
+.detailSub { display: block; font-size: var(--font-13); color: var(--sub); margin-bottom: var(--space-6); }

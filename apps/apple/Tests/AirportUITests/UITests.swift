@@ -245,6 +245,24 @@ final class RendererTests: XCTestCase {
     }
   }
 
+  func testSizeLadderIsExportedAndCoversTheUI() {
+    let metrics = AirportGraph.shared.bundle.metrics
+    XCTAssertEqual(metrics.fontSizes.count, 13, "字号阶梯应有 13 档")
+    XCTAssertEqual(metrics.spaceSizes.count, 10, "间距阶梯应有 10 档")
+    XCTAssertEqual(metrics.radiusSizes, [9, 11, 14, 16], "圆角阶梯应与 DESIGN.md §6 一致")
+    XCTAssertEqual(metrics.fontSizes, [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 24, 28])
+
+    // 阶梯覆盖 UI 里用到的字号（Theme.font 只在阶梯上取值，否则视觉会漂）
+    for size in [11.0, 12, 13, 14, 15, 16, 17, 19, 22, 28] {
+      XCTAssertTrue(metrics.fontSizes.contains(size), "UI 用到的字号 \(size) 不在阶梯上")
+    }
+    XCTAssertEqual(Metrics.fontLadder, metrics.fontSizes)
+    XCTAssertEqual(Metrics.spaceLadder, metrics.spaceSizes)
+    // 不在阶梯上的值原样返回，便于渐进收敛
+    XCTAssertEqual(Metrics.fontSize(37), 37)
+    XCTAssertEqual(Metrics.fontSize(19), 19)
+  }
+
   func testColorParsing() {
     XCTAssertEqual(RGBAColor(string: "#007F7A"), RGBAColor(red: 0, green: 127.0 / 255, blue: 122.0 / 255))
     XCTAssertEqual(RGBAColor(string: "#fff"), RGBAColor(red: 1, green: 1, blue: 1))

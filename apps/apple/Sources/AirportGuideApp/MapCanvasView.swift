@@ -97,7 +97,7 @@ struct MapCanvasView: View {
   private func mapButton(_ systemName: String, action: @escaping () -> Void) -> some View {
     Button(action: action) {
       Image(systemName: systemName)
-        .font(.system(size: 14, weight: .bold))
+        .font(Theme.font(14, .bold))
         .frame(width: 32, height: 32)
         .background(.thinMaterial, in: Circle())
     }

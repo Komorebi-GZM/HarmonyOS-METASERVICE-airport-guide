@@ -28,9 +28,9 @@
 | 7 | 注释用中文，代码标识符用英文；沿用现有文件风格（一个文件一个主题）。 | 与既有 4 千行代码保持一致，避免风格撕裂。 |
 | 8 | **`packages/core/src/generated/**` 是生成物，禁止手改。** 文案改 `Loc.ets`、配色改 `Theme.ets`、地图改 `gen_maps.py`，然后跑 `python3 tools/export_shared.py`。 | 生成链是"ArkTS 真源 → 共享核心"的唯一通道；手改会在下次导出时静默丢失。 |
 | 9 | **`packages/core` 不许依赖任何平台 API**（无 DOM、无 `wx.*`、无 ArkTS Kit）。 | 它是 Web / 小程序 / Swift 的共同底座；一旦引入平台依赖，多端共享即失效。 |
-| 10 | **改完核心必须跑 `npm run test:all`**（核心 37 + 令牌 5 + Web 15 + Apple 45 + 小程序 9 = 111 项）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"各端没走偏"的手段。 |
+| 10 | **改完核心必须跑 `npm run test:all`**（核心 37 + 令牌 6 + Web 15 + Apple 46 + 小程序 9 = 113 项）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"各端没走偏"的手段。 |
 | 11 | **改核心后必须重跑导出与打包**：`export_shared.py`（TS/Swift 数据）→ `npm run fixtures`（寻路 + 渲染两份跨语言基准）→ `build_weapp.mjs`（小程序产物）。 | 都是生成物，漏跑会让某一端停留在旧逻辑上且不报错。 |
-| 12 | **颜色/圆角只写令牌引用**：样式里用 `var(--app-accent)` 这类变量，不写死色值；`node tools/check_tokens.mjs` 会拒绝与令牌同值的硬编码。 | 三端观感一致靠的是同一份令牌，不是三处手工同步。 |
+| 12 | **颜色与尺寸只写令牌引用**：用 `var(--app-accent)` / `var(--font-19)` / `var(--space-16)`；SwiftUI 用 `Theme.font(...)`。`node tools/check_tokens.mjs` 会拒绝与令牌同值的硬编码与字号/圆角字面量。 | 三端观感一致靠的是同一份令牌，不是三处手工同步。 |
 
 ## 3. 快速事实卡
 
@@ -64,15 +64,15 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   └── test/                        ← 37 项回归（conformance 16 + render 13 + app-model 8）
 ├── apps/web/                        ← ★ Web/PWA 客户端（Vite + TS + Canvas 2D）
 │   ├── index.html  vite.config.ts  src/{main,map-view,storage}.ts  src/styles.css
-│   ├── src/tokens.css               ← 【生成物】设计令牌（Theme.ets → CSS 变量）
+│   ├── src/tokens.css               ← 【生成物】令牌：颜色 + 字号/间距/圆角
 │   └── dist/                        ← 构建产物（.gitignore）
 ├── apps/apple/                      ← ★ Apple 端（SwiftPM，Xcode 打开 Package.swift）
 │   ├── Sources/AirportCore/         ← Swift 核心移植 + Resources/airport-data.json（生成物）
-│   ├── Sources/AirportUI/           ← 呈现层（AppModel/Presenter/MapRenderer，纯逻辑可测）
+│   ├── Sources/AirportUI/           ← 呈现层（AppModel/Presenter/MapRenderer/Metrics）
 │   ├── Sources/AirportGuideApp/     ← SwiftUI 六页 + Canvas 地图
 │   ├── Sources/AirportCLI/          ← 命令行示例（macOS 可直接运行）
 │   ├── Tests/AirportCoreTests/      ← 18 项（含 824 条路线 + 664 条绘制命令的跨语言比对）
-│   └── Tests/AirportUITests/        ← 27 项回归（文案/绘制命令/状态机/偏好）
+│   └── Tests/AirportUITests/        ← 28 项回归（文案/绘制命令/状态机/偏好/尺寸阶梯）
 ├── apps/weapp/                      ← ★ 微信小程序端（开发者工具打开 apps/weapp）
 │   ├── project.config.json
 │   └── miniprogram/{app.*, tokens.wxss(生成物), utils/*, pages/*/index.{js,wxml}}
@@ -249,3 +249,4 @@ npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas
 | v1.4 | 2026-10-02 | DSH Agent | 渲染命令流与状态机/呈现层上提到共享核心；交付微信小程序端（六页 + Canvas 2D，9 项冒烟）；新增红线 11 |
 | v1.5 | 2026-10-02 | DSH Agent | Web 端纯视图化（改用共享 AppModel）；新增渲染命令流的跨语言基准（10 场景 / 664 条命令，Swift 逐条比对通过） |
 | v1.6 | 2026-10-02 | DSH Agent | 设计令牌三端同源：`export_shared.py` 生成 `tokens.css`/`tokens.wxss`，Web 与小程序样式全部改为令牌引用；新增 `check_tokens.mjs` 与红线 12 |
+| v1.7 | 2026-10-02 | DSH Agent | 尺寸阶梯令牌化：13 字号 / 10 间距 / 6 圆角，三端共用（Apple 走 `Metrics`）；检查脚本增至 6 项 |

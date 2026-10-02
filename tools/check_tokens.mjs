@@ -101,8 +101,44 @@ check('业务样式里没有与令牌同值的硬编码颜色', () => {
   }
 });
 
+check('字号/圆角一律走令牌，间距不得使用阶梯字面量', () => {
+  const ladder = (prefix) => {
+    const text = readFileSync(TOKENS_CSS, 'utf8');
+    return new Set([...text.matchAll(new RegExp(`--${prefix}-(\\d+):`, 'g'))].map((m) => Number(m[1])));
+  };
+  const fonts = ladder('font');
+  const spaces = ladder('space');
+  const radii = ladder('radius');
+  assert(fonts.size >= 10 && spaces.size >= 8 && radii.size >= 3, '尺寸阶梯令牌缺失，请重跑 export_shared.py');
+
+  for (const [path, unit] of [[STYLE_CSS, 'px'], [STYLE_WXSS, 'rpx']]) {
+    const text = readFileSync(path, 'utf8');
+    const problems = [];
+    const scale = (value) => (unit === 'px' ? value : value / 2);
+
+    for (const m of text.matchAll(/font-size:\s*(\d+)(px|rpx)/g)) {
+      problems.push(`font-size ${m[0].split(':')[1].trim()} 应改用 var(--font-N)`);
+    }
+    for (const m of text.matchAll(/border-radius:\s*(\d+)(px|rpx)\s*;/g)) {
+      problems.push(`border-radius ${m[1]}${m[2]} 应改用 var(--radius-N)`);
+    }
+    for (const m of text.matchAll(/(?:padding|margin|gap)(?:-[a-z]+)?:\s*([^;{}]+);/g)) {
+      const body = m[1];
+      const values = [...body.matchAll(/(\d+)(px|rpx)/g)].map((x) => scale(Number(x[1])));
+      if (values.length > 0 && values.every((v) => spaces.has(v)) && !body.includes('var(')) {
+        problems.push(`间距 ${body.trim()} 应改用 var(--space-N)`);
+      }
+    }
+    assert(problems.length === 0, `${path.replace(ROOT + '/', '')} 有 ${problems.length} 处：${[...new Set(problems)].slice(0, 5).join(' | ')}`);
+  }
+});
+
 check('所有 var(--x) 引用都有定义', () => {
   const defined = new Set([...expected.keys(), '--radius-card', '--radius-pill']);
+  // 尺寸阶梯令牌（--font-N / --space-N / --radius-N）
+  for (const path of [TOKENS_CSS, TOKENS_WXSS]) {
+    for (const m of readFileSync(path, 'utf8').matchAll(/(--(?:font|space|radius)-\d+):/g)) { defined.add(m[1]); }
+  }
   // 业务样式里自定义的语义别名也算已定义
   for (const path of [STYLE_CSS, STYLE_WXSS]) {
     const text = readFileSync(path, 'utf8');
@@ -130,9 +166,27 @@ check('小程序与 Web 的语义别名集合一致', () => {
   assert(missingInWxss.length === 0, `小程序缺少 Web 端的别名：${missingInWxss.join(', ')}（两端观感应一致）`);
 });
 
+// 信息性统计：阶梯外的间距字面量（多为"混合值"声明，收敛见 docs/TODO.md T-202）
+function offLadderSpacing() {
+  const text = readFileSync(TOKENS_CSS, 'utf8');
+  const spaces = new Set([...text.matchAll(/--space-(\d+):/g)].map((m) => Number(m[1])));
+  let count = 0;
+  for (const [path, unit] of [[STYLE_CSS, 'px'], [STYLE_WXSS, 'rpx']]) {
+    const body = readFileSync(path, 'utf8');
+    for (const m of body.matchAll(/(?:padding|margin|gap)(?:-[a-z]+)?:\s*([^;{}]+);/g)) {
+      if (m[1].includes('var(')) { continue; }
+      const values = [...m[1].matchAll(/(\d+)(px|rpx)/g)].map((x) => (unit === 'px' ? Number(x[1]) : Number(x[1]) / 2));
+      if (values.some((v) => v !== 0 && !spaces.has(v))) { count += 1; }
+    }
+  }
+  return count;
+}
+
 console.log('');
 if (failures.length === 0) {
-  console.log(`令牌一致性通过 ✔（${expected.size} 个颜色令牌 + 2 个圆角令牌，三端同源）`);
+  const cssText = readFileSync(TOKENS_CSS, 'utf8');
+const count = (prefix) => [...cssText.matchAll(new RegExp(`--${prefix}-\\d+:`,'g'))].length;
+console.log(`令牌一致性通过 ✔（颜色 ${expected.size} + 字号 ${count('font')} + 间距 ${count('space')} + 圆角 ${count('radius') + 2}，三端同源）`);
   process.exit(0);
 }
 console.log(`${failures.length} 项失败：`);
