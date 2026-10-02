@@ -30,8 +30,8 @@
 | 9 | **`packages/core` 不许依赖任何平台 API**（无 DOM、无 `wx.*`、无 ArkTS Kit）。 | 它是 Web / 小程序 / Swift 的共同底座；一旦引入平台依赖，多端共享即失效。 |
 | 10 | **改完必须跑 `npm run check:all`**（9 步：漂移检测 → 导出 → Python 参考实现 → **ArkTS 源码回归** → 核心 37 → 令牌 6 → 跨语言基准 → Web 15 → Apple 46 → 小程序 14）。只要改动不限于单一端，就别只跑单端脚本。 | 五类检查散着跑必漏；`check:all` 是唯一"真源到底"的入口。 |
 | 11 | **改核心后必须重跑导出与打包**：`export_shared.py`（TS/Swift 数据）→ `npm run fixtures`（寻路 + 渲染两份跨语言基准）→ `build_weapp.mjs`（小程序产物）。 | 都是生成物，漏跑会让某一端停留在旧逻辑上且不报错。 |
-| 13 | **对比度受门禁约束**：正文 4.5:1、图形 3:1（WCAG AA）。改主题色后 `check_tokens.mjs` 会逐对核算；要豁免必须写明理由（现有 3 处豁免见脚本内 `allowed` 表）。 | 无障碍不是事后补的，靠人眼估对比度不可靠。 |
 | 12 | **颜色与尺寸只写令牌引用**：用 `var(--app-accent)` / `var(--font-19)` / `var(--space-16)`；SwiftUI 用 `Theme.font(...)`。`node tools/check_tokens.mjs` 会拒绝与令牌同值的硬编码与字号/圆角字面量。 | 三端观感一致靠的是同一份令牌，不是三处手工同步。 |
+| 13 | **对比度受门禁约束**：正文 4.5:1、图形 3:1（WCAG AA）。改主题色后 `check_tokens.mjs` 会逐对核算；要豁免必须写明理由（现有 3 处豁免见脚本内 `allowed` 表）。 | 无障碍不是事后补的，靠人眼估对比度不可靠。 |
 
 ## 3. 快速事实卡
 
@@ -261,5 +261,5 @@ npm run test:weapp             # 9 项冒烟 + 5 项静态契约（绑定/事件
 | v1.7 | 2026-10-02 | DSH Agent | 尺寸阶梯令牌化：13 字号 / 10 间距 / 6 圆角，三端共用（Apple 走 `Metrics`）；检查脚本增至 6 项 |
 | v1.8 | 2026-10-02 | DSH Agent | 两端静态契约检查：小程序 `weapp_static.mjs`（5 项）、Web 类名契约；修复两处未定义样式 |
 | v1.9 | 2026-10-02 | DSH Agent | Web 端补齐 PWA：manifest + 图标 + 带内容指纹的 service worker 与 3 项自检 |
-| v2.1 | 2026-10-02 | DSH Agent | 令牌门禁增加 WCAG AA 对比度核算；新增红线 13 |
 | v2.0 | 2026-10-02 | DSH Agent | 修好 ArkTS 源码回归（`verify_product.mjs` 三级解析 TypeScript）；新增一键门禁 `tools/check_all.sh`（9 步）；红线 10 改为 `check:all` |
+| v2.1 | 2026-10-02 | DSH Agent | 令牌门禁增加 WCAG AA 对比度核算；新增红线 13 |

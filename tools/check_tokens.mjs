@@ -167,10 +167,10 @@ check('无障碍对比度（WCAG 2.1 AA）', () => {
 
   // 已知且已记录的偏差（上游主题色限制，见 docs/TODO.md T-620）；这些只报告不判失败
   const allowed = new Map([
-    ['次要文字/页面底色', '4.42:1，差 2% 未达 AA：上游 sub 色在页面底色上的固有上限'],
-    ['强调文字/浅强调底', '4.00:1：选中态胶囊用强调色文字，同属上游配色限制'],
-    ['类型色 corridor/陆侧洗色', '1.85:1：走廊是结构性底图（浏览列表已过滤 corridor 节点），导航信息由 4.56:1 的路线线承载'],
-    ['类型色 corridor/空侧洗色', '1.82:1：同上'],
+    ['次要文字/页面底色', '差 2% 未达 AA：上游 sub 色在页面底色上的固有上限'],
+    ['强调文字/浅强调底', '选中态胶囊用强调色文字，同属上游配色限制'],
+    ['类型色 corridor/陆侧洗色', '走廊是结构性底图（浏览列表已过滤 corridor 节点），导航信息由 4.56:1 的路线线承载'],
+    ['类型色 corridor/空侧洗色', '同上'],
   ]);
 
   const problems = [];
@@ -178,9 +178,7 @@ check('无障碍对比度（WCAG 2.1 AA）', () => {
   for (const [name, fg, bg, threshold] of pairs) {
     const ratio = contrast(fg, bg);
     if (ratio >= threshold) { continue; }
-    const key = name === '次要文字/卡片' ? '次要文字/卡片' : name;
-    const noteKey = name === '次要文字/页面底色' ? '次要文字/页面底色' : null;
-    if (noteKey !== null && allowed.has(noteKey)) { notes.push(`${noteKey} ${ratio.toFixed(2)}:1（${allowed.get(noteKey)}）`); continue; }
+    if (allowed.has(name)) { notes.push(`${name} ${ratio.toFixed(2)}:1（${allowed.get(name)}）`); continue; }
     problems.push(`${name} ${fg} on ${bg} = ${ratio.toFixed(2)}:1 < ${threshold}`);
   }
   // 选中态胶囊单独核对（颜色对不在上面的表里）
