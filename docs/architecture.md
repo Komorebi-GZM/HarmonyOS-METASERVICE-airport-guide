@@ -644,7 +644,8 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
         │ import（构建期）
         ▼
 ┌──── packages/core/src/generated（生成物，勿手改）────┐
-│ map-data  i18n-data  labels(类型/楼层/NODE_EN)  tokens │
+│ map-data  i18n-data  labels  tokens(颜色/圆角)         │
+│ + tokens.css / tokens.wxss / airport-data.json(tokens) │
 └───────┬─────────────────────────────────────────────┘
         │ tools/export_shared.py（唯一通道）
         ▼
@@ -696,6 +697,7 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 | 加文案 | `Loc.ets` | 同上；共享核心的 `t()` 未命中会回落 key，容易漏翻 |
 | 加配色/类型 | `Theme.ets` 的 `TYPE_COLOR`、`Localization.ets` 的 `TYPE_ZH/EN` | 导出的 `tokens.ts`/`labels.ts` 会一并更新 |
 | 加一个端 | 新建 `apps/<name>/` | 只允许依赖 `packages/core`，禁止反向依赖 |
+| 改主题色/圆角 | `ui/Theme.ets`、`resources/base/element/float.json` | 之后必须 `export_shared.py`（生成三端令牌）+ `npm run test:tokens` |
 | 换渲染方式 | 各端自己的 renderer（如 `apps/web/src/map-view.ts`、将来的 SwiftUI Canvas） | 绘制顺序与用色以 [DESIGN.md](DESIGN.md) 为准 |
 | 加一种语言的移植 | 新建 `apps/<name>/`，读 `packages/core/assets/airport-data.json` | 必须消费第 3 层锚点（基准路线）做逐节点比对，否则"看起来一样"不算数 |
 
@@ -712,3 +714,4 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 | v1.3 | 2026-10-02 | DSH Agent | 13.3.1 拆分 Swift 核心与 SwiftUI 界面两行；Web 端到端更新为 15 项 |
 | v1.4 | 2026-10-02 | DSH Agent | 分层图加入 render/app-model/presenter；新增小程序端对照行与"第 5 层锚点：同一份渲染契约" |
 | v1.5 | 2026-10-02 | DSH Agent | 渲染契约补充 664 条命令基准的锁定方式；各端对照表新增渲染契约行 |
+| v1.6 | 2026-10-02 | DSH Agent | 分层图补充令牌生成物（tokens.css / tokens.wxss / airport-data.json）；扩展点加入改主题色的链路 |

@@ -208,6 +208,56 @@ def export_map():
     return data, digest
 
 
+def css_var_name(group, key):
+    """APP.bg -> --app-bg；APP.accentSoft -> --app-accent-soft；TYPE_COLOR.gate -> --type-gate"""
+    kebab = re.sub(r"(?<!^)(?=[A-Z])", "-", key).replace("_", "-").lower()
+    if group == "TYPE_COLOR":
+        return "--type-" + kebab
+    return "--%s-%s" % (group.lower(), kebab)
+
+
+def export_css_tokens(tokens):
+    """把令牌写成交付给 Web (CSS) 与小程序 (WXSS) 的自定义属性。
+
+    为什么这样做：三端（Web / 小程序 / Apple）都必须用同一份颜色与尺寸，
+    否则改一次主题要改三处、且必然漏。Apple 端读 airport-data.json 里的 tokens，
+    Web/小程序读这里生成的自定义属性 —— 源头都是 Theme.ets / float.json。
+    """
+    lines = [
+        "/* 由 tools/export_shared.py 从 ArkTS 真源生成，请勿手改。",
+        "   真源：harmony_app/entry/src/main/ets/ui/Theme.ets + resources/base/element/float.json",
+        "   重新生成：python3 tools/export_shared.py */",
+        "",
+        ":root {",
+    ]
+    for group in ("APP", "MAP", "ROUTE"):
+        for key, value in tokens[group].items():
+            lines.append("  %s: %s;" % (css_var_name(group, key), value))
+    lines.append("  --hit: %s;" % tokens["HIT"])
+    for key, value in tokens["TYPE_COLOR"].items():
+        lines.append("  %s: %s;" % (css_var_name("TYPE_COLOR", key), value))
+    # 尺寸令牌：真源是 resources/base/element/float.json（card_radius 16vp / pill_radius 999vp）
+    lines.append("  --radius-card: 16px;")
+    lines.append("  --radius-pill: 999px;")
+    lines.append("}")
+    lines.append("")
+    css = "\n".join(lines)
+    wxss = css.replace(":root {", "page {").replace("--radius-card: 16px;", "--radius-card: 32rpx;") \
+        .replace("--radius-pill: 999px;", "--radius-pill: 999rpx;")
+
+    for path, body, source in (
+        (os.path.join(ROOT, "apps", "web", "src", "tokens.css"), css,
+         "harmony_app/entry/src/main/ets/ui/Theme.ets"),
+        (os.path.join(ROOT, "apps", "weapp", "miniprogram", "tokens.wxss"), wxss,
+         "harmony_app/entry/src/main/ets/ui/Theme.ets"),
+    ):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(body)
+        print(f"  写出 {os.path.relpath(path, ROOT)}  ({len(body)} 字节)")
+    return css
+
+
 def export_bundle(data, digest, texts, labels, tokens):
     """给非 TS 消费端（Swift / 小程序 / 其他）产出一份合并 JSON。
 
@@ -245,6 +295,7 @@ def main():
     labels, fallback = export_labels()
     tokens = export_tokens()
     export_bundle(data, digest, texts, labels, tokens)
+    export_css_tokens(tokens)
     n_texts = len(texts)
     n_nodes = len(labels["nodeEn"])
     floors = {}
@@ -257,6 +308,7 @@ def main():
     print("  ✔ 英文名    : %d 条（其中 %d 条回落中文）" % (n_nodes, fallback))
     print("  ✔ 令牌      : APP / MAP / ROUTE / HIT / TYPE_COLOR(15)")
     print("  ✔ 跨语言包  : packages/core/assets + apps/apple/Sources/AirportCore/Resources")
+    print("  ✔ 令牌样式  : apps/web/src/tokens.css + apps/weapp/miniprogram/tokens.wxss")
     print("  ✔ 源 JSON   : sha256:%s" % digest[:16])
     return 0
 

@@ -1,0 +1,140 @@
+#!/usr/bin/env node
+// 设计令牌一致性检查：确保三端用的是同一份颜色/圆角，且 UI 样式里不再写死色值。
+//
+// 规则（对应 docs/DESIGN.md §2.6 的统一方案）：
+//   1. 生成物 apps/web/src/tokens.css 与 apps/weapp/miniprogram/tokens.wxss 必须与真源一致
+//      （真源 = Theme.ets / float.json，经 export_shared.py 导出，这里与 TS 核心的 tokens 对表）
+//   2. styles.css / app.wxss 里**不允许**再出现与令牌同值的硬编码色（只允许显式语义白与提示底色）
+//   3. 所有 var(--x) 引用都必须有定义（防拼错、防删了定义还留着引用）
+//
+// 用法：node tools/check_tokens.mjs
+
+import { readFileSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { AIRPORT } from '../packages/core/src/index.ts';
+
+const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
+const TOKENS_CSS = join(ROOT, 'apps/web/src/tokens.css');
+const TOKENS_WXSS = join(ROOT, 'apps/weapp/miniprogram/tokens.wxss');
+const STYLE_CSS = join(ROOT, 'apps/web/src/styles.css');
+const STYLE_WXSS = join(ROOT, 'apps/weapp/miniprogram/app.wxss');
+
+/** 允许在业务样式里显式写死的语义值（ArkTS 侧同样是硬编码，见 docs/TODO.md T-203） */
+const ALLOWED_LITERALS = new Set(['#FFFFFF', '#FFF2DF']);
+
+const failures = [];
+function check(name, fn) {
+  try {
+    fn();
+    console.log(`  ✔ ${name}`);
+  } catch (err) {
+    failures.push(`${name}: ${err.message}`);
+    console.log(`  ✖ ${name}\n      ${err.message}`);
+  }
+}
+
+function assert(condition, message) {
+  if (!condition) { throw new Error(message); }
+}
+
+function kebab(key) {
+  return key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').replace(/_/g, '-').toLowerCase();
+}
+
+/** 由核心令牌推出"变量名 -> 色值"的期望表 */
+function expectedVars() {
+  const tokens = AIRPORT.tokens;
+  const out = new Map();
+  for (const [group, prefix] of [['APP', 'app'], ['MAP', 'map'], ['ROUTE', 'route']]) {
+    for (const [key, value] of Object.entries(tokens[group])) {
+      out.set(`--${prefix}-${kebab(key)}`, value);
+    }
+  }
+  for (const [key, value] of Object.entries(tokens.TYPE_COLOR)) {
+    out.set(`--type-${kebab(key)}`, value);
+  }
+  out.set('--hit', tokens.HIT);
+  return out;
+}
+
+const expected = expectedVars();
+
+check('生成的令牌文件存在且包含全部颜色令牌', () => {
+  for (const path of [TOKENS_CSS, TOKENS_WXSS]) {
+    assert(existsSync(path), `缺少 ${path.replace(ROOT + '/', '')}，请运行 python3 tools/export_shared.py`);
+    const text = readFileSync(path, 'utf8');
+    const missing = [];
+    for (const [name, value] of expected) {
+      if (!text.includes(`${name}: ${value};`)) { missing.push(`${name}=${value}`); }
+    }
+    assert(missing.length === 0, `${path.replace(ROOT + '/', '')} 缺少/不匹配 ${missing.length} 个令牌：${missing.slice(0, 5).join(', ')}`);
+  }
+});
+
+check('Web 与小程序令牌文件内容一致（仅单位换算不同）', () => {
+  const css = readFileSync(TOKENS_CSS, 'utf8');
+  const wxss = readFileSync(TOKENS_WXSS, 'utf8');
+  const colors = (text) => (text.match(/--[a-z0-9-]+: #[0-9A-Fa-f]{6};/g) ?? []).sort();
+  assert(JSON.stringify(colors(css)) === JSON.stringify(colors(wxss)), '两端颜色令牌集合不一致');
+  assert(css.includes('--radius-card: 16px;') && css.includes('--radius-pill: 999px;'), 'CSS 圆角令牌缺失');
+  assert(wxss.includes('--radius-card: 32rpx;') && wxss.includes('--radius-pill: 999rpx;'), 'WXSS 圆角令牌缺失（1px = 2rpx）');
+  assert(css.includes(':root {') && wxss.includes('page {'), '变量作用域应分别为 :root 与 page');
+});
+
+check('业务样式里没有与令牌同值的硬编码颜色', () => {
+  const tokenValues = new Set([...expected.values()].map((v) => v.toUpperCase()));
+  for (const path of [STYLE_CSS, STYLE_WXSS]) {
+    const text = readFileSync(path, 'utf8');
+    const offenders = [];
+    for (const match of text.matchAll(/#[0-9A-Fa-f]{6}/g)) {
+      const value = match[0].toUpperCase();
+      if (!tokenValues.has(value)) { continue; }
+      if (ALLOWED_LITERALS.has(value) && /--(on-accent|warn-bg)\s*:/.test(text.slice(Math.max(0, match.index - 40), match.index))) {
+        continue; // 语义别名允许显式写死
+      }
+      const line = text.slice(0, match.index).split('\n').length;
+      offenders.push(`${path.replace(ROOT + '/', '')}:${line} ${match[0]}`);
+    }
+    assert(offenders.length === 0, `应改用 var(--token)：${offenders.slice(0, 6).join(' | ')}`);
+  }
+});
+
+check('所有 var(--x) 引用都有定义', () => {
+  const defined = new Set([...expected.keys(), '--radius-card', '--radius-pill']);
+  // 业务样式里自定义的语义别名也算已定义
+  for (const path of [STYLE_CSS, STYLE_WXSS]) {
+    const text = readFileSync(path, 'utf8');
+    for (const match of text.matchAll(/(--[a-z0-9-]+)\s*:/g)) { defined.add(match[1]); }
+  }
+  for (const path of [TOKENS_CSS, TOKENS_WXSS, STYLE_CSS, STYLE_WXSS]) {
+    const text = readFileSync(path, 'utf8');
+    const undefinedRefs = [];
+    for (const match of text.matchAll(/var\((--[a-z0-9-]+)\)/g)) {
+      if (!defined.has(match[1])) { undefinedRefs.push(match[1]); }
+    }
+    assert(undefinedRefs.length === 0, `${path.replace(ROOT + '/', '')} 引用了未定义变量：${[...new Set(undefinedRefs)].join(', ')}`);
+  }
+});
+
+check('小程序与 Web 的语义别名集合一致', () => {
+  const aliases = (path) => {
+    const text = readFileSync(path, 'utf8');
+    const head = text.slice(0, text.indexOf('\n\n\n'));
+    return [...new Set([...head.matchAll(/(--[a-z0-9-]+)\s*:\s*var\(/g)].map((m) => m[1]))].sort();
+  };
+  const web = aliases(STYLE_CSS);
+  const wxss = aliases(STYLE_WXSS);
+  const missingInWxss = web.filter((a) => !wxss.includes(a));
+  assert(missingInWxss.length === 0, `小程序缺少 Web 端的别名：${missingInWxss.join(', ')}（两端观感应一致）`);
+});
+
+console.log('');
+if (failures.length === 0) {
+  console.log(`令牌一致性通过 ✔（${expected.size} 个颜色令牌 + 2 个圆角令牌，三端同源）`);
+  process.exit(0);
+}
+console.log(`${failures.length} 项失败：`);
+for (const f of failures) { console.log(`  - ${f}`); }
+process.exit(1);

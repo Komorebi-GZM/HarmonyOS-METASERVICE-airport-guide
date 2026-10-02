@@ -518,6 +518,8 @@ git remote -v
 | `packages/core/src/generated/**` | 从 ArkTS 真源导出的地图、文案、标签、令牌 | ❌ 生成物，改真源后重跑导出 |
 | `packages/core/test/conformance.test.ts` | 16 项一致性回归 | ✅ 手写 |
 | `apps/web/src/main.ts` | Web 视图层（只渲染 + 转发动作，状态来自核心） | ✅ 手写 |
+| `apps/web/src/tokens.css`、`apps/weapp/miniprogram/tokens.wxss` | 设计令牌（CSS/WXSS 变量） | ❌ 生成物（export_shared.py） |
+| `tools/check_tokens.mjs` | 令牌一致性检查（5 项） | ✅ 手写 |
 | `apps/apple/Sources/AirportCore/**` | Apple 端 Swift 核心移植 | ✅ 手写 |
 | `apps/apple/Sources/AirportUI/**` | Apple 端呈现层（状态机/文案/绘制命令，纯逻辑） | ✅ 手写 |
 | `apps/apple/Sources/AirportGuideApp/**` | SwiftUI 六页 + Canvas 地图（命令流解释器） | ✅ 手写 |
@@ -550,6 +552,7 @@ git remote -v
 | `npm run apple:build` | 编译全部 Apple 目标（含 SwiftUI 应用） | 同上 |
 | `bash tools/apple_test.sh run AirportGuideApp` | 启动 SwiftUI 界面（macOS 14+） | 同上 |
 | `npm run apple:run` | 运行 `airport-cli`，打印 6 条参考样例与四档偏好对比 | 同上 |
+| `npm run test:tokens` | 令牌一致性：生成物与真源一致、两端一致、无同值硬编码、无未定义引用、别名集合一致 | 无（零依赖） |
 | `npm run fixtures` | 重新生成两份跨语言基准：`routes.json`（824 条路线）与 `render.json`（10 场景 / 664 条命令） | 改了寻路/渲染/数据之后必须跑 |
 | `node tools/gen_route_fixture.mjs` | 只生成寻路基准 | 改了寻路之后 |
 | `node tools/gen_render_fixture.mjs` | 只生成渲染基准 | 改了渲染之后 |
@@ -596,3 +599,4 @@ git remote -v
 | v1.3 | 2026-10-02 | DSH Agent | §10 补 Apple 界面目标与 42 项回归；限制说明更新为"未做视觉走查" |
 | v1.4 | 2026-10-02 | DSH Agent | §10 补小程序端目录/命令与"WXML 未渲染"限制 |
 | v1.5 | 2026-10-02 | DSH Agent | §10 补充 `npm run fixtures` 与 Web 视图层说明 |
+| v1.6 | 2026-10-02 | DSH Agent | §10 补充令牌生成物与 `test:tokens` |

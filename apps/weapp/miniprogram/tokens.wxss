@@ -1,0 +1,45 @@
+/* 由 tools/export_shared.py 从 ArkTS 真源生成，请勿手改。
+   真源：harmony_app/entry/src/main/ets/ui/Theme.ets + resources/base/element/float.json
+   重新生成：python3 tools/export_shared.py */
+
+page {
+  --app-bg: #F4F7F9;
+  --app-card: #FFFFFF;
+  --app-card2: #E9F3F2;
+  --app-line: #DFE7EB;
+  --app-text: #172B3A;
+  --app-sub: #657582;
+  --app-accent: #007F7A;
+  --app-accent-soft: #D5EEEB;
+  --app-gold: #B86A12;
+  --app-gtext: #86500E;
+  --map-surface: #F6F8F8;
+  --map-grid: #EEF2F3;
+  --map-ink: #172B3A;
+  --map-ink2: #657582;
+  --map-muted: #A6B6BF;
+  --map-corridor: #FFFFFF;
+  --map-land-wash: #EDF2F4;
+  --map-air-wash: #E5F2F0;
+  --route-color: #007F7A;
+  --route-case: #FFFFFF;
+  --route-trans: #B7DBD7;
+  --hit: #007F7A;
+  --type-entrance: #007F7A;
+  --type-exit: #007F7A;
+  --type-checkin: #486A85;
+  --type-security: #B86A12;
+  --type-gate: #286DAB;
+  --type-lift: #657582;
+  --type-escalator: #657582;
+  --type-stair: #657582;
+  --type-metro: #007F7A;
+  --type-coach: #486A85;
+  --type-parking: #486A85;
+  --type-baggage: #007F7A;
+  --type-toilet: #486A85;
+  --type-hall: #486A85;
+  --type-corridor: #A6B6BF;
+  --radius-card: 32rpx;
+  --radius-pill: 999rpx;
+}

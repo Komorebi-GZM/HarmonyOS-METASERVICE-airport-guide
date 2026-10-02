@@ -28,8 +28,9 @@
 | 7 | 注释用中文，代码标识符用英文；沿用现有文件风格（一个文件一个主题）。 | 与既有 4 千行代码保持一致，避免风格撕裂。 |
 | 8 | **`packages/core/src/generated/**` 是生成物，禁止手改。** 文案改 `Loc.ets`、配色改 `Theme.ets`、地图改 `gen_maps.py`，然后跑 `python3 tools/export_shared.py`。 | 生成链是"ArkTS 真源 → 共享核心"的唯一通道；手改会在下次导出时静默丢失。 |
 | 9 | **`packages/core` 不许依赖任何平台 API**（无 DOM、无 `wx.*`、无 ArkTS Kit）。 | 它是 Web / 小程序 / Swift 的共同底座；一旦引入平台依赖，多端共享即失效。 |
-| 10 | **改完核心必须跑 `npm run test:all`**（核心 37 + Web 15 + Apple 45 + 小程序 9 = 106 项）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"各端没走偏"的手段。 |
+| 10 | **改完核心必须跑 `npm run test:all`**（核心 37 + 令牌 5 + Web 15 + Apple 45 + 小程序 9 = 111 项）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"各端没走偏"的手段。 |
 | 11 | **改核心后必须重跑导出与打包**：`export_shared.py`（TS/Swift 数据）→ `npm run fixtures`（寻路 + 渲染两份跨语言基准）→ `build_weapp.mjs`（小程序产物）。 | 都是生成物，漏跑会让某一端停留在旧逻辑上且不报错。 |
+| 12 | **颜色/圆角只写令牌引用**：样式里用 `var(--app-accent)` 这类变量，不写死色值；`node tools/check_tokens.mjs` 会拒绝与令牌同值的硬编码。 | 三端观感一致靠的是同一份令牌，不是三处手工同步。 |
 
 ## 3. 快速事实卡
 
@@ -60,9 +61,10 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── src/app-model.ts             ← ★ 六页状态机（Web/小程序共用）
 │   ├── src/presenter.ts             ← ★ 文案与列表映射（Web/小程序共用）
 │   ├── src/generated/               ← 【生成物】map-data / i18n-data / labels / tokens
-│   └── test/                        ← 37 项回归：conformance 16 + render 13 + app-model 8（零依赖，Node 直接跑）
+│   └── test/                        ← 37 项回归（conformance 16 + render 13 + app-model 8）
 ├── apps/web/                        ← ★ Web/PWA 客户端（Vite + TS + Canvas 2D）
 │   ├── index.html  vite.config.ts  src/{main,map-view,storage}.ts  src/styles.css
+│   ├── src/tokens.css               ← 【生成物】设计令牌（Theme.ets → CSS 变量）
 │   └── dist/                        ← 构建产物（.gitignore）
 ├── apps/apple/                      ← ★ Apple 端（SwiftPM，Xcode 打开 Package.swift）
 │   ├── Sources/AirportCore/         ← Swift 核心移植 + Resources/airport-data.json（生成物）
@@ -73,7 +75,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   └── Tests/AirportUITests/        ← 27 项回归（文案/绘制命令/状态机/偏好）
 ├── apps/weapp/                      ← ★ 微信小程序端（开发者工具打开 apps/weapp）
 │   ├── project.config.json
-│   └── miniprogram/{app.*, utils/*, pages/*/index.{js,wxml}}
+│   └── miniprogram/{app.*, tokens.wxss(生成物), utils/*, pages/*/index.{js,wxml}}
 ├── harmony_app/                     ← 上游 HarmonyOS ArkTS 原工程（只读参照）
 │   ├── AppScope/  entry/src/main/{ets,resources}/
 ├── data/                            ← 地图数据真源产物（XHA_xinghai_t1.map.json）
@@ -86,6 +88,7 @@ airport-guide/                       ← 工作区根 = 项目根（pnpm workspa
 │   ├── web_smoke.mjs                ← Web 端到端冒烟（15 项断言）
 │   ├── build_weapp.mjs              ← 把核心打包成小程序可 require 的单文件
 │   ├── weapp_smoke.mjs              ← 小程序冒烟（9 项：配置/文案/页面流程/Canvas/包体）
+│   ├── check_tokens.mjs             ← ★ 设计令牌一致性检查（三端同源 + 禁止硬编码）
 │   └── apple_test.sh                ← swift test/run 的沙箱友好包装
 ├── docs/                            ← 8 份工作区文档 + 上游 BUILD/需求/开发文档
 ├── cases/                           ← 案例交付包（只读）
@@ -141,7 +144,7 @@ python3 tools/pathfind_reference.py
 # 改了 ArkTS 真源（Loc.ets / Theme.ets / gen_maps.py）之后必须重新导出，否则多端看到的是旧数据
 python3 tools/export_shared.py
 
-# 共享核心一致性回归：16 项，含 14 042 组全量节点对、500 组×4 偏好、6 条参考样例
+# 共享核心一致性回归：37 项，含 14 042 组全量节点对、500 组×4 偏好、6 条参考样例、13 项渲染、8 项状态机
 npm test
 
 # Web 开发服务器（Mac 本机浏览器直接可用）
@@ -154,6 +157,9 @@ pnpm test:web
 
 # 跨语言基准（改了寻路/渲染/数据后重跑；Swift 与小程序都靠它对齐）
 npm run fixtures
+
+# 设计令牌一致性（三端同源、样式里无硬编码）
+npm run test:tokens
 ```
 
 ### Apple 端（macOS / iOS）
@@ -222,7 +228,7 @@ npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas
 5. **离线校验两极化**：`python3 tools/pathfind_reference.py`（500 组随机起终点）本机实测**通过**；`node tools/verify_product.mjs`（6 套件 / 500 组 × 4 偏好 = 2 000 条路线）在 Windows + DevEco 环境通过，但第 9 行硬编码了 Windows 的 `typescript.js` 绝对路径，**在 macOS 上实测直接报错**；其余流程校验依赖 `hdc` 设备（`verify_flows.py`、`smoke_emulator.py`）。两条离线校验也缺统一入口（"一键回归"），这是本轮工程质量提升的入口。
 6. **API 23 无实测证据**：工程声明兼容 `6.1.0(23)`，但 `docs/reports/ProductExperience-20261001.md:107` 明确"API 23 设备实测尚未进行"，实测集中在 API 24/26。
 7. **`preview/` 是本地生成物**，已在 `.gitignore` 中；不要把它当作可提交资产。
-8. **Web 端目前是"视觉近似"**：六页流程、寻路、双语、异常提示都已对齐，但字号/间距/圆角尚未逐项收敛到 `docs/DESIGN.md` 的令牌（该文件 §11 有落地清单）。
+8. **Web/小程序的视觉仍是"近似"**：颜色与圆角已三端同源（T-201，由 `check_tokens.mjs` 强制），但**字号与间距**尚未逐档映射到 `docs/DESIGN.md` §5/§6 的阶梯（T-202）；排版观感也未做逐屏比对（T-612 / T-614）。
 9. **共享核心的回归是"内部一致 + 参考样例对齐"**：它证明了与 `tools/pathfind_reference.py` 的样例米数一致、割点拆分与全图 Dijkstra 等价，但没有在设备上逐个比对 ArkTS 运行时结果（本机无 DevEco SDK）。
 10. **Apple 端界面已实现但未做真机视觉走查**：核心通过 824 条跨语言逐节点比对（T-606），
     SwiftUI 六页 + Canvas 地图已可编译运行（T-609），呈现层有 27 项测试；但本机无 iOS 模拟器运行时，
@@ -242,3 +248,4 @@ npm run test:weapp             # 9 项冒烟：配置/文案/六页流程/Canvas
 | v1.3 | 2026-10-02 | DSH Agent | Apple 端补齐 SwiftUI 六页 + Canvas 地图与呈现层 27 项回归；修复「修改出发位置」误入目的地页的缺陷（Web 端同步修复并加回归） |
 | v1.4 | 2026-10-02 | DSH Agent | 渲染命令流与状态机/呈现层上提到共享核心；交付微信小程序端（六页 + Canvas 2D，9 项冒烟）；新增红线 11 |
 | v1.5 | 2026-10-02 | DSH Agent | Web 端纯视图化（改用共享 AppModel）；新增渲染命令流的跨语言基准（10 场景 / 664 条命令，Swift 逐条比对通过） |
+| v1.6 | 2026-10-02 | DSH Agent | 设计令牌三端同源：`export_shared.py` 生成 `tokens.css`/`tokens.wxss`，Web 与小程序样式全部改为令牌引用；新增 `check_tokens.mjs` 与红线 12 |

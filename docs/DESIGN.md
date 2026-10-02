@@ -604,8 +604,34 @@
 
 ---
 
+---
+
+## 12. 令牌的落地方式（v1.6 起）
+
+令牌不再只是文档约定，而是**生成物 + 检查脚本**：
+
+| 消费端 | 拿到令牌的方式 | 生成物 |
+|---|---|---|
+| Web (CSS) | `apps/web/src/tokens.css` 的 `:root` 自定义属性 | 由 `tools/export_shared.py` 生成 |
+| 小程序 (WXSS) | `apps/weapp/miniprogram/tokens.wxss` 的 `page` 自定义属性 | 同上（px → rpx 按 1:2） |
+| Apple (SwiftUI) | `airport-data.json` 的 `tokens` 字段，由 `AirportUI/Theme` 读取 | 同上 |
+| ArkTS（上游） | 直接 import `Theme.ets` | 真源 |
+
+真源：`harmony_app/entry/src/main/ets/ui/Theme.ets`（颜色）+ `resources/base/element/float.json`（圆角）。
+
+**约束（由 `node tools/check_tokens.mjs` 强制）**：
+
+1. `tokens.css` / `tokens.wxss` 必须与真源逐项一致（与 TS 核心的 `AIRPORT.tokens` 对表）；
+2. 业务样式（`styles.css` / `app.wxss`）里**不得出现与令牌同值的硬编码色** —— 只允许语义别名里显式写死的
+   `--on-accent: #FFFFFF` 与 `--warn-bg: #FFF2DF`（这两个在 ArkTS 侧同样是硬编码，见 docs/TODO.md T-203）；
+3. 所有 `var(--x)` 引用必须有定义（防拼错、防删定义留引用）；
+4. Web 与小程序暴露的语义别名集合必须一致（两端观感不能靠人自觉）。
+
+仍未收敛的是**字号与间距**（T-202）：两端目前按"视觉近似"给值，尚未逐档映射到 §5/§6 的阶梯。
+
 ## 变更记录
 
 | 版本 | 日期 | 修改人 | 说明 |
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
+| v1.6 | 2026-10-02 | DSH Agent | 新增 §12 令牌落地方式：三端生成物 + check_tokens 5 项强制约束 |
