@@ -623,8 +623,69 @@ flowchart LR
 
 ---
 
+---
+
+## 13. 多端架构（v1.1 新增）
+
+v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**"。这一节说明新的分层与数据流，其余章节描述的原工程结构仍然有效（`harmony_app` 现在是**只读参照实现**）。
+
+### 13.1 新的分层
+
+```
+┌──────────────────────── 客户端壳（各自独立）────────────────────────┐
+│  harmony_app/ (ArkTS)   apps/web/ (TS+Canvas)   apps/weapp/  apps/apple/  │
+└───────┬────────────────────────┬──────────────────────┬─────────────┘
+        │ 原生重写 UI            │ 直接用               │ Swift 移植
+        ▼                        ▼                      ▼
+┌─────────────────── packages/core（平台无关，唯一逻辑真源）───────────────────┐
+│ graph  pathfinder  route-steps  planner  places  categories  i18n  viewport │
+└───────┬────────────────────────────────────────────────────────────────────┘
+        │ import（构建期）
+        ▼
+┌──── packages/core/src/generated（生成物，勿手改）────┐
+│ map-data  i18n-data  labels(类型/楼层/NODE_EN)  tokens │
+└───────┬─────────────────────────────────────────────┘
+        │ tools/export_shared.py（唯一通道）
+        ▼
+┌──────────── ArkTS 真源（上游资产，只读）────────────┐
+│ data/*.map.json ← gen_maps.py    Loc.ets    Theme.ets │
+│                  gen_model.py → AirportMap.ets        │
+└──────────────────────────────────────────────────────┘
+```
+
+### 13.2 与 ArkTS 端的行为差异（有意为之）
+
+| 项 | ArkTS 端 | 共享核心 | 原因 |
+|---|---|---|---|
+| `side`（陆/空侧）与楼层 bbox | 构建期由 `gen_model.py` 算好并编译进 `AirportMap.ets` | **加载期**用同一算法（从首个 entrance BFS、跳过安检）现算 | 让 Web/小程序/Swift 只需要那份 JSON，不必再各养一个代码生成器 |
+| 平行边（同节点对、不同类型） | `_etype` 后写覆盖先写，静默取错类型 | 构造图时**直接抛错** | 静默错误比崩溃更难查；当前数据 0 组此类边 |
+| `apm`（捷运）权重 | 权重表缺项 → 兜底 25m（把 350m 捷运当楼梯） | 补上 350m，并在四档偏好里给中性乘子 1 | 文档与 `gen_maps.py` 都保留了这个类型，属于实现漏项 |
+| Dijkstra 实现 | 朴素 O(V²) + 线性扫描 | **逐行照搬**（含 Map 插入顺序） | 119 节点下性能无差异，但能保证并列最短时选出同一条路 |
+
+### 13.3 一致性怎么保证
+
+三层锚点，缺一不可：
+
+1. **同一份数据**：`tools/export_shared.py` 从 ArkTS 真源导出，生成物带源 JSON 的 sha256。
+2. **同一套断言**：`packages/core/test/conformance.test.ts` 复刻 `tools/pathfind_reference.py` 的 A–E 自测与 `tools/verify_product.mjs` 的状态机/检索断言，并额外锁定 6 条样例路线的**米数与节点数**（与 Python 参考实现逐条一致）。
+3. **同一个入口**：`npm run test:all` 串起核心回归与 Web 端到端；后续小程序与 Apple 端各加一条同样性质的回归即可接入。
+
+### 13.4 扩展点
+
+| 想扩展 | 改哪里 | 注意 |
+|---|---|---|
+| 加/改地点、边 | `tools/gen_maps.py` 的 `XHA` spec | 之后必须 `gen_model.py` → `export_shared.py`，否则多端各看各的 |
+| 加文案 | `Loc.ets` | 同上；共享核心的 `t()` 未命中会回落 key，容易漏翻 |
+| 加配色/类型 | `Theme.ets` 的 `TYPE_COLOR`、`Localization.ets` 的 `TYPE_ZH/EN` | 导出的 `tokens.ts`/`labels.ts` 会一并更新 |
+| 加一个端 | 新建 `apps/<name>/` | 只允许依赖 `packages/core`，禁止反向依赖 |
+| 换渲染方式 | 各端自己的 renderer（如 `apps/web/src/map-view.ts`） | 绘制顺序与用色以 [DESIGN.md](DESIGN.md) 为准 |
+
+---
+
 ## 变更记录
+
 
 | 版本 | 日期 | 修改人 | 说明 |
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
+| v1.1 | 2026-10-02 | DSH Agent | 新增 §13 多端架构：新分层图、与 ArkTS 端的有意行为差异、三层一致性锚点、扩展点 |

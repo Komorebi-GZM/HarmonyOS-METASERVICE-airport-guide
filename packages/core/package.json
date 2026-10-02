@@ -1,0 +1,13 @@
+{
+  "name": "@airport-guide/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "平台无关的机场导航核心：图数据、Dijkstra+安检割点寻路、路线步骤、行程状态、双语、视口",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  }
+}

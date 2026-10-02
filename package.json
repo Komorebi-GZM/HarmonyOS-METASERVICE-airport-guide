@@ -1,0 +1,22 @@
+{
+  "name": "airport-guide",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "星海国际机场室内导航：HarmonyOS 原工程 + 平台无关共享核心 + Web/小程序/iOS 客户端",
+  "packageManager": "pnpm@11.24.0",
+  "scripts": {
+    "export": "python3 tools/export_shared.py",
+    "test": "node --test packages/core/test/conformance.test.ts",
+    "test:core": "node --test packages/core/test/conformance.test.ts",
+    "check": "npm run export && npm run test",
+    "web": "pnpm --filter @airport-guide/web dev",
+    "web:build": "pnpm --filter @airport-guide/web build",
+    "test:web": "node tools/web_smoke.mjs",
+    "test:all": "npm run test && npm run web:build && npm run test:web"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}

@@ -8,11 +8,12 @@
 
 ## 1. 项目一句话
 
-**星海国际机场 XHA（虚构）· 室内导航元服务**：HarmonyOS ArkTS 纯端侧应用，用一张本地节点图完成"选目的地 → 选当前位置 → 规划跨层路线 → 分步指引 → 地铁换乘"，支持中英双语。
+**星海国际机场 XHA（虚构）· 室内导航**：一份平台无关的导航内核（119 节点图 + 跨层最短路径 + 安检必经 + 中英双语），外面套多个客户端壳——HarmonyOS 元服务（上游原工程）、Web/PWA、微信小程序、macOS/iOS。
 
 - 上游仓库：`https://gitcode.com/harmony-practice-center/HarmonyOS-METASERVICE-airport-guide.git`（git remote 名 **`upstream`**）
-- 本工作区：**个人本地 fork 开发环境**，分支 `main`，当前基线 `8350ff4`（7 次提交）。**默认不推送到任何远程**。
+- 本工作区：**个人本地 fork 开发环境**，分支 `main`。原工程基线 `8350ff4`，文档基线 `3a1a5d3`。**默认不推送到任何远程**。
 - 许可：MIT。教学案例，六页流程、119 节点 / 145 边。
+- 多端布局：`harmony_app/`（上游 ArkTS 原工程，**只读参照**）+ `packages/core/`（共享核心，唯一逻辑真源）+ `apps/web/`（Web/PWA，已可用）+ 后续 `apps/weapp/`、`apps/apple/`。
 
 ## 2. 红线（改代码前必须接受）
 
@@ -20,11 +21,14 @@
 |---|---|---|
 | 1 | **`harmony_app/entry/src/main/ets/model/AirportMap.ets` 是生成物，禁止手改。** | 文件头已写明"自动生成，请勿手改"。改它 = 下次跑生成器就丢，且与 `data/*.map.json` 漂移。 |
 | 2 | **地图的真源是 `tools/gen_maps.py`，不是 JSON。** | `gen_maps.py:main()` 会**覆盖写** `data/XHA_xinghai_t1.map.json`。只改 JSON 再跑 `gen_maps.py` 会把你的改动冲掉。 |
-| 3 | **数据变更必须走完整链路**：`gen_maps.py` → `gen_model.py` →（可选）`preview_nodes.py` 校验。 | 漏跑 `gen_model.py` 时，App 仍用旧图，UI 表现与数据不一致但不报错。 |
+| 3 | **数据变更必须走完整链路**：`gen_maps.py` → `gen_model.py` → `export_shared.py`。 | 漏跑任一步，ArkTS 端与共享核心就会各自停留在旧数据上，且不报错。 |
 | 4 | **安检节点必须恰好一个**（当前 `xha_p4_sec`）。 | `gen_model.py` 用 `assert len(secs) == 1` 硬校验；它是陆侧/空侧的**割点**，寻路的"必经安检"等价性依赖它。 |
 | 5 | **保持"纯端侧"**：不引入云端、账号、支付、权限申请、网络请求。 | 这是产品的立身之本（`installationFree: true` 的元服务），加了就不是这个案例了。 |
-| 6 | **不要修改既有交付文档**：`README.md`、`docs/BUILD.md`、`docs/需求文档.md`、`docs/开发文档.md`、`data/README.md`、`docs/reports/**`、`cases/**`、`docs/images/**`。 | 它们是上游交付物与历史证据；本工作区的文档一律新增在 `docs/` 下或根 `AGENTS.md`。 |
-| 7 | 注释用中文，代码标识符用英文；沿用现有文件风格（`file.ets` 内单文件单主题）。 | 与既有 4 千行代码保持一致，避免风格撕裂。 |
+| 6 | **不要修改上游交付物**：`README.md`、`docs/BUILD.md`、`docs/需求文档.md`、`docs/开发文档.md`、`data/README.md`、`docs/reports/**`、`cases/**`、`docs/images/**`、`tools/gen_maps.py` 与 `tools/gen_model.py` 的地图内容。 | 它们是上游交付物与历史证据；移植只在 `packages/`、`apps/` 内新增。 |
+| 7 | 注释用中文，代码标识符用英文；沿用现有文件风格（一个文件一个主题）。 | 与既有 4 千行代码保持一致，避免风格撕裂。 |
+| 8 | **`packages/core/src/generated/**` 是生成物，禁止手改。** 文案改 `Loc.ets`、配色改 `Theme.ets`、地图改 `gen_maps.py`，然后跑 `python3 tools/export_shared.py`。 | 生成链是"ArkTS 真源 → 共享核心"的唯一通道；手改会在下次导出时静默丢失。 |
+| 9 | **`packages/core` 不许依赖任何平台 API**（无 DOM、无 `wx.*`、无 ArkTS Kit）。 | 它是 Web / 小程序 / Swift 的共同底座；一旦引入平台依赖，多端共享即失效。 |
+| 10 | **改完核心必须跑 `npm test`**（16 项一致性回归，含 14 042 组全量节点对与 6 条参考样例）。 | 共享核心是 ArkTS 逻辑的移植，回归是唯一能证明"两边没走偏"的手段。 |
 
 ## 3. 快速事实卡
 
@@ -45,33 +49,28 @@
 ## 4. 目录地图
 
 ```
-airport-guide/                       ← 工作区根 = 项目根
+airport-guide/                       ← 工作区根 = 项目根（pnpm workspace）
 ├── AGENTS.md                        ← 本文件（AI 入口）
-├── README.md                        ← 上游教学案例说明（只读）
-├── data/
-│   ├── README.md                    ← 节点图数据规范（只读）
-│   └── XHA_xinghai_t1.map.json      ← 生成物：119 节点 / 145 边
-├── docs/
-│   ├── BUILD.md                     ← 上游构建手册（只读）
-│   ├── 需求文档.md / 开发文档.md      ← 上游首版需求与开发文档（只读）
-│   ├── project-overview.md          ← 【本工作区新增】项目整体说明
-│   ├── architecture.md              ← 【本工作区新增】架构与数据流
-│   ├── DESIGN.md                    ← 【本工作区新增】设计系统与视觉规约
-│   ├── component-api.md             ← 【本工作区新增】组件与模块 API
-│   ├── development.md               ← 【本工作区新增】开发命令与回归清单
-│   ├── user-guide.md                ← 【本工作区新增】使用者功能说明
-│   ├── TODO.md                      ← 【本工作区新增】任务、优先级与进度
-│   ├── images/ 、reports/            ← 产品截图与体验报告（只读证据）
-├── harmony_app/                     ← HarmonyOS 工程
-│   ├── AppScope/                    ← 应用级配置与图标
-│   └── entry/src/main/
-│       ├── ets/model/               ← 地图模型（AirportMap 生成物）+ 语义层
-│       ├── ets/core/                ← 寻路、状态机、视口、存储、路由常量
-│       ├── ets/ui/                  ← 主题、通用组件、Canvas、地点选择器
-│       ├── ets/pages/               ← Index 宿主 + 5 个 Navigation 子页
-│       └── resources/               ← 字符串/颜色/尺寸、rawfile/icons/*.svg
-├── tools/                           ← 数据生成、参考实现、校验与素材脚本（Python + Node）
-└── cases/                           ← 案例交付包：case.json、practice.html、封面/卡片/分享图
+├── package.json / pnpm-workspace.yaml / .npmrc
+├── packages/core/                   ← ★ 平台无关共享核心（唯一逻辑真源）
+│   ├── src/types.ts graph.ts pathfinder.ts route-steps.ts planner.ts
+│   │        places.ts categories.ts i18n.ts viewport.ts index.ts
+│   ├── src/generated/               ← 【生成物】map-data / i18n-data / labels / tokens
+│   └── test/conformance.test.ts     ← 16 项一致性回归（零依赖，Node 直接跑）
+├── apps/web/                        ← ★ Web/PWA 客户端（Vite + TS + Canvas 2D）
+│   ├── index.html  vite.config.ts  src/{main,map-view,storage}.ts  src/styles.css
+│   └── dist/                        ← 构建产物（.gitignore）
+├── harmony_app/                     ← 上游 HarmonyOS ArkTS 原工程（只读参照）
+│   ├── AppScope/  entry/src/main/{ets,resources}/
+├── data/                            ← 地图数据真源产物（XHA_xinghai_t1.map.json）
+├── tools/                           ← 生成/校验/导出脚本（Python + Node）
+│   ├── gen_maps.py → gen_model.py   ← 地图数据链
+│   ├── export_shared.py             ← ★ 导出到 packages/core/src/generated
+│   ├── pathfind_reference.py        ← 寻路参考实现（500 组自测）
+│   └── web_smoke.mjs                ← Web 端到端冒烟（14 项断言）
+├── docs/                            ← 8 份工作区文档 + 上游 BUILD/需求/开发文档
+├── cases/                           ← 案例交付包（只读）
+└── README.md                        ← 上游教学案例说明（只读）
 ```
 
 ## 5. 代码结构速查（一句话一个文件）
@@ -116,6 +115,24 @@ python3 tools/pathfind_reference.py
 ```
 
 真机/模拟器流程回归脚本需要 `hdc` 设备：`tools/verify_flows.py --target <hdc-id> --out <dir>`、`tools/smoke_emulator.py --target <hdc-id> --out <dir>`。
+
+### 多端（共享核心 + Web）
+
+```bash
+# 改了 ArkTS 真源（Loc.ets / Theme.ets / gen_maps.py）之后必须重新导出，否则多端看到的是旧数据
+python3 tools/export_shared.py
+
+# 共享核心一致性回归：16 项，含 14 042 组全量节点对、500 组×4 偏好、6 条参考样例
+npm test
+
+# Web 开发服务器（Mac 本机浏览器直接可用）
+pnpm install          # 首次
+pnpm web              # -> http://127.0.0.1:5173
+pnpm web:build        # 产出 apps/web/dist（静态托管 / WKWebView 壳可直接用）
+
+# Web 端到端冒烟（跑构建产物，覆盖 首页→目的地→起点→路线→指引→完成→楼层地图）
+pnpm test:web
+```
 
 ## 7. 改动配方（最短路径）
 
@@ -162,6 +179,9 @@ python3 tools/pathfind_reference.py
 5. **离线校验两极化**：`python3 tools/pathfind_reference.py`（500 组随机起终点）本机实测**通过**；`node tools/verify_product.mjs`（6 套件 / 500 组 × 4 偏好 = 2 000 条路线）在 Windows + DevEco 环境通过，但第 9 行硬编码了 Windows 的 `typescript.js` 绝对路径，**在 macOS 上实测直接报错**；其余流程校验依赖 `hdc` 设备（`verify_flows.py`、`smoke_emulator.py`）。两条离线校验也缺统一入口（"一键回归"），这是本轮工程质量提升的入口。
 6. **API 23 无实测证据**：工程声明兼容 `6.1.0(23)`，但 `docs/reports/ProductExperience-20261001.md:107` 明确"API 23 设备实测尚未进行"，实测集中在 API 24/26。
 7. **`preview/` 是本地生成物**，已在 `.gitignore` 中；不要把它当作可提交资产。
+8. **Web 端目前是"视觉近似"**：六页流程、寻路、双语、异常提示都已对齐，但字号/间距/圆角尚未逐项收敛到 `docs/DESIGN.md` 的令牌（该文件 §11 有落地清单）。
+9. **共享核心的回归是"内部一致 + 参考样例对齐"**：它证明了与 `tools/pathfind_reference.py` 的样例米数一致、割点拆分与全图 Dijkstra 等价，但没有在设备上逐个比对 ArkTS 运行时结果（本机无 DevEco SDK）。
+10. **本机缺少 iOS 模拟器运行时与微信开发者工具**：`xcrun simctl list runtimes` 为空（可编译不可运行），`/Applications` 里没有微信开发者工具。iOS/macOS 与小程序端开工前需先补这两项。
 
 ---
 
@@ -170,3 +190,4 @@ python3 tools/pathfind_reference.py
 | 版本 | 日期 | 修改人 | 说明 |
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4；建立 8 份工作区文档的入口与红线 |
+| v1.1 | 2026-10-02 | DSH Agent | 加入多端移植：共享核心 `packages/core`（16 项回归）+ Web/PWA `apps/web`（14 项端到端）；新增红线 8–10 与多端命令 |

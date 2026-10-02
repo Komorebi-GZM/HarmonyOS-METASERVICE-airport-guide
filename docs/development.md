@@ -503,8 +503,59 @@ git remote -v
 
 ---
 
+---
+
+## 10. 多端移植（v1.1 新增：共享核心 + Web）
+
+本仓库在 v1.1 起变成 **pnpm workspace 多端工程**：`harmony_app/` 仍是 ArkTS 真源（只读参照），
+`packages/core/` 是平台无关的共享核心，`apps/*` 是各端客户端。本节只讲"怎么跑"，架构见 [architecture.md](architecture.md) §13。
+
+### 10.1 目录与职责
+
+| 路径 | 职责 | 能否手改 |
+|---|---|---|
+| `packages/core/src/*.ts` | 图/寻路/路线步骤/状态机/检索/双语/视口（11 个模块） | ✅ 手写 |
+| `packages/core/src/generated/**` | 从 ArkTS 真源导出的地图、文案、标签、令牌 | ❌ 生成物，改真源后重跑导出 |
+| `packages/core/test/conformance.test.ts` | 16 项一致性回归 | ✅ 手写 |
+| `apps/web/**` | Web/PWA 客户端（Vite + TS + Canvas 2D） | ✅ 手写 |
+| `tools/export_shared.py` | ArkTS 真源 → 共享核心的导出器 | ✅ 手写 |
+| `tools/web_smoke.mjs` | Web 端到端冒烟（跑构建产物） | ✅ 手写 |
+
+### 10.2 环境
+
+- **Node ≥ 20.11**（`import.meta.dirname`）；本机实测 Node 25.9 可直接运行 `.ts`（原生类型擦除，**核心回归零依赖、无需构建**）。
+- **pnpm ≥ 10**（本机 11.24）。仓库已用 `.npmrc` 把 pnpm 的 store/cache 指到仓库内（`store-dir=.pnpm-store`、`cache-dir=.pnpm-cache`），避免写 `~` 下的目录被沙箱拒绝。
+- **pnpm 11 会拦截依赖构建脚本**：`pnpm-workspace.yaml` 里以 `allowBuilds: { esbuild: true }` 显式放行（vite 依赖 esbuild 的 postinstall）。换机器时若报 `ERR_PNPM_IGNORED_BUILDS`，就是这个开关没生效。
+- 已实测：`pnpm install` 只拉 14 个包；`vite build` 约 0.15 s，产物 62 KB JS（gzip 18 KB）+ 7.6 KB CSS。
+
+### 10.3 命令
+
+| 命令 | 作用 | 前置 |
+|---|---|---|
+| `python3 tools/export_shared.py` | ArkTS 真源 → `packages/core/src/generated/**`；会打印节点/边/文案/英文名统计与源 JSON 的 sha256 | 改过 `Loc.ets`、`Theme.ets`、`gen_maps.py` 之后**必须**跑 |
+| `npm test` | 共享核心一致性回归（16 项） | 无（Node 直接跑 TS） |
+| `pnpm web` | Web 开发服务器 → http://127.0.0.1:5173 | 先 `pnpm install` |
+| `pnpm web:build` | 产出 `apps/web/dist`（静态托管 / WKWebView 壳可直接用） | 同上 |
+| `pnpm test:web` | Web 端到端冒烟：加载 `dist` 产物，在最小 DOM 桩里走完主链路 | 先 `pnpm web:build` |
+| `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 | 同上 |
+
+### 10.4 回归覆盖了什么
+
+- `npm test` 16 项：地图规模/侧别/楼层/包围盒与 ArkTS 生成物逐条对齐；6 条参考样例米数与节点数复现；500 组随机 × 4 偏好的割点等价（拆两段 == 全图 Dijkstra）与 legs/transitions 不变量；**14 042 组全量有序节点对**可达性；状态机不可变性与转移；检索/最近列表；112 条文案双语完整性；视口 fit/钳制/焦点缩放。
+- `pnpm test:web` 14 项：首页渲染 → 目的地分类/搜索过滤 → 出发位置 → 路线预览（米数/中央安检提示/四档偏好）→ Canvas 实际绘制调用 → 切偏好 → 开始指引（步骤计数）→ 逐步确认到完成 → 返回首页 → 本地存储写入 → 中英切换 → 楼层地图切层与选点。
+- **未覆盖**：ArkTS 运行时逐值比对（本机无 DevEco SDK）、真机/模拟器形态、小程序与 Apple 端（尚未开工）。
+
+### 10.5 已知限制
+
+- Web 端为**视觉近似**：流程与逻辑对齐，字号/间距/圆角尚未收敛到 [DESIGN.md](DESIGN.md) 的令牌（T-607）。
+- 共享核心对"平行边"与 `apm` 类型做了**更严格**的处理：前者在加载期直接抛错（ArkTS 端是静默覆盖），后者补上了 350m 权重（ArkTS 端会降级成 25m）。这是有意的差异，已在代码注释与本文件说明。
+
+---
+
 ## 变更记录
+
 
 | 版本 | 日期 | 修改人 | 说明 |
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
+| v1.1 | 2026-10-02 | DSH Agent | 新增 §10 多端移植：目录职责、环境（Node≥20.11 / pnpm≥10 / allowBuilds）、命令表、回归覆盖面与已知限制 |

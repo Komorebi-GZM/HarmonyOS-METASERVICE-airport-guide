@@ -1,0 +1,18 @@
+{
+  "name": "@airport-guide/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "星海机场导航 · Web/PWA 客户端（复用 @airport-guide/core）",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173"
+  },
+  "dependencies": {
+    "@airport-guide/core": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^7.1.0"
+  }
+}

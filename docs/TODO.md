@@ -39,6 +39,8 @@
 | 素材脚本 | `capture_product_screens.py` 与 `gen_brand_assets.py` 需要 **Pillow**（≥9.1，用了 `Image.Resampling.LANCZOS`），仓库无 `requirements.txt`；本机 `import PIL` 失败 | `tools/gen_brand_assets.py:3`、`tools/capture_product_screens.py:9`、2026-10-02 实测 |
 | 图标资源 | 3 个 PNG（`app_icon.png`/`icon.png`/`startIcon.png`）当前提交版本均为 **512×512**（brand_assets 产物），但 `gen_icons.py` 会写 216/108/216——两条生成路径互相覆盖，未约定谁是权威 | 实测尺寸；`tools/gen_icons.py:73`、`tools/gen_brand_assets.py:6` |
 | 设备级校验 | `verify_flows.py` / `smoke_emulator.py` 需 `hdc` 设备；历史结果为 API 24/26 通过 | `docs/reports/ProductExperience-20261001.md:67-83` |
+| 共享核心 | **已抽取并通过回归**：`packages/core`（3 000 余行 TS，含生成数据）；`npm test` 16 项全绿，含 14 042 组全量节点对与 6 条参考样例米数复现 | 2026-10-02 实测 |
+| Web 客户端 | **已可用**：`apps/web`（Vite 7 + TS + Canvas 2D），构建产物 62 KB JS / 7.6 KB CSS；`pnpm test:web` 14 项端到端断言全绿 | 2026-10-02 实测 |
 | 本机工具链 | Python 3.14.7 ✔、Node v25.9.0 ✔；**未安装 DevEco Studio / hdc / hvigorw** ✘ → 本机无法构建 HAP、无法跑设备脚本 | 2026-10-02 `which` 探测 |
 | 平台证据 | 编译用 API 26、声明兼容 API 23、实测 API 24/26；**API 23 未实测** | `docs/reports/ProductExperience-20261001.md:35,107` |
 | 交付物 | 案例包 `cases/`（case.json、practice.html、封面/卡片/分享图、arch-diagram.svg）、产品截图 `docs/images/product-20261001/**`、体验报告 `docs/reports/**` | 目录实况 |
@@ -56,6 +58,7 @@
 | **W2 设计系统** | Theme / 色彩 / 组件规约统一，令牌单一来源 | DESIGN.md |
 | **W3 性能与包体** | 首屏、地图渲染、资源体积可测量、可优化 | architecture.md |
 | **W4 平台兼容** | 明确支持矩阵并逐档验证（API 23/24/26、手机/折叠/宽屏/大字体） | development.md、DESIGN.md |
+| **W6 多端移植** | 一份内核多端壳：Web/PWA（已可用）→ 微信小程序 → macOS/iOS | architecture.md、AGENTS.md |
 
 ---
 
@@ -140,6 +143,21 @@
 | T-018 | 死代码与重复表清理：`Categories.catSymbol`/`matches`/`HOT_DESTINATIONS`、`Localization.floorName`/`floorShort`/`floorOrder`、`Viewport.reset`/`fit`、`Theme.ROUTE`/`HIT`、`AirportMap.XHA_META`/`PX_PER_METER`、`Pathfinder.PREF_*` 均无调用方；`pages/Index.ets:16` 的 `POPULAR`（4 项）与 `Categories.ets:100-107` 的 `HOT_DESTINATIONS`（14 项）语义重复且内容不同 | P3 | — | 上述位置 | 清理或接线 | 无未使用导出；"热门目的地"单一来源 | ☐ |
 | T-019 | 零散卫生问题：`pages/SelectTarget.ets:6`、`pages/SelectStart.ets:6` 声明了未使用的 `@Consume pathStack`；`ui/Common.ets:37` 用 `AppStorage.get('lang')` 形成与 `@StorageLink('lang')` 并行的第二条读路径；`PlannerState.query` 只被清空、从不被写入，`revision` 只增不读；`resources/base/element/float.json` 的 `card_radius`/`pill_radius` 无引用（圆角内联在 `ui/Common.ets:52,82-83`） | P3 | T-201 | 上述位置 | 清理结果 | 无未使用声明/配置项 | ☐ |
 
+### W6 多端移植（Web / 小程序 / Apple）
+
+| ID | 任务 | 优先级 | 依赖 | 证据起点 | 产出物 | 验收口径 | 状态 |
+|---|---|---|---|---|---|---|---|
+| T-601 | **抽取平台无关共享核心**：把 ArkTS 的图/寻路/路线步骤/状态机/检索/双语/视口移植为 TypeScript，且不依赖任何平台 API | P1 | — | `packages/core/src/*.ts` | 11 个核心模块 | 16 项一致性回归全绿（含 14 042 组全量节点对、500 组×4 偏好、6 条参考样例复现） | ☑ 2026-10-02 |
+| T-602 | **建立"ArkTS 真源 → 共享核心"导出链**：地图/文案/标签/令牌统一由一个脚本翻译，避免第二份事实 | P1 | T-601 | `tools/export_shared.py` | 导出脚本 + `src/generated/**` | 跑一次导出后 `npm test` 全绿；改 `Loc.ets`/`Theme.ets` 能反映到 Web | ☑ 2026-10-02 |
+| T-603 | **Web/PWA 客户端**：六页流程 + Canvas 2D 地图渲染 + 手势 + 本地存储 + 中英切换 | P1 | T-601, T-602 | `apps/web/src/**` | `apps/web`（Vite 构建） | `pnpm web` 在浏览器可用；六页流程走通 | ◐ 流程已通，视觉仍为近似 |
+| T-604 | Web 端到端回归：跑构建产物验证主链路与关键分支 | P1 | T-603 | `tools/web_smoke.mjs` | 14 项断言脚本 | `pnpm test:web` 全绿（首页→目的地→起点→预览→指引→完成→楼层地图→双语→本地存储） | ☑ 2026-10-02 |
+| T-605 | **微信小程序端**：WXML/WXSS + Canvas 2D，复用 `packages/core` | P1 | T-603, 决策 D-08 | 待建 `apps/weapp/` | 小程序工程 | 微信开发者工具里六页流程可用；主包体积 ≤ 2 MB | ☐ |
+| T-606 | **macOS/iOS 原生端**：SwiftUI + Swift 移植核心，用同一套 JSON 与断言对齐 | P1 | 决策 D-09 | 待建 `apps/apple/` | Xcode 工程 | macOS 直接运行；iOS 模拟器/真机通过同一套寻路断言 | ☐ |
+| T-607 | Web/小程序的视觉收敛：把 `docs/DESIGN.md` 的令牌与字号阶梯落到实现 | P2 | T-201, T-603 | `apps/web/src/styles.css` | 令牌化样式 | 无裸色值/裸字号；与 DESIGN.md 令牌表一一对应 | ☐ |
+| T-608 | 统一离线回归入口：把 `pathfind_reference.py`、`npm test`、`pnpm test:web` 串成一条命令 | P2 | T-604 | 本文件 §3 W0 | 一键脚本 | 一条命令全绿；任一环失败即非零退出 | ☐ |
+
+决策待拍板见 §5 的 D-08（小程序技术选型）与 D-09（Apple 端实现形态）。
+
 ---
 
 ## 4. 里程碑
@@ -151,6 +169,7 @@
 | **M2 规则统一** | T-201、T-202、T-103 | 设计令牌单一来源；无障碍路径可硬约束 | ☐ |
 | **M3 能力扩展** | T-101、T-102、T-401、T-404、T-402 | 多航站楼可用；平台矩阵逐档验证通过 | ☐ |
 | **M4 收口** | T-301~T-304、T-403、T-405、T-204 | 有包体/性能基线，发布链路可用 | ☐ |
+| **M5 多端可用** | T-601~T-606 | Web/PWA 已可用；小程序与 macOS/iOS 各自能本地运行，且共用同一套回归 | ◐ Web ✔ / 小程序·Apple 未开始 |
 
 ---
 
@@ -164,6 +183,8 @@
 | D-04 | 目标 API 档位 | ①保持 `6.1.0(23)` 但补 API 23 实测 ②提升 target 并重跑全矩阵 | ①：先保证声明与实测一致，再谈升级 | 决定 T-401/T-402 的顺序 |
 | D-05 | 是否向上游提 PR | ①只本地开发 ②文档纠错单独提 PR | ①（当前用户已选本地开发）；纠错先在本文件登记 | 决定 T-004 的落地方式 |
 | D-06 | 双语机制以哪套为准 | ①代码现状为准（`model/Loc.ets` 运行时表），把 `string.json` 冗余键删掉、需求文档口径改掉 ②改为 `$r('app.string.*')` 资源化，重写全部文案引用 | ①：改动量小、不触碰全部页面；②仅在需要系统级多语言/随系统切换时才有收益 | 决定 T-011/T-005 的实现；影响所有文案改动方式 |
+| D-08 | 小程序端技术选型 | ①原生小程序（WXML/WXSS + Canvas 2D，直接引用共享核心产物） ②Taro（React 一套 UI 同时出 H5 与小程序） | ①：本项目是 Canvas 为主的重交互，Taro 的跨端 Canvas 差异反而添乱，包体也更大 | 决定 T-605 的工程形态 |
+| D-09 | Apple 端实现形态 | ①SwiftUI 原生 + Swift 移植核心（同一套 JSON + 断言对齐） ②WKWebView 包壳复用 Web 版 | ①：地图手感与系统集成最好，代价是要维护第二份寻路实现（用共享 JSON 做一致性锚点）；②可先做，用于快速验证 | 决定 T-606 的形态与工作量 |
 | D-07 | 图标产物以谁为权威 | ①`gen_brand_assets.py`（512×512，与当前提交一致）②`gen_icons.py`（216/108/216，纯标准库无需 Pillow）③两者合并为一个脚本 | ①：与已提交产物一致；把 `gen_icons.py` 标注为"仅无 Pillow 时的降级方案"或直接删除 | 决定 T-007；影响应用图标在设备上的清晰度 |
 
 上游《需求文档》§9 的三项历史待确认已由实现拍板，记录备查：端侧数据载体=编译进 ArkTS 模块（`model/AirportMap.ets`）；首页默认停留=总览；寻路默认偏好=最短距离。
@@ -175,6 +196,7 @@
 | 日期 | 变更 | 说明 |
 |---|---|---|
 | 2026-10-02 | 首次创建 | 建立基线快照、四条主线任务池、里程碑与决策清单；基于 `main@8350ff4` 与本机实测（`pathfind_reference.py` 通过、`verify_product.mjs` 与 `gen_checker.py` 因硬编码 Windows 路径 / 占位符被消耗而失败、生成链逐字节可复现） |
+| 2026-10-02 | 多端移植第一步：共享核心 + Web/PWA | 抽出 `packages/core`（零平台依赖，Node 原生跑 TS）与 `tools/export_shared.py` 导出链；`apps/web` 六页流程可用；新增 16 项核心回归 + 14 项 Web 端到端断言；新增 W6 任务段与 D-08/D-09 决策 |
 | 2026-10-02 | 补入 W5 一致性与 W2 设计侧取证 | 汇总五份专项文档撰写过程中在代码里发现的 20 余项事实性问题（令牌零引用、色值漂移、双语双轨、动效缺失、apm 类型降级、状态竞态等），全部带文件位置 |
 
 ---
@@ -184,3 +206,4 @@
 | 版本 | 日期 | 修改人 | 说明 |
 |---|---|---|---|
 | v1.0 | 2026-10-02 | DSH Agent | 首次创建，基于 main@8350ff4 |
+| v1.1 | 2026-10-02 | DSH Agent | 新增 W6 多端移植任务段（T-601~T-608）、D-08/D-09 决策与 M5 里程碑；基线快照补共享核心与 Web 客户端实测 |

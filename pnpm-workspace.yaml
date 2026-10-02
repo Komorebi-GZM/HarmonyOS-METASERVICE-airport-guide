@@ -1,0 +1,8 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+
+# pnpm 11 默认拦截依赖的构建脚本（供应链防护）。
+# vite 依赖 esbuild 的 postinstall，这里显式放行；比交互式 `pnpm approve-builds` 更适合脚本化环境。
+allowBuilds:
+  esbuild: true
