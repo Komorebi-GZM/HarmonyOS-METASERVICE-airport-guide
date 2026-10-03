@@ -49,3 +49,6 @@ apps/*/dist/
 apps/apple/.build/
 apps/apple/.swiftpm/
 apps/apple/.module-cache/
+
+# ===== 测试台（验收轮的证据与台账，本地物，不随仓上传）=====
+.testbench/
