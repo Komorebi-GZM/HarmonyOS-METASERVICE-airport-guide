@@ -221,7 +221,7 @@ npm run test:weapp             # 9 项冒烟 + 5 项静态契约（绑定/事件
 | [docs/development.md](docs/development.md) | 07 | 环境、命令、生成链路、回归清单、Git 工作流 |
 | [docs/component-api.md](docs/component-api.md) | 08 | 每个模块/组件的签名、参数、契约与依赖方向 |
 
-上游既有文档（只读参考）：`README.md`（教学实践路径）、`docs/BUILD.md`（构建手册）、`docs/需求文档.md`、`docs/开发文档.md`、`data/README.md`（图数据规范）、`docs/reports/ProductExperience-20261001.md`（产品体验报告）。
+上游既有文档（只读参考）：`README.md`（教学实践路径）、`docs/original-blog.md`（上游官方原始开发导读 Blog）、`docs/BUILD.md`（构建手册）、`docs/需求文档.md`、`docs/开发文档.md`、`data/README.md`（图数据规范）、`docs/reports/ProductExperience-20261001.md`（产品体验报告）。
 
 ## 9. 工作区与 Git 约定
 
