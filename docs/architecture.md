@@ -486,14 +486,14 @@ stateDiagram-v2
 - **本机实测输出**（2026-10-02 实际运行）：`节点 119（land 63 / air 55 / gate 1）| 阈值安检=xha_p4_sec`，A–E 各 500 通过，另打印 6 条样例路线（如 `出发门→远端登机口 [必经安检] 635 m 10 节点`）。
 - **架构角色**：它是 `Pathfinder.ets` 的**跨语言对照实现**。同一份数据、同一套权重常数在两处独立实现，任一处改动而另一处没跟上（例如改 `PREF_MULT`）会立刻被对照测试暴露。
 
-### 9.3 `tools/verify_product.mjs`：`.ets` 逻辑的离线回归（当前在本机跑不起来）
+### 9.3 `tools/verify_product.mjs`：`.ets` 逻辑的离线回归（已可在本机运行）
 
 - **设计**：不依赖 DevEco 构建——用 TypeScript 的 `transpileModule` 把 `.ets` 即时转成 CommonJS 并在 `vm` 里执行，用一个自制的 `localRequire` 解析 `.ets` 相对导入（`tools/verify_product.mjs:9-25`）。因此它能直接断言真实的 `PlannerState.ets`、`Pathfinder.ets`、`RouteSteps.ets`、`Viewport.ets`、`Places.ets`、`AirportMap.ets`。
 - **验证什么（6 个套件）**：`PlannerState` 转移与不可变性（`37-50`）；`Places` 搜索与最近列表 ≤6/去重（`51-60`）；**500 组随机起终点 × 4 档偏好 = 2000 条路线**的连通性、端点、路径连续性、`viaSecurity === crossSide`（`61-121`）；`RouteSteps` 的异侧往返与 `missing/invalid/same` 三种状态、步骤序列与 `walkingMeters` 逐项对照（`122-136`）；`Viewport` 的 fit/pan 钳制/焦点缩放与 56 留白、以及路线/漫游两种 inset 的边界（`137-165`）；`Loc` 键对称性与页面字面量覆盖（`166-193`）。通过后打印 `PASS 6/6 suites; route cases 2,000; nodes 119; edges 145`（`194`）。
-- **怎么跑（意图）**：`node tools/verify_product.mjs`（`AGENTS.md` §10 亦如此记录）。
-- **⚠ 实测结论：在当前 macOS 工作区无法运行**。第 8 行把 TypeScript 编译器的路径写死成 Windows 绝对路径：
+- **怎么跑**：`node tools/verify_product.mjs`（也被 `tools/check_all.sh` 第 4 步调用）。
+- **现状（原「本机不可运行」断言已过时）**：`verify_product.mjs` 改为**三级解析**——`DEVECO_SDK_HOME` 探测（Windows/macOS 两种 SDK 布局）→ 仓库本地 `typescript` 依赖 → 找不到时给出可读指引；曾硬编码的 Windows 绝对路径为：
   `const tsFile = 'C:/Program Files/Huawei/DevEco Studio/sdk/default/openharmony/ets/build-tools/ets-loader/node_modules/typescript/lib/typescript.js'`
-  Node 会把该字符串当作相对 `cwd` 的路径去解析，于是实际报 `ERR_MODULE_NOT_FOUND: .../airport-guide/C:/Program Files/...`。要让这个"离线回归闸"真正可用，需要把它改成环境变量/自动探测 SDK（属 TODO 项）。
+  旧写法下 Node 会把该字符串当作相对 `cwd` 的路径解析，报 `ERR_MODULE_NOT_FOUND: .../airport-guide/C:/Program Files/...`。该问题已由 `docs/TODO.md` 的 T-001（P0）修复，2026-10-02 起本机实测输出 `PASS 6/6 suites; route cases 2,000; nodes 119; edges 145`。
 
 ### 9.4 设备级 UI 验证：`tools/smoke_emulator.py` 与 `tools/verify_flows.py`
 
@@ -551,7 +551,7 @@ flowchart LR
 | 13 | **文案走自建 `Loc` 表，`string.json` 只做元数据** | 便于 `verify_product.mjs` 静态扫描 `Loc.t('key')` 覆盖并断言双语不缺键 | 两套体系并存，改错地方不生效（`string.json` 有 60+ 个 UI 键其实无人引用） | `model/Loc.ets:2-123`、`resources/base/element/string.json`、`tools/verify_product.mjs:166-193` |
 | 14 | **本地存储只存语言与最近 6 条，且失败静默降级** | 元服务无账号，偏好数据非关键；任何读写失败都不应影响导航 | 保存失败无任何提示；`load()` 未完成前的 `save()` 会被丢弃 | `core/LocalStore.ets:7-28`、`pages/Index.ets:28-32` |
 | 15 | **元服务形态 + 零权限 + 零依赖** | 免安装、即点即用；纯端侧是案例立身之本 | 无法联网获取航班动态、无法定位、无法做云端同步；`bundleType: atomicService` 与 `installationFree` 必须同时成立 | `AppScope/app.json5:4`、`entry/src/main/module.json5:11`、`harmony_app/oh-package.json5:9` |
-| 16 | **验证放在 `tools/` 的外部脚本，而不是工程内单测** | 不强依赖 DevEco 构建（`verify_product.mjs` 自行转译 `.ets`）；Python 参考实现可与 `.ets` 对照 | 无统一入口、无 CI 接线；`verify_product.mjs` 的 SDK 路径写死导致本机不可用 | `tools/verify_product.mjs:8-25`、`tools/pathfind_reference.py`、`tools/smoke_emulator.py` |
+| 16 | **验证放在 `tools/` 的外部脚本，而不是工程内单测** | 不强依赖 DevEco 构建（`verify_product.mjs` 自行转译 `.ets`）；Python 参考实现可与 `.ets` 对照 | 无 CI 接线；本地一键入口是 `tools/check_all.sh`（10 步）。`verify_product.mjs` 原 SDK 路径硬编码已改为三级探测（T-001） | `tools/verify_product.mjs`、`tools/check_all.sh`、`tools/pathfind_reference.py`、`tools/smoke_emulator.py` |
 
 ---
 
@@ -686,7 +686,7 @@ v1.1 起，导航能力从 ArkTS 单一实现变成"**一份内核 + 多个壳**
 |---|---|---|---|---|
 | ArkTS（上游） | `harmony_app/entry/src/main/ets/{model,core}` | `pathfind_reference.py` + 设备脚本（需 hdc） | 编译进 `AirportMap.ets` | 只读参照 |
 | TypeScript | `packages/core/src/*.ts` | `npm test`（16 项） | `src/generated/*.ts` | ✅ |
-| Swift 核心 | `apps/apple/Sources/AirportCore/*.swift` | 核心 15 项（含 824 条逐节点比对） | `Resources/airport-data.json` | ✅ |
+| Swift 核心 | `apps/apple/Sources/AirportCore/*.swift` | 核心 18 项（含 824 条逐节点比对）；另有呈现层 29 项，`npm run test:apple` 合计 47 项 | `Resources/airport-data.json` | ✅ |
 | SwiftUI 界面 | `apps/apple/Sources/{AirportUI,AirportGuideApp}` | 呈现层 27 项（文案/绘制命令/状态机/偏好） | 同 Swift 核心 | ✅ 编译验证 / 视觉走查待做 |
 | Web UI | `apps/web/src/*.ts`（`main.ts` 已纯视图化，状态来自核心） | `pnpm test:web`（15 项端到端） | 同 TS 核心 | ✅ 视觉近似 |
 | 小程序 | `apps/weapp/miniprogram/**`（页面）+ `utils/core.js`（生成物） | `npm run test:weapp`（9 项：配置/文案/六页 Page 生命周期/Canvas/包体） | 同 TS 核心（esbuild → CommonJS） | ✅ 工程与逻辑；WXML 未在开发者工具中渲染过 |

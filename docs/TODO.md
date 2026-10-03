@@ -34,20 +34,20 @@
 | 工程配置 | 元服务 `atomicService`、`installationFree: true`、compatible/target = `6.1.0(23)`、`signingConfigs: []` | `harmony_app/AppScope/app.json5`、`harmony_app/build-profile.json5` |
 | 离线校验 ① | `python3 tools/pathfind_reference.py` **本机实测通过**：119 节点（land 63 / air 55 / gate 1），500 组随机起终点 5 项断言全通过 | 2026-10-02 实测输出 |
 | 离线校验 ② | `node tools/verify_product.mjs` **本机实测通过**：`PASS 6/6 suites; route cases 2,000; nodes 119; edges 145`——它转译并运行的是 **ArkTS 源码本身** | 2026-10-02 实测（修好 T-001 后） |
-| 一键门禁 | `npm run check:all` = `tools/check_all.sh`：9 步，从漂移检测到三端回归 | 2026-10-02 实测全绿 |
+| 一键门禁 | `npm run check:all` = `tools/check_all.sh`：10 步（v2.2 起含 TS strict 类型检查），从漂移检测到三端回归 | 2026-10-02 实测全绿 |
 | 工具链可用性 | `python3 tools/gen_checker.py` **本机实测失败**（`AssertionError: checker.html 缺失注入占位符`，exit 1）；提交版本与 HEAD 版本里占位符均已不存在，取而代之的是已注入的 `window.AIRPORTS = …;` | `tools/gen_checker.py:23`、`tools/checker.html:164`、2026-10-02 实测 |
 | 生成链可复现性 | **本机实测：完全可复现**。`gen_maps.py` + `gen_model.py` 重跑后 `data/XHA_xinghai_t1.map.json` 与 `model/AirportMap.ets` 的 SHA-256 均与提交版本一致（`a61d3d22…` / `191ecc47…`），无漂移 | 2026-10-02 实测：各层节点 4F 55 / 3F 12 / 2F 21 / 1F 11 / B1 14 / B2 6 |
 | 素材脚本 | `capture_product_screens.py` 与 `gen_brand_assets.py` 需要 **Pillow**（≥9.1，用了 `Image.Resampling.LANCZOS`），仓库无 `requirements.txt`；本机 `import PIL` 失败 | `tools/gen_brand_assets.py:3`、`tools/capture_product_screens.py:9`、2026-10-02 实测 |
 | 图标资源 | 3 个 PNG（`app_icon.png`/`icon.png`/`startIcon.png`）当前提交版本均为 **512×512**（brand_assets 产物），但 `gen_icons.py` 会写 216/108/216——两条生成路径互相覆盖，未约定谁是权威 | 实测尺寸；`tools/gen_icons.py:73`、`tools/gen_brand_assets.py:6` |
 | 设备级校验 | `verify_flows.py` / `smoke_emulator.py` 需 `hdc` 设备；历史结果为 API 24/26 通过 | `docs/reports/ProductExperience-20261001.md:67-83` |
-| 共享核心 | **已抽取并通过回归**：`packages/core`（3 000 余行 TS，含生成数据）；`npm test` 16 项全绿，含 14 042 组全量节点对与 6 条参考样例米数复现 | 2026-10-02 实测 |
-| 设计令牌 | **三端同源**：颜色 37 + 字号 13 + 间距 10 + 圆角 6 项，由 `export_shared.py` 生成到 `tokens.css`、`tokens.wxss` 与 `airport-data.json(metrics)`；`tools/check_tokens.mjs` **6 项**检查（含"字号/圆角不得写死""间距不得使用阶梯字面量"） | 2026-10-02 实测 |
+| 共享核心 | **已抽取并通过回归**：`packages/core`（3 000 余行 TS，含生成数据）；`npm test` 38 项全绿（一致性 16 + 渲染命令流 13 + 状态机 9），含 14 042 组全量节点对与 6 条参考样例米数复现 | 2026-10-02 实测 |
+| 设计令牌 | **三端同源**：颜色 37 + 字号 13 + 间距 10 + 圆角 6 项，由 `export_shared.py` 生成到 `tokens.css`、`tokens.wxss` 与 `airport-data.json(metrics)`；`tools/check_tokens.mjs` **7 项**检查（含"字号/圆角不得写死""间距不得使用阶梯字面量"、WCAG AA 对比度逐对核算） | 2026-10-02 实测 |
 | 跨语言渲染基准 | **已建立**：`tools/gen_render_fixture.mjs` 产出 10 个场景 / 664 条命令；Swift 端逐条比对通过（同一份文件也被 TS 端作为契约） | 2026-10-02 实测 |
 | Web PWA | **已可离线安装**：`manifest.webmanifest` + 2 个品牌 SVG 图标 + `dist/sw.js`（预缓存 6 个文件 / 79 KB，缓存名含内容指纹）；`tools/build_web_pwa.mjs` 3 项自检 | 2026-10-02 实测 |
 | 小程序静态契约 | **5 项检查**：数据绑定可由 `present.*` 产出、事件处理函数都在 `Page` 里、每个 `wx:for` 带 `wx:key`、class 都在 `app.wxss` 里、页面登记一致；实测抓出 `.stepFloor` 缺样式（Web 端同类问题 `.step-floor`/`.picker-body` 一并修复） | 2026-10-02 实测 |
 | 小程序端 | **已交付**：`apps/weapp`（六页 WXML + Canvas 2D），核心经 esbuild 打成 95 KB CommonJS 单文件；`npm run test:weapp` 9 项全绿（含用 `wx` 桩跑通六页真实 Page 生命周期与 470 次绘制调用）；主包 136 KB | 2026-10-02 实测 |
 | Apple 端 | **核心 + 界面均已实现**：`apps/apple`（SwiftPM，macOS 14+/iOS 17+）；`npm run test:apple` **42 项**全绿（核心 15 + 呈现 27），824 条路线与 TS 在节点序列/米数/步骤上逐项相等；`AirportGuideApp`（SwiftUI 六页 + Canvas 地图）可编译运行；`airport-cli` 打印与参考实现同口径的样例（635/505/630/445/250/300 米） | 2026-10-02 实测 |
-| Web 客户端 | **已可用**：`apps/web`（Vite 7 + TS + Canvas 2D），构建产物 62 KB JS / 7.6 KB CSS；`pnpm test:web` 14 项端到端断言全绿 | 2026-10-02 实测 |
+| Web 客户端 | **已可用**：`apps/web`（Vite 7 + TS + Canvas 2D），构建产物 62 KB JS / 7.6 KB CSS；`pnpm test:web` 15 项端到端断言全绿（`AGENTS.md` §6 同口径） | 2026-10-02 实测 |
 | 本机工具链 | Python 3.14.7 ✔、Node v25.9.0 ✔；**未安装 DevEco Studio / hdc / hvigorw** ✘ → 本机无法构建 HAP、无法跑设备脚本 | 2026-10-02 `which` 探测 |
 | 平台证据 | 编译用 API 26、声明兼容 API 23、实测 API 24/26；**API 23 未实测** | `docs/reports/ProductExperience-20261001.md:35,107` |
 | 交付物 | 案例包 `cases/`（case.json、practice.html、封面/卡片/分享图、arch-diagram.svg）、产品截图 `docs/images/product-20261001/**`、体验报告 `docs/reports/**` | 目录实况 |
@@ -76,7 +76,7 @@
 | ID | 任务 | 优先级 | 依赖 | 证据起点 | 产出物 | 验收口径 | 状态 |
 |---|---|---|---|---|---|---|---|
 | T-001 | 解除 `verify_product.mjs` 的 SDK 路径硬编码：按 `DEVECO_SDK_HOME` → 仓库本地 `typescript` → 明确报错 三级解析 | **P0** | — | `tools/verify_product.mjs:9` | 修改后的脚本 + 根级 `typescript` devDependency | macОS 上 `node tools/verify_product.mjs` 输出 `PASS 6/6 suites; route cases 2,000; nodes 119; edges 145`；无 SDK 时给出可读指引 | ☑ 2026-10-02 |
-| T-002 | 统一离线回归入口 `tools/check_all.sh`：漂移检测 → 导出 → Python 参考实现 → **ArkTS 源码回归** → 核心 → 令牌 → 基准 → Web → Apple → 小程序，共 9 步 | P1 | T-001 | `tools/check_all.sh`、`npm run check:all` | 一键脚本 | 干净工作区一次全绿；任一步失败即非零退出 | ☑ 2026-10-02 |
+| T-002 | 统一离线回归入口 `tools/check_all.sh`：漂移检测 → 导出 → Python 参考实现 → **ArkTS 源码回归** → 核心 → 令牌 → 基准 → Web → Apple → 小程序，共 10 步（v2.2 加入 TS 类型检查一步） | P1 | T-001 | `tools/check_all.sh`、`npm run check:all` | 一键脚本 | 干净工作区一次全绿；任一步失败即非零退出 | ☑ 2026-10-02 |
 | T-003 | 生成物漂移检测：重跑生成链后 `git diff --quiet -- data/*.json harmony_app/.../AirportMap.ets` | P1 | T-002 | `tools/check_all.sh` 第 1 步 | 脚本内的一步（含 diff 输出） | 手改生成物或漏跑生成器时立即红，并打印差异 | ☑ 2026-10-02 |
 | T-004 | 上游文档事实性纠错清单（本工作区不改上游文件，只在本文件登记，等决定是否提 PR）——已登记 8 类：① 案例仓地址 `HarmonyOS-AtomSer-…` 在 `README.md`、`cases/case.json`、`cases/practice.html` 共 12 处；② `data/README.md` 的"改 JSON 再跑 `gen_maps.py`"与覆盖语义相反；③ `data/README.md:23` `meta.floors` 示例缺 2F/1F；④ `data/README.md:45` 列了数据中不存在的 `apm_station`；⑤ `docs/BUILD.md` §6.2 生成顺序写反（应为 `gen_maps.py` → `gen_model.py`）；⑥ `docs/BUILD.md` §7 行数与工具清单过时（漏 `verify_flows.py` 等 6 个文件）；⑦ `docs/开发文档.md` 的 `compileSdkVersion` 与 `Viewport` 钳制参数与代码不符；⑧ `docs/BUILD.md` §2.1 未提 Pillow 依赖 | P2 | D-05 | 逐条见 `project-overview.md` §10 冲突汇总、`development.md` §3.4 | 纠错条目表 | 每条均有原文位置与正确说法 | ☐ |
 | T-005 | **修复 `gen_checker.py`**：占位符 `/*__AIRPORTS_JSON__*/` 已被上一次注入消耗（提交版本与 HEAD 版本都没有），脚本硬断言导致必然失败。改为替换已有的 `window.AIRPORTS = …;` 或把占位符加回 `checker.html` | **P0** | — | `tools/gen_checker.py:23`、`tools/checker.html:164`、2026-10-02 实测 exit 1 | 修好的脚本 + `checker.html` 可重复注入 | `python3 tools/gen_checker.py` 连续跑两次都 exit 0，且 `checker.html` 打开后含最新节点数据 | ☐ |
@@ -156,10 +156,10 @@
 
 | ID | 任务 | 优先级 | 依赖 | 证据起点 | 产出物 | 验收口径 | 状态 |
 |---|---|---|---|---|---|---|---|
-| T-601 | **抽取平台无关共享核心**：把 ArkTS 的图/寻路/路线步骤/状态机/检索/双语/视口移植为 TypeScript，且不依赖任何平台 API | P1 | — | `packages/core/src/*.ts` | 11 个核心模块 | 16 项一致性回归全绿（含 14 042 组全量节点对、500 组×4 偏好、6 条参考样例复现） | ☑ 2026-10-02 |
+| T-601 | **抽取平台无关共享核心**：把 ArkTS 的图/寻路/路线步骤/状态机/检索/双语/视口移植为 TypeScript，且不依赖任何平台 API | P1 | — | `packages/core/src/*.ts` | 11 个核心模块 | 16 项一致性回归全绿（含 14 042 组全量节点对、500 组×4 偏好、6 条参考样例复现）；该项已随后续里程碑扩至 38 项（见 development.md 回归清单） | ☑ 2026-10-02 |
 | T-602 | **建立"ArkTS 真源 → 共享核心"导出链**：地图/文案/标签/令牌统一由一个脚本翻译，避免第二份事实 | P1 | T-601 | `tools/export_shared.py` | 导出脚本 + `src/generated/**` | 跑一次导出后 `npm test` 全绿；改 `Loc.ets`/`Theme.ets` 能反映到 Web | ☑ 2026-10-02 |
 | T-603 | **Web/PWA 客户端**：六页流程 + Canvas 2D 地图渲染 + 手势 + 本地存储 + 中英切换 | P1 | T-601, T-602 | `apps/web/src/**` | `apps/web`（Vite 构建） | `pnpm web` 在浏览器可用；六页流程走通 | ◐ 流程已通，视觉仍为近似 |
-| T-604 | Web 端到端回归：跑构建产物验证主链路与关键分支 | P1 | T-603 | `tools/web_smoke.mjs` | 14 项断言脚本 | `pnpm test:web` 全绿（首页→目的地→起点→预览→指引→完成→楼层地图→双语→本地存储） | ☑ 2026-10-02 |
+| T-604 | Web 端到端回归：跑构建产物验证主链路与关键分支 | P1 | T-603 | `tools/web_smoke.mjs` | 15 项断言脚本（T-613 纯视图化后仍 15 项） | `pnpm test:web` 全绿（首页→目的地→起点→预览→指引→完成→楼层地图→双语→本地存储） | ☑ 2026-10-02 |
 | T-605 | **微信小程序端**：WXML/WXSS + Canvas 2D，复用 `packages/core`（含绘制命令流） | P1 | T-603, D-08 | `apps/weapp/**`、`tools/build_weapp.mjs` | 小程序工程 + 核心 CJS 打包 | `npm run test:weapp` 9 项全绿（配置/文案/六页真实 Page 生命周期/Canvas 链路/包体）；主包 136 KB | ☑ 2026-10-02 |
 | T-613 | Web 端改用共享 `AppModel`/`Presenter`：消除第二份状态机与文案映射 | P2 | — | `apps/web/src/main.ts`、`apps/web/src/storage.ts` | 重构后的 Web 端（本文件现为纯视图层） | 本文件不再持有状态；15 项端到端全绿 | ☑ 2026-10-02 |
 | T-617 | **小程序静态契约检查**：在无法渲染 WXML 的前提下，用静态分析核对数据绑定 / 事件处理 / `wx:key` / class 是否都有对应实现 | P1 | T-605 | `tools/weapp_static.mjs` | 5 项检查纳入 `npm run test:weapp` | 6 页 / 79 数据键 / 74 样式类全部对得上；实测抓出 `.stepFloor` 未定义样式 | ☑ 2026-10-02 |
@@ -170,7 +170,7 @@
 | T-618 | Web 端同类静态契约：源码里 `class: '...'` 用到的类必须在样式表里有定义 | P2 | — | `tools/web_smoke.mjs` | 1 项检查 | 实测抓出 `.step-floor` / `.picker-body` 未定义并已补齐 | ☑ 2026-10-02 |
 | T-614 | **小程序在微信开发者工具中目视验证**：本机未安装开发者工具，WXML/WXSS 从未真实渲染 | P1 | T-605 | `apps/weapp/miniprogram/**` | 走查记录 + 修正 | 六页在开发者工具里排版正常、与 Web 端观感一致 | ☐ |
 | T-615 | 渲染器跨语言逐命令比对：TS（`render.ts`）与 Swift（`MapRenderer.swift`）两份实现用基准锁死 | P2 | T-609 | `tools/gen_render_fixture.mjs`、`RendererParityTests.swift` | 10 场景 / 664 条命令基准 | `swift test` 逐条相等（含标签底片宽度、缩放阈值、水印位置） | ☑ 2026-10-02 |
-| T-606 | **Apple 端核心移植**：Swift 版图/寻路/步骤/状态机/检索/双语/视口，读同一份导出 JSON | P1 | D-09 | `apps/apple/Sources/AirportCore/**` | SwiftPM 包 `AirportCore` + CLI | `npm run test:apple` 15 项全绿，含 **824 条路线与 TS 逐节点一致**、14 042 组全量节点对与割点等价 | ☑ 2026-10-02 |
+| T-606 | **Apple 端核心移植**：Swift 版图/寻路/步骤/状态机/检索/双语/视口，读同一份导出 JSON | P1 | D-09 | `apps/apple/Sources/AirportCore/**` | SwiftPM 包 `AirportCore` + CLI | `npm run test:apple` 47 项全绿（核心 18 + 呈现 29；本项结项时为 15 项，后续里程碑扩充），含 **824 条路线与 TS 逐节点一致**、14 042 组全量节点对与割点等价 | ☑ 2026-10-02 |
 | T-609 | **Apple 端 UI**：SwiftUI 六页 + Canvas 地图；绘制逻辑抽成「命令流」以便测试 | P1 | T-606 | `apps/apple/Sources/{AirportUI,AirportGuideApp}/**` | 可运行的 App（macOS 14+/iOS 17+） | `swift build` 全部目标通过；呈现层 27 项回归全绿（文案/绘制命令/状态机/偏好） | ☑ 2026-10-02 |
 | T-611 | **缺陷修复：「修改出发位置」误入目的地页**（Apple 端实现时由新测试发现，Web 端同源缺陷） | P1 | — | `apps/apple/Sources/AirportUI/AppModel.swift`、`apps/web/src/main.ts` | 两端修复 + 回归断言 | 修改起点进入出发位置页、选完回到路线页；仅改起点不改写目的地与最近列表 | ☑ 2026-10-02 |
 | T-612 | **Apple 端视觉走查**：在 macOS 与 iOS 模拟器上逐屏核对六页排版（对齐 `docs/DESIGN.md`） | P1 | T-609 | `apps/apple/Sources/AirportGuideApp/**` | 走查记录 + 修正 | 六个页面在 macOS 与 iOS 模拟器上无裁切/错位；与 Web 端观感一致 | ☐ |
@@ -178,16 +178,12 @@
 | T-607 | Web/小程序的视觉收敛：把 `docs/DESIGN.md` 的令牌与字号阶梯落到实现 | P2 | T-201, T-603 | `apps/web/src/styles.css` | 令牌化样式 | 无裸色值/裸字号；与 DESIGN.md 令牌表一一对应 | ☐ |
 | T-608 | 统一离线回归入口：把 `pathfind_reference.py`、`npm test`、`pnpm test:web` 串成一条命令 | P2 | T-604 | 本文件 §3 W0 | 一键脚本 | 一条命令全绿；任一环失败即非零退出 | ☐ |
 
-**目视验证的两条路径**（第 8 轮实测记录）：
+**目视验证的两条路径**：
 
 1. **人工**：`bash tools/apple_test.sh run AirportGuideApp`（macOS 窗口）／微信开发者工具「导入项目」选 `apps/weapp`。
-2. **自动截图（可让 AI 自己做）**：本机装有 Orca.app，其 CLI 在
-   `/Applications/Orca.app/Contents/Resources/bin/orca`（`/usr/local/bin/orca` 软链不可读，无法自解析路径）。
-   第 8 轮尝试 `orca computer permissions --json` 返回 `runtime_unavailable`：
-   > Could not read Orca runtime metadata at ~/Library/Application Support/orca/orca-runtime.json. Start the Orca app first.
+2. **自动截图（AI 可自行完成）**：macOS 上用系统原生 `screencapture` + 无障碍（System Events / AX）驱动窗口即可逐屏取证，无需第三方桌面应用；前提是该进程已获得「屏幕录制」与「辅助功能」两项系统授权（首次会弹系统授权框，需人批准）。
 
-   即：**先启动 Orca 应用**，之后 `orca computer get-app-state --app <bundle-id> --restore-window --json`
-   就能拿到窗口截图，AI 即可自行完成 T-612/T-614 的目视走查。未启动前不擅自拉起桌面应用。
+**当前进度**：macOS 端已按第 2 条完成中英双语实机走查（六页 + 楼层地图，像素截图与 AX 文本逐字回读成对留存）；小程序端与 iOS 端仍依赖第 1 条的人工目视（本机无微信开发者工具、无 iOS 模拟器运行时）。
 
 
 决策待拍板见 §5 的 D-08（小程序技术选型）与 D-09（Apple 端实现形态）。
@@ -199,7 +195,7 @@
 | 里程碑 | 内容 | 完成判据 | 状态 |
 |---|---|---|---|
 | **M0 文档就绪** | 8 份工作区文档（`AGENTS.md` + `docs/` 七份）落地并与代码对齐 | 八份文档可追溯、无编造；`AGENTS.md` 索引齐全 | ☑ 2026-10-02 |
-| **M1 回归可跑** | T-001 → T-002 → T-003 → T-406 | 一条命令（`npm run check:all`）跑完 9 步离线回归并检出漂移 | ☑ 2026-10-02 |
+| **M1 回归可跑** | T-001 → T-002 → T-003 → T-406 | 一条命令（`npm run check:all`）跑完 10 步离线回归并检出漂移 | ☑ 2026-10-02 |
 | **M2 规则统一** | T-201、T-202、T-103 | 设计令牌单一来源；无障碍路径可硬约束 | ☐ |
 | **M3 能力扩展** | T-101、T-102、T-401、T-404、T-402 | 多航站楼可用；平台矩阵逐档验证通过 | ☐ |
 | **M4 收口** | T-301~T-304、T-403、T-405、T-204 | 有包体/性能基线，发布链路可用 | ☐ |
@@ -261,3 +257,4 @@
 | v2.0 | 2026-10-02 | DSH Agent | T-001/T-002/T-003 结项：修好 ArkTS 源码验证 + 一键门禁 `check_all.sh`（9 步）；M1 完成 |
 | v2.1 | 2026-10-02 | DSH Agent | T-620：令牌门禁增加 WCAG 2.1 AA 对比度核算（第 7 项），记录 3 处已豁免偏差 |
 | v2.2 | 2026-10-02 | DSH Agent | T-621 类型检查门禁（首次即抓出 4 个问题）；T-622 修复两端「我在这里」不写起点；门禁扩至 10 步 |
+| v2.3 | 2026-10-03 | DSH Agent | 文档口径对齐实测值：`check_all.sh` 步骤标题改为 38 / 7 / 47（原写 37 / 6 / 46）；`docs/TODO.md`、`docs/architecture.md`、`docs/development.md` 中「门禁 9 步」「`npm test` 16 项」「令牌 6 项」「Apple 46 项」「`verify_product.mjs` 本机跑不起来」等旧断言改为当前实测口径（T-001 已修好 SDK 路径三级解析）；目视验证段落删除本机私有工具链叙述，改为「人工目视 + macOS 原生 `screencapture`/无障碍驱动」两条通用路径 |

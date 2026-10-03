@@ -38,10 +38,10 @@ step "5/10 TypeScript 类型检查（核心 + Web，strict）"
 npx tsc --noEmit -p tsconfig.json | sed 's/^/   /'
 ok "类型检查通过（0 error）"
 
-step "6/10 共享核心回归（37 项：全量节点对 / 割点等价 / 渲染 / 状态机）"
+step "6/10 共享核心回归（38 项：全量节点对 / 割点等价 / 渲染 / 状态机）"
 npm test 2>&1 | grep -E "^ℹ (tests|pass|fail)" | sed 's/^/   /'
 
-step "7/10 设计令牌一致性（6 项：三端同源 + 禁止硬编码）"
+step "7/10 设计令牌一致性（7 项：三端同源 + 禁止硬编码）"
 npm run test:tokens 2>&1 | tail -4 | sed 's/^/   /'
 
 step "8/10 跨语言基准（824 条路线 + 664 条绘制命令）"
@@ -51,7 +51,7 @@ step "9/10 Web：构建 + PWA 自检 + 端到端冒烟"
 npm run web:build 2>&1 | tail -4 | sed 's/^/   /'
 npm run test:web 2>&1 | tail -3 | sed 's/^/   /'
 
-step "10/10 Apple（46 项）与微信小程序（9 项冒烟 + 5 项静态契约）"
+step "10/10 Apple（47 项）与微信小程序（9 项冒烟 + 5 项静态契约）"
 npm run test:apple 2>&1 | grep -E "Executed [0-9]+ tests, with" | tail -1 | sed 's/^/   /'
 npm run test:weapp 2>&1 | tail -3 | sed 's/^/   /'
 

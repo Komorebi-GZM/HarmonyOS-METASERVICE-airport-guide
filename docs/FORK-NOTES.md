@@ -72,7 +72,7 @@ UI 文案在 `model/Loc.ets` 的 `TEXTS`（`{key, zh, en}`）而**不在** `reso
 1. `tools/verify_product.mjs`（+28 / −2）：删掉第 8-9 行硬编码的 `C:/Program Files/Huawei/DevEco Studio/...typescript.js`，改为 `DEVECO_SDK_HOME` 探测（Windows/macOS 两种布局）→ 仓库本地 `typescript` 依赖 → 找不到时给出明确指引。**这是上游手写脚本，请上游确认改法是否符合你们的 SDK 环境约定。**
 2. `.gitignore`：忽略多端构建产物（`node_modules/`、`.pnpm-store/`、`dist/`、`apps/*/dist/`、`.build/`、`apps/apple/.swiftpm/` 等）与本地测试台 `.testbench/`。
 
-注：`docs/TODO.md`、`docs/architecture.md`、`docs/development.md` 中存在与本 fork 代码不同步的旧断言（例如仍写「门禁 9 步」「`npm test` 16 项」「`verify_product.mjs` 硬编码 Windows 路径不可运行」）。这些是本 fork 自有文档，修订尚未落盘，评审时以 `tools/check_all.sh` 与 `npm run check:all` 的实际输出为准。
+注：`docs/TODO.md`、`docs/architecture.md`、`docs/development.md` 中曾存在与本 fork 代码不同步的旧断言（「门禁 9 步」「`npm test` 16 项」「令牌 6 项」「Apple 46 项」「`verify_product.mjs` 硬编码 Windows 路径不可运行」）。**本 fork 自有文档，已在本地批次修订对齐**（口径以 `tools/check_all.sh` 与 `npm run check:all` 的实际输出为准：10 步 / 核心 38 / 令牌 7 / Apple 47 / 小程序 14）。修订只改口径数字与过时断言，未改动任何算法、数据或验收结论。
 
 ## 7. 许可
 

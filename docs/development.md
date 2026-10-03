@@ -114,7 +114,7 @@ cat "$DEVECO_SDK_HOME/default/openharmony/ets/oh-uni-package.json" | grep apiVer
 | 5 | `python3 tools/gen_icons.py` | 纯标准库（`struct`+`zlib`）画图标 | 无 | **覆盖** `AppScope/.../app_icon.png`(216×216)、`entry/.../icon.png`(108×108)、`entry/.../startIcon.png`(216×216) | 实测 OK。⚠️ 与 #6 写**同一组 3 个文件**，会把 512×512 降级成 216/108 |
 | 6 | `python3 tools/gen_brand_assets.py` | Pillow 画 512×512 品牌图标 | `pip install Pillow` | **覆盖**与 #5 相同的 3 个文件（512×512） | 本机缺 Pillow → `ModuleNotFoundError`，exit 1。当前提交的 3 个 PNG **均为 512×512**，即本脚本产物 |
 | 7 | `python3 tools/pathfind_reference.py` | 寻路参考实现：500 组随机起终点 + 6 条样例路线，断言「异侧必经安检」等 5 项 | 无（无任何参数） | 仅 stdout（不写文件） | 实测 **0.34s**，exit 0。输出 `A reachable 500 / B cross==full 270 / C same no-sec 230 / D legs/trans 500 / E edges 500` |
-| 8 | `node tools/verify_product.mjs` | ArkTS 核心逻辑离线回归（6 套件；2000 条路线；RouteSteps / PlannerState / 搜索 / Viewport / `Loc` 键对称） | 需要 **DevEco SDK 内的 `typescript.js`**；该路径在源码里**硬编码为 Windows 路径** | 仅 stdout（成功时 `PASS 6/6 suites; …`） | 本机实测 **exit 1**：`ERR_MODULE_NOT_FOUND .../C:/Program Files/Huawei/DevEco Studio/...`（`tools/verify_product.mjs:9`）。见 §9 |
+| 8 | `node tools/verify_product.mjs` | ArkTS 核心逻辑离线回归（6 套件；2000 条路线；RouteSteps / PlannerState / 搜索 / Viewport / `Loc` 键对称） | 需要 `typescript.js`：按 `DEVECO_SDK_HOME` → 仓库本地 `typescript` 依赖 → 明确报错 三级解析（原硬编码 Windows 路径已修复，T-001） | 仅 stdout（成功时 `PASS 6/6 suites; …`） | 本机实测通过：`PASS 6/6 suites; route cases 2,000; nodes 119; edges 145`。见 §9 |
 
 ### 3.2 设备相关（需要 `hdc` + 已启动的模拟器/真机）
 
@@ -293,7 +293,7 @@ f27cdf5 doc: 文档修复           ← 前缀用 doc 而非 docs
 - [ ] `python3 tools/gen_maps.py` → 打印 `节点 N | 边 M (walk … / 垂直+捷运 …)`，各层计数合理
 - [ ] `python3 tools/gen_model.py` → 打印 `节点 N（land … / air … / gate 1）| 边 M`，**无** `⚠ 缺英译名称`
 - [ ] `python3 tools/pathfind_reference.py` → `自测通过 ✔`，5 项计数满（A/D/E 各 500）
-- [ ] `node tools/verify_product.mjs` → `PASS 6/6 suites; route cases 2,000; …`（⚠️ 本机当前跑不了，见 §9）
+- [ ] `node tools/verify_product.mjs` → `PASS 6/6 suites; route cases 2,000; …`（本机实测通过）
 - [ ] 若改了 `Loc.ets` / `string.json`：中英键数一致
 
 **设备可自动（需 `hdc` + 已装 HAP）**
@@ -477,7 +477,7 @@ git remote -v
 | `python3 tools/gen_checker.py` → `AssertionError: checker.html 缺失注入占位符` | 已实测；`grep -c '__AIRPORTS_JSON__' tools/checker.html` = **0**，连 `git show HEAD:tools/checker.html` 也是 0（上一次注入已被提交） | 需把占位符 `/*__AIRPORTS_JSON__*/` **重新加回** `tools/checker.html`（或改 `gen_checker.py` 让它替换已有的 `window.AIRPORTS = …;`）。`git checkout` 无法修复，因为提交版本本身就没有 token |
 | `python3 tools/gen_brand_assets.py` → `ModuleNotFoundError: No module named 'PIL'` | 已实测；本机 `python3 -c "import PIL"` 同样失败 | `python3 -m pip install Pillow`（≥ 9.1） |
 | `python3 tools/gen_brand_assets.py` 生成的图标被降级 | `gen_icons.py` 与 `gen_brand_assets.py` 写**同一组 3 个文件**；实测跑 `gen_icons.py` 后变成 216/108/216 | 明确顺序：要品牌图标就跑 `gen_brand_assets.py`；**不要**在同一轮里再跑 `gen_icons.py` |
-| `node tools/verify_product.mjs` → `ERR_MODULE_NOT_FOUND .../C:/Program Files/Huawei/...` | 已实测 exit 1；`verify_product.mjs:9` 硬编码 Windows 路径 | 需把 `tsFile` 改成按平台/`DEVECO_SDK_HOME` 推导（本机可指向 `/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/ets/build-tools/ets-loader/node_modules/typescript/lib/typescript.js`）。**在 DevEco 环境实测确认前，不要断言本机可跑** |
+| `node tools/verify_product.mjs` → `ERR_MODULE_NOT_FOUND .../C:/Program Files/Huawei/...` | 旧版本的 `verify_product.mjs:9` 曾硬编码 Windows 路径；该写法已按 T-001 改为三级解析（`DEVECO_SDK_HOME` → 仓库本地 `typescript` → 明确报错） | 若在装有 DevEco 的机器上仍报此错，先 export `DEVECO_SDK_HOME=/Applications/DevEco-Studio.app/Contents/sdk`；无 DevEco 时走仓库本地 `typescript` 依赖即可 |
 | `verify_flows.py` / `smoke_emulator.py` 立刻失败 | 需要 `hdc`；本机 `which hdc` 无输出 | 把 `<SDK>/default/openharmony/toolchains` 加进 `PATH`；先 `hdc list targets` 确认设备 |
 | `verify_flows.py` 报「机场地图源数据或楼层边界读取失败」/「FloorCanvas fitInsets 源码配置不可解析」 | 它用**正则**解析 `AirportMap.ets` 的 `FLOOR_BBOX.set(...)`/`NODE_EN.set(...)` 与 `FloorCanvas.ets` 的 `fitInsets(...)` 调用（`verify_flows.py:93-104`） | 改动 `gen_model.py` 的输出语法或 `FloorCanvas.ets` 的 `fitInsets` 调用形式时，必须同步更新该脚本的正则 |
 
@@ -546,7 +546,7 @@ git remote -v
 | 命令 | 作用 | 前置 |
 |---|---|---|
 | `python3 tools/export_shared.py` | ArkTS 真源 → `packages/core/src/generated/**`；会打印节点/边/文案/英文名统计与源 JSON 的 sha256 | 改过 `Loc.ets`、`Theme.ets`、`gen_maps.py` 之后**必须**跑 |
-| `npm test` | 共享核心一致性回归（16 项） | 无（Node 直接跑 TS） |
+| `npm test` | 共享核心回归（38 项：一致性 16 + 渲染命令流 13 + 状态机 9） | 无（Node 直接跑 TS） |
 | `pnpm web` | Web 开发服务器 → http://127.0.0.1:5173 | 先 `pnpm install` |
 | `pnpm web:build` | 产出 `apps/web/dist`：vite 构建 + `build_web_pwa.mjs` 生成 `sw.js`（可离线安装） | 同上 |
 | `npm run test:pwa` | PWA 自检（3 项：预缓存完整、manifest 引用、体积上限） | 先构建 |
@@ -556,21 +556,21 @@ git remote -v
 | `bash tools/apple_test.sh run AirportGuideApp` | 启动 SwiftUI 界面（macOS 14+） | 同上 |
 | `npm run apple:run` | 运行 `airport-cli`，打印 6 条参考样例与四档偏好对比 | 同上 |
 | `npm run typecheck` | TS strict 类型检查（核心 + Web）。**`vite build` 不做类型检查**，改 TS 后必须单独跑 | 无 |
-| `npm run test:tokens` | 令牌一致性（6 项）：生成物与真源一致、两端一致、无同值硬编码、字号/圆角无字面量、间距不用阶梯字面量、无未定义引用、别名集合一致 | 无（零依赖） |
+| `npm run test:tokens` | 令牌一致性（7 项，含 WCAG AA 对比度逐对核算）：生成物与真源一致、两端一致、无同值硬编码、字号/圆角无字面量、间距不用阶梯字面量、无未定义引用、别名集合一致 | 无（零依赖） |
 | `npm run fixtures` | 重新生成两份跨语言基准：`routes.json`（824 条路线）与 `render.json`（10 场景 / 664 条命令） | 改了寻路/渲染/数据之后必须跑 |
 | `node tools/gen_route_fixture.mjs` | 只生成寻路基准 | 改了寻路之后 |
 | `node tools/gen_render_fixture.mjs` | 只生成渲染基准 | 改了渲染之后 |
 | `node tools/build_weapp.mjs` | 把共享核心打成小程序可 require 的 CommonJS 单文件（95 KB） | 改了核心之后必须跑 |
 | `npm run test:weapp` | 小程序冒烟（9 项）+ 静态契约（5 项：绑定/事件/wx:key/样式类/页面登记） | 同上 |
 | `npm run check:weapp` | 只跑小程序静态契约（改 WXML/WXSS 时快速反馈） | 同上 |
-| `npm run check:all` | **一键门禁**：9 步（漂移检测 → 导出 → Python 参考实现 → ArkTS 源码回归 → 核心 → 令牌 → 基准 → Web → Apple → 小程序） | 提交前 |
+| `npm run check:all` | **一键门禁**：10 步（漂移检测 → 导出 → Python 参考实现 → ArkTS 源码回归 → TS strict 类型检查 → 核心 → 令牌 → 基准 → Web → Apple+小程序） | 提交前 |
 | `npm run verify:arkts` | 只跑 ArkTS 源码回归（需 `typescript`，已加入根 devDependencies） | 无 |
 | `npm run test:all` | 核心回归 + Web 构建 + Web 端到端 + Apple 端回归 | 同上 |
 
 ### 10.4 回归覆盖了什么
 
-- `npm test` 16 项：地图规模/侧别/楼层/包围盒与 ArkTS 生成物逐条对齐；6 条参考样例米数与节点数复现；500 组随机 × 4 偏好的割点等价（拆两段 == 全图 Dijkstra）与 legs/transitions 不变量；**14 042 组全量有序节点对**可达性；状态机不可变性与转移；检索/最近列表；112 条文案双语完整性；视口 fit/钳制/焦点缩放。
-- `pnpm test:web` 14 项：首页渲染 → 目的地分类/搜索过滤 → 出发位置 → 路线预览（米数/中央安检提示/四档偏好）→ Canvas 实际绘制调用 → 切偏好 → 开始指引（步骤计数）→ 逐步确认到完成 → 返回首页 → 本地存储写入 → 中英切换 → 楼层地图切层与选点。
+- `npm test` 共 38 项，其中一致性回归 16 项：地图规模/侧别/楼层/包围盒与 ArkTS 生成物逐条对齐；6 条参考样例米数与节点数复现；500 组随机 × 4 偏好的割点等价（拆两段 == 全图 Dijkstra）与 legs/transitions 不变量；**14 042 组全量有序节点对**可达性；状态机不可变性与转移；检索/最近列表；112 条文案双语完整性；视口 fit/钳制/焦点缩放。
+- `pnpm test:web` 15 项：首页渲染 → 目的地分类/搜索过滤 → 出发位置 → 路线预览（米数/中央安检提示/四档偏好）→ Canvas 实际绘制调用 → 切偏好 → 开始指引（步骤计数）→ 逐步确认到完成 → 返回首页 → 本地存储写入 → 中英切换 → 楼层地图切层与选点。
 - **未覆盖**：ArkTS 运行时逐值比对（本机无 DevEco SDK）、真机/模拟器形态、小程序与 Apple 端（尚未开工）。
 
 ### 10.5 Apple 端的环境坑（实测）
