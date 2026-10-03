@@ -11,7 +11,7 @@
 **星海国际机场 XHA（虚构）· 室内导航**：一份平台无关的导航内核（119 节点图 + 跨层最短路径 + 安检必经 + 中英双语），外面套多个客户端壳——HarmonyOS 元服务（上游原工程）、Web/PWA、微信小程序、macOS/iOS。
 
 - 上游仓库：`https://gitcode.com/harmony-practice-center/HarmonyOS-METASERVICE-airport-guide.git`（git remote 名 **`upstream`**）
-- 本工作区：**个人本地 fork 开发环境**，分支 `main`。原工程基线 `8350ff4`，文档基线 `3a1a5d3`。**默认不推送到任何远程**。
+- 本工作区：**个人本地 fork 开发环境**，当前工作分支 `feat/multiplatform-port`（`main` 停在同步点）。原工程基线 `8350ff4`，文档基线 `3a1a5d3`。**推送只在用户明确同意后执行**（见 §9）。
 - 许可：MIT。教学案例，六页流程、119 节点 / 145 边。
 - 多端布局：`harmony_app/`（上游 ArkTS 原工程，**只读参照**）+ `packages/core/`（共享核心，唯一逻辑真源）+ `apps/web/`（Web/PWA，已可用）+ `apps/apple/`（Swift 核心 + SwiftUI 六页界面，核心已通过跨语言比对）+ `apps/weapp/`（微信小程序，复用同一份核心）。
 
@@ -225,9 +225,9 @@ npm run test:weapp             # 9 项冒烟 + 5 项静态契约（绑定/事件
 
 ## 9. 工作区与 Git 约定
 
-- 本地 fork 工作区，**只有 `upstream` 一个 remote**；`main` 跟踪 `upstream/main`。
+- 本地 fork 工作区，两个 remote：`upstream`（gitcode 原仓，只 fetch / rebase，本 fork 不向其推送）与 `myfork`（GitHub 公开 fork `https://github.com/Komorebi-GZM/HarmonyOS-METASERVICE-airport-guide`，默认分支 `feat/multiplatform-port`）；`main` 跟踪 `upstream/main`。
 - 同步上游：`git fetch upstream && git rebase upstream/main`（本地提交请分支化，例如 `feat/xxx`）。
-- 将来若要推自己的 fork：`git remote add myfork <你的仓库地址>` 再 `git push -u myfork <分支>`。**未经用户明确同意，不要执行任何 push / force / 远端改写。**
+- 推自己的 fork：`myfork` 已建好，`git push myfork <分支>` 即可。**未经用户明确同意，不要执行任何 push / force / 远端改写**（这条不因远端已存在而放松）。
 - 提交信息沿用现有风格：`feat: ...` / `docs: ...` / `fix: ...`（中文描述，见 `git log --oneline`）。
 
 ## 10. 已知问题与待确认
